@@ -12,6 +12,6 @@
     "declarationMap": true,
     "skipLibCheck": false
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+  "include": ["src/index.ts"],
   "exclude": ["node_modules"]
 }

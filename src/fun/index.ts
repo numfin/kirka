@@ -1,3 +1,5 @@
-export function call() {
-  console.log("not implemented");
+export namespace Fun {
+  export function call() {
+    console.log("not implemented");
+  }
 }
