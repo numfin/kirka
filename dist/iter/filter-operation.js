@@ -1,4 +1,4 @@
-import { just, none } from "../maybe";
+import { M } from "../maybe";
 import { IntermidiateOperation } from "./intermediate-operation";
 export class FilterOperation extends IntermidiateOperation {
     predicate;
@@ -9,9 +9,9 @@ export class FilterOperation extends IntermidiateOperation {
     execute(value) {
         const result = this.predicate(value, () => this.terminate());
         if (this.terminated) {
-            return none();
+            return M.none();
         }
-        return result ? just(value) : none();
+        return result ? M.just(value) : M.none();
     }
 }
 //# sourceMappingURL=filter-operation.js.map

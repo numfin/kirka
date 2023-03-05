@@ -1,4 +1,4 @@
-import { just } from "../maybe";
+import { M } from "../maybe";
 import { IntermidiateOperation } from "./intermediate-operation";
 export class MapOperation extends IntermidiateOperation {
     fn;
@@ -7,7 +7,7 @@ export class MapOperation extends IntermidiateOperation {
         this.fn = fn;
     }
     execute(value) {
-        return just(this.fn(value, () => this.terminate()));
+        return M.just(this.fn(value, () => this.terminate()));
     }
 }
 //# sourceMappingURL=map-operation.js.map

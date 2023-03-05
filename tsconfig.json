@@ -9,8 +9,9 @@
     "moduleResolution": "Node",
     "outDir": "./dist",
     "sourceMap": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "skipLibCheck": false
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["node_modules"]
 }
