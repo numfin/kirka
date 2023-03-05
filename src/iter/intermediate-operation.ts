@@ -1,4 +1,4 @@
-import type { Maybe } from "../maybe";
+import { M } from "../maybe";
 
 export abstract class IntermidiateOperation<A, B> {
   protected terminated = false;
@@ -9,7 +9,7 @@ export abstract class IntermidiateOperation<A, B> {
     return this.terminated;
   }
 
-  abstract execute(v: A): Maybe<B>;
+  abstract execute(v: A): M.Maybe<B>;
 
   protected terminate() {
     this.terminated = true;

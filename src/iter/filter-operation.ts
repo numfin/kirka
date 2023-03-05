@@ -1,6 +1,5 @@
-import { just, none } from "../maybe";
+import { M } from "../maybe";
 import { IntermidiateOperation } from "./intermediate-operation";
-import type { Maybe } from "../maybe";
 
 export class FilterOperation<A, B extends A = A> extends IntermidiateOperation<
   A,
@@ -12,11 +11,11 @@ export class FilterOperation<A, B extends A = A> extends IntermidiateOperation<
     super();
   }
 
-  execute(value: A): Maybe<B> {
+  execute(value: A): M.Maybe<B> {
     const result = this.predicate(value, () => this.terminate());
     if (this.terminated) {
-      return none<B>();
+      return M.none<B>();
     }
-    return result ? just<B>(value as B) : none<B>();
+    return result ? M.just<B>(value as B) : M.none<B>();
   }
 }

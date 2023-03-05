@@ -1,6 +1,5 @@
-import { just } from "../maybe";
+import { M } from "../maybe";
 import { IntermidiateOperation } from "./intermediate-operation";
-import type { Maybe } from "../maybe";
 
 export class MapOperation<A, B> extends IntermidiateOperation<A, B> {
   constructor(fn: (v: A, terminate: () => void) => B);
@@ -12,7 +11,7 @@ export class MapOperation<A, B> extends IntermidiateOperation<A, B> {
     super(isFlat);
   }
 
-  execute(value: A): Maybe<B> {
-    return just(this.fn(value, () => this.terminate()));
+  execute(value: A): M.Maybe<B> {
+    return M.just(this.fn(value, () => this.terminate()));
   }
 }
