@@ -4,9 +4,10 @@
   "description": "This is fork of JSMonk/sweet-monads with some fixes and additional functionality",
   "type": "module",
   "exports": {
-    ".": "./dist/**/*.js"
+    ".": "./dist/index.js"
   },
-  "types": "./dist/index.d.ts",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
   "scripts": {
     "build": "tsc"
   },
