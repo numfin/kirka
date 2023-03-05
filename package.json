@@ -1,0 +1,41 @@
+{
+  "name": "sweet-monads",
+  "version": "1.0.0",
+  "description": "This is fork of JSMonk/sweet-monads with some fixes and additional functionality",
+  "type": "module",
+  "exports": {
+    "./either/*": "./dist/either/*.js",
+    "./fun/*": "./dist/fun/*.js",
+    "./interfaces/*": "./dist/interfaces/*.js",
+    "./iter/*": "./dist/iter/*.js",
+    "./maybe/*": "./dist/maybe/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "either/*": [
+        "dist/either/*"
+      ],
+      "fun/*": [
+        "dist/fun/*"
+      ],
+      "interfaces/*": [
+        "dist/interfaces/*"
+      ],
+      "iter/*": [
+        "dist/iter/*"
+      ],
+      "maybe/*": [
+        "dist/maybe/*"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
+}
