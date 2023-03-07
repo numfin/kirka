@@ -1,18 +1,17 @@
-import { Some, None } from "../option";
-
-export const defaultFilter = <T>(item: T, i: number) => true;
-export const iterFactory = function* <T>(
+export const defaultFilter = <T>(item: T) => true;
+export const defaultMap = <T, U>(item: T): U => item as unknown as U;
+export const iterFactory = function* <T, U>(
   source: Iterable<T>,
-  filter = defaultFilter
+  map = defaultMap<T, U>,
+  filter = defaultFilter<U>
 ) {
-  let i = 0;
-  const check = (item: T, i: number) => filter(item, i);
+  const check = (item: U) => filter(item);
   for (const item of source) {
-    if (check(item, i + 1)) {
-      yield item;
+    const mappedItem = map(item);
+    if (check(mappedItem)) {
+      yield mappedItem;
     } else {
       return;
     }
-    i++;
   }
 };
