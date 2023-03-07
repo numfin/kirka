@@ -5,6 +5,8 @@ import { Either, EitherUnion } from "./interfaces";
 function create_either<L, R>(v: EitherUnion<L, R>): Either<L, R> {
   let inner = v;
   const api: Either<L, R> = {
+    inner: () => inner,
+    eq: (other: Either<L, R>) => EitherApi.eq(api, other),
     format: () => EitherApi.format(inner),
     isLeft: () => EitherApi.isLeft(inner),
     isRight: () => EitherApi.isRight(inner),
@@ -39,6 +41,11 @@ export function Right<L, R>(value: R) {
 export namespace EitherApi {
   export function format<L, R>(either: EitherUnion<L, R>) {
     return `Either.${either.type}(${either.value})`;
+  }
+  export function eq<L, R>(self: Either<L, R>, other: Either<L, R>) {
+    const a = self.inner();
+    const b = other.inner();
+    return a.type === b.type && a.value === b.value;
   }
   export function unwrap<L, R>(either: EitherUnion<L, R>) {
     return either.value;

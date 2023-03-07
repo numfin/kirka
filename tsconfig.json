@@ -9,13 +9,8 @@
     "preserveConstEnums": true,
     "outDir": "./dist",
     "declarationMap": true,
-    "skipLibCheck": false
+    "lib": ["ESNext"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "src/**/*test.ts",
-    "src/iter/bak",
-    "src/interfaces"
-  ]
+  "exclude": ["node_modules"]
 }
