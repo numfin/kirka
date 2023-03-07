@@ -1,4 +1,4 @@
-import { M } from "../maybe";
+import { M } from "../maybe/index.bak";
 import { IntermidiateOperation } from "./intermediate-operation";
 
 export class MapOperation<A, B> extends IntermidiateOperation<A, B> {

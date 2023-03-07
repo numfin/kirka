@@ -1,4 +1,4 @@
-import { M } from "../maybe";
+import { M } from "../maybe/index.bak";
 
 export abstract class IntermidiateOperation<A, B> {
   protected terminated = false;

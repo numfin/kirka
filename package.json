@@ -1,7 +1,7 @@
 {
-  "name": "sweet-monads",
+  "name": "kirka",
   "version": "1.0.0",
-  "description": "This is fork of JSMonk/sweet-monads with some fixes and additional functionality",
+  "description": "Monoids Rust-style for Typescript",
   "type": "module",
   "exports": {
     ".": "./dist/index.js"
@@ -12,7 +12,7 @@
     "build": "tsc"
   },
   "keywords": [],
-  "author": "",
+  "author": "nextgen-samurai",
   "license": "ISC",
   "devDependencies": {
     "typescript": "^4.9.5"
