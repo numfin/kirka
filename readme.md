@@ -18,8 +18,9 @@
 
 # Installation
 
-```
+```bash
 npm i github.com/numfin/kirka
+# or fork it and instal from your own repo
 ```
 
 Usage described in `example.ts` files. All documentation inside `JSDoc` (autocomplete)
