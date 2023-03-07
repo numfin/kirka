@@ -9,11 +9,11 @@
 
 <details open="open">
   <summary>Modules</summary>
-  <ol>
-    <li><a href="/src/option"> ➤ Option&lt;T&gt;</a></li>
-    <li><a href="/src/either"> ➤ Either&lt;L, R&gt;</a></li>
-    <li><a href="/src/iter"> ➤ Iter&lt;T&gt;</a></li>
-  </ol>
+  <ul>
+    <li><a href="/src/option">Option&lt;T&gt;</a></li>
+    <li><a href="/src/either">Either&lt;L, R&gt;</a></li>
+    <li><a href="/src/iter">Iter&lt;T&gt;</a></li>
+  </ul>
 </details>
 
 # Installation
