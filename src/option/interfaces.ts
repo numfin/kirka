@@ -9,6 +9,8 @@ export interface None<T> {
 export type OptionUnion<T> = None<T> | Some<T>;
 
 export interface Option<T> {
+  inner(): OptionUnion<T>;
+  eq(v: Option<T>): boolean;
   format(): string;
   clone(): Option<T>;
   unwrap(): T;

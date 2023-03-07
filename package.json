@@ -9,12 +9,29 @@
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "ava",
+    "test:w": "ava -w"
   },
   "keywords": [],
   "author": "nextgen-samurai",
   "license": "ISC",
   "devDependencies": {
+    "ava": "^5.2.0",
+    "esbuild-node-loader": "^0.8.0",
+    "tsx": "^3.12.3",
     "typescript": "^4.9.5"
+  },
+  "ava": {
+    "extensions": {
+      "ts": "module"
+    },
+    "nodeArguments": [
+      "--loader=tsx",
+      "--no-warnings"
+    ],
+    "files": [
+      "src/**/*test.ts"
+    ]
   }
 }

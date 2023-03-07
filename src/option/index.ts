@@ -1,10 +1,12 @@
 import { None, Option, Some, OptionUnion } from "./interfaces";
-export { Option } from "./interfaces";
+export type { Option } from "./interfaces";
 
 function create_option<T>(v: OptionUnion<T>): Option<T> {
   let inner = v;
 
   const api: Option<T> = {
+    inner: () => inner,
+    eq: (value) => OptionApi.eq(api, value),
     format: () => OptionApi.format(inner),
     clone: () => OptionApi.clone(inner),
     unwrap: () => OptionApi.unwrap(inner),
@@ -32,6 +34,12 @@ export namespace OptionApi {
   export function format<T>(option: OptionUnion<T>) {
     return option.type === "Some" ? `Some(${option.value})` : `None`;
   }
+  export function eq<T>(option: Option<T>, value: Option<T>) {
+    if (value.isNone() || option.isNone()) {
+      return value.isNone() && option.isNone();
+    }
+    return value.unwrap() === option.unwrap();
+  }
   export function clone<T>(option: OptionUnion<T>): Option<T> {
     return option.type === "Some" ? Some(option.value) : None();
   }
@@ -48,7 +56,7 @@ export namespace OptionApi {
       (option.value as undefined) = undefined;
       return Some(value);
     }
-    return create_option(option);
+    return None<T>();
   }
   export function isSomeAnd<T>(
     option: Option<T>,
@@ -56,7 +64,6 @@ export namespace OptionApi {
   ): boolean {
     return option.isSome() && fn(option.unwrap());
   }
-
   export function unwrap<T>(option: OptionUnion<T>) {
     if (option.type === "None") {
       throw new Error(`unwrap called on ${format(option)}`);

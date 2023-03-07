@@ -10,8 +10,6 @@ export const iterFactory = function* <T, U>(
     const mappedItem = map(item);
     if (check(mappedItem)) {
       yield mappedItem;
-    } else {
-      return;
     }
   }
 };

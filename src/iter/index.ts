@@ -12,11 +12,10 @@ function create_iter<T>(source: Gen<T>) {
   return api;
 }
 
-export function fromArr<T>(source: T[]) {
-  return create_iter(iterFactory(source));
-}
-
 export namespace IterApi {
+  export function fromArr<T>(source: T[]): Iter<T> {
+    return create_iter(iterFactory(source));
+  }
   export function map<T, U>(source: Gen<T>, fn: (item: T) => U) {
     return create_iter(iterFactory(source, fn));
   }

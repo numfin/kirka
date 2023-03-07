@@ -1,120 +1,136 @@
-export var E;
-(function (E) {
-    let EitherType;
-    (function (EitherType) {
-        EitherType["Left"] = "Left";
-        EitherType["Right"] = "Right";
-    })(EitherType || (EitherType = {}));
-    function isWrappedFunction(m) {
-        return typeof m.value === "function";
+import { None, Some } from "../option";
+function create_either(v) {
+    let inner = v;
+    const api = {
+        format: () => EitherApi.format(inner),
+        isLeft: () => EitherApi.isLeft(inner),
+        isRight: () => EitherApi.isRight(inner),
+        unwrap: () => EitherApi.unwrap(inner),
+        unwrapLeft: () => EitherApi.unwrapLeft(api),
+        unwrapRight: () => EitherApi.unwrapRight(api),
+        unwrapLeftOr: (default_value) => EitherApi.unwrapLeftOr(api, default_value),
+        unwrapRightOr: (default_value) => EitherApi.unwrapRightOr(api, default_value),
+        isLeftAnd: (fn) => EitherApi.isLeftAnd(api, fn),
+        isRightAnd: (fn) => EitherApi.isRightAnd(api, fn),
+        optionLeft: () => EitherApi.optionLeft(api),
+        optionRight: () => EitherApi.optionRight(api),
+        mapLeft: (fn) => EitherApi.mapLeft(api, fn),
+        mapRight: (fn) => EitherApi.mapRight(api, fn),
+        inspectLeft: (fn) => EitherApi.inspectLeft(api, fn),
+        inspectRight: (fn) => EitherApi.inspectRight(api, fn),
+        andThenLeft: (fn) => EitherApi.andThenLeft(api, fn),
+        andThenRight: (fn) => EitherApi.andThenRight(api, fn),
+        andLeft: (new_value) => EitherApi.andLeft(api, new_value),
+        andRight: (new_value) => EitherApi.andRight(api, new_value),
+    };
+    return api;
+}
+export function Left(value) {
+    return create_either({ value, type: "Left" });
+}
+export function Right(value) {
+    return create_either({ value, type: "Right" });
+}
+export var EitherApi;
+(function (EitherApi) {
+    function format(either) {
+        return `Either.${either.type}(${either.value})`;
     }
-    class EitherConstructor {
-        type;
-        value;
-        static chain(f) {
-            return (m) => m.asyncChain(f);
-        }
-        static mergeInOne(eithers) {
-            return eithers.reduce((res, v) => res.chain((res) => v.map((v) => res.concat([v]))), EitherConstructor.right([]));
-        }
-        static merge = EitherConstructor.mergeInOne;
-        static from(v) {
-            return EitherConstructor.right(v);
-        }
-        static right(v) {
-            return new EitherConstructor("Right" /* EitherType.Right */, v);
-        }
-        static left(v) {
-            return new EitherConstructor("Left" /* EitherType.Left */, v);
-        }
-        constructor(type, value) {
-            this.type = type;
-            this.value = value;
-        }
-        isLeft() {
-            return this.type === "Left" /* EitherType.Left */;
-        }
-        isRight() {
-            return this.type === "Right" /* EitherType.Right */;
-        }
-        join() {
-            return this.chain((x) => x);
-        }
-        mapRight(f) {
-            return this.map(f);
-        }
-        mapLeft(f) {
-            if (this.isLeft()) {
-                return EitherConstructor.left(f(this.value));
-            }
-            return EitherConstructor.right(this.value);
-        }
-        map(f) {
-            if (this.isLeft()) {
-                return EitherConstructor.left(this.value);
-            }
-            return EitherConstructor.right(f(this.value));
-        }
-        asyncMap(f) {
-            if (this.isLeft()) {
-                return Promise.resolve(EitherConstructor.left(this.value));
-            }
-            return f(this.value).then((v) => EitherConstructor.right(v));
-        }
-        apply(argOrFn) {
-            if (this.isLeft()) {
-                return EitherConstructor.left(this.value);
-            }
-            if (argOrFn.isLeft()) {
-                return EitherConstructor.left(argOrFn.value);
-            }
-            if (isWrappedFunction(this)) {
-                return argOrFn.map(this.value);
-            }
-            if (isWrappedFunction(argOrFn)) {
-                return argOrFn.apply(this);
-            }
-            throw new Error("Some of the arguments should be a function");
-        }
-        asyncApply(argOrFn) {
-            if (this.isLeft()) {
-                return Promise.resolve(EitherConstructor.left(this.value));
-            }
-            if (argOrFn.isLeft()) {
-                return Promise.resolve(EitherConstructor.left(argOrFn.value));
-            }
-            if (isWrappedFunction(this)) {
-                return argOrFn
-                    .map((a) => Promise.resolve(a))
-                    .asyncMap((pa) => pa.then(this.value));
-            }
-            if (isWrappedFunction(argOrFn)) {
-                return argOrFn.asyncApply(this);
-            }
-            throw new Error("Some of the arguments should be a function");
-        }
-        chain(f) {
-            if (this.isLeft()) {
-                return EitherConstructor.left(this.value);
-            }
-            return f(this.value);
-        }
-        asyncChain(f) {
-            if (this.isLeft()) {
-                return Promise.resolve(EitherConstructor.left(this.value));
-            }
-            return f(this.value);
-        }
-        or(x) {
-            return this.isLeft() ? x : this;
-        }
-        unwrap() {
-            if (this.isRight())
-                return this.value;
-            throw new Error("Either state is Left");
-        }
+    EitherApi.format = format;
+    function unwrap(either) {
+        return either.value;
     }
-    E.merge = EitherConstructor.merge, E.mergeInOne = EitherConstructor.mergeInOne, E.left = EitherConstructor.left, E.right = EitherConstructor.right, E.from = EitherConstructor.from, E.chain = EitherConstructor.chain;
-    E.isEither = (value) => value instanceof EitherConstructor;
-})(E || (E = {}));
-//# sourceMappingURL=index.js.map
+    EitherApi.unwrap = unwrap;
+    function isLeft(either) {
+        return either.type === "Left";
+    }
+    EitherApi.isLeft = isLeft;
+    function isRight(either) {
+        return either.type === "Right";
+    }
+    EitherApi.isRight = isRight;
+    function unwrapLeft(either) {
+        if (either.isRight()) {
+            throw new Error(`unwrapLeft called on ${either.format()}`);
+        }
+        return either.unwrap();
+    }
+    EitherApi.unwrapLeft = unwrapLeft;
+    function unwrapRight(either) {
+        if (either.isLeft()) {
+            throw new Error(`unwrapRight called on ${either.format()}`);
+        }
+        return either.unwrap();
+    }
+    EitherApi.unwrapRight = unwrapRight;
+    function unwrapLeftOr(either, default_value) {
+        return either.isLeft() ? either.unwrap() : default_value;
+    }
+    EitherApi.unwrapLeftOr = unwrapLeftOr;
+    function unwrapRightOr(either, default_value) {
+        return either.isRight() ? either.unwrap() : default_value;
+    }
+    EitherApi.unwrapRightOr = unwrapRightOr;
+    function isLeftAnd(either, fn) {
+        return either.isLeft() && fn(either.unwrap());
+    }
+    EitherApi.isLeftAnd = isLeftAnd;
+    function isRightAnd(either, fn) {
+        return either.isRight() && fn(either.unwrap());
+    }
+    EitherApi.isRightAnd = isRightAnd;
+    function optionLeft(either) {
+        return either.isLeft() ? Some(either.unwrap()) : None();
+    }
+    EitherApi.optionLeft = optionLeft;
+    function optionRight(either) {
+        return either.isRight() ? Some(either.unwrap()) : None();
+    }
+    EitherApi.optionRight = optionRight;
+    function mapLeft(either, fn) {
+        if (either.isLeft()) {
+            return Left(fn(either.unwrap()));
+        }
+        return Right(either.unwrap());
+    }
+    EitherApi.mapLeft = mapLeft;
+    function mapRight(either, fn) {
+        if (either.isRight()) {
+            return Right(fn(either.unwrap()));
+        }
+        return Left(either.unwrap());
+    }
+    EitherApi.mapRight = mapRight;
+    function inspectLeft(either, fn) {
+        either.mapLeft(fn);
+        return either;
+    }
+    EitherApi.inspectLeft = inspectLeft;
+    function inspectRight(either, fn) {
+        either.mapRight(fn);
+        return either;
+    }
+    EitherApi.inspectRight = inspectRight;
+    function andThenLeft(either, fn) {
+        if (either.isLeft()) {
+            return fn(either.unwrap());
+        }
+        return Right(either.unwrap());
+    }
+    EitherApi.andThenLeft = andThenLeft;
+    function andThenRight(either, fn) {
+        if (either.isRight()) {
+            return fn(either.unwrap());
+        }
+        return Left(either.unwrap());
+    }
+    EitherApi.andThenRight = andThenRight;
+    function andLeft(either, other_either) {
+        return either.andThenLeft(() => other_either);
+    }
+    EitherApi.andLeft = andLeft;
+    function andRight(either, other_either) {
+        return either.andThenRight(() => other_either);
+    }
+    EitherApi.andRight = andRight;
+})(EitherApi || (EitherApi = {}));
