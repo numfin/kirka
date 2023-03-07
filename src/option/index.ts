@@ -1,4 +1,5 @@
 import { None, Option, Some, OptionUnion } from "./interfaces";
+export { Option } from "./interfaces";
 
 function create_option<T>(v: OptionUnion<T>): Option<T> {
   let inner = v;
