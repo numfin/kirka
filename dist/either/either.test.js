@@ -54,14 +54,6 @@ test(`.isRightAnd()`, (t) => {
     t.false(Left(3).isRightAnd((v) => true));
     t.false(Left(3).isRightAnd((v) => false));
 });
-test(`.optionLeft()`, (t) => {
-    t.true(Left(3).optionLeft().eq(Some(3)));
-    t.true(Right(3).optionLeft().eq(None()));
-});
-test(`.optionRight()`, (t) => {
-    t.true(Right(3).optionRight().eq(Some(3)));
-    t.true(Left(3).optionRight().eq(None()));
-});
 test(`.mapLeft()`, (t) => {
     t.true(Left(3)
         .mapLeft((v) => v * 2)
@@ -135,4 +127,12 @@ test(`.andRight()`, (t) => {
     t.true(eitherL.andRight(Right(8)).eq(Left(4)));
     t.true(eitherL.andRight(Right("changed")).eq(Left(4)));
     t.true(eitherL.andRight(Left(8)).eq(Left(4)));
+});
+test(`.toLeftOption()`, (t) => {
+    t.true(Left(3).toLeftOption().eq(Some(3)));
+    t.true(Right(3).toLeftOption().eq(None()));
+});
+test(`.toRightOption()`, (t) => {
+    t.true(Right(3).toRightOption().eq(Some(3)));
+    t.true(Left(3).toRightOption().eq(None()));
 });

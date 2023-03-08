@@ -1,4 +1,4 @@
-import { Option } from "../option/interfaces";
+import type { Option } from "../option/interfaces";
 export interface Left<T> {
     type: "Left";
     value: T;
@@ -21,8 +21,6 @@ export interface Either<L, R> {
     unwrapRightOr(v: R): R;
     isLeftAnd(fn: (v: L) => boolean): boolean;
     isRightAnd(fn: (v: R) => boolean): boolean;
-    optionLeft(): Option<L>;
-    optionRight(): Option<R>;
     mapLeft<U>(fn: (v: L) => U): Either<U, R>;
     mapRight<U>(fn: (v: R) => U): Either<L, U>;
     inspectLeft(fn: (v: L) => unknown): Either<L, R>;
@@ -31,5 +29,7 @@ export interface Either<L, R> {
     andThenRight<U>(fn: (v: R) => Either<L, U>): Either<L, U>;
     andLeft<U>(either: Either<U, R>): Either<U, R>;
     andRight<U>(either: Either<L, U>): Either<L, U>;
+    toLeftOption(): Option<L>;
+    toRightOption(): Option<R>;
 }
 //# sourceMappingURL=interfaces.d.ts.map

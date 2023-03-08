@@ -15,8 +15,8 @@ export declare namespace EitherApi {
     function unwrapRightOr<L, R>(either: Either<L, R>, default_value: R): R;
     function isLeftAnd<L, R>(either: Either<L, R>, fn: (v: L) => boolean): boolean;
     function isRightAnd<L, R>(either: Either<L, R>, fn: (v: R) => boolean): boolean;
-    function optionLeft<L, R>(either: Either<L, R>): Option<L>;
-    function optionRight<L, R>(either: Either<L, R>): Option<R>;
+    function toLeftOption<L, R>(either: Either<L, R>): Option<L>;
+    function toRightOption<L, R>(either: Either<L, R>): Option<R>;
     function mapLeft<L, R, U>(either: Either<L, R>, fn: (value: L) => U): Either<U, R>;
     function mapRight<L, R, U>(either: Either<L, R>, fn: (value: R) => U): Either<L, U>;
     function inspectLeft<L, R>(either: Either<L, R>, fn: (value: L) => void): Either<L, R>;

@@ -14,8 +14,6 @@ export function create_either(v) {
         unwrapRightOr: (default_value) => EitherApi.unwrapRightOr(api, default_value),
         isLeftAnd: (fn) => EitherApi.isLeftAnd(api, fn),
         isRightAnd: (fn) => EitherApi.isRightAnd(api, fn),
-        optionLeft: () => EitherApi.optionLeft(api),
-        optionRight: () => EitherApi.optionRight(api),
         mapLeft: (fn) => EitherApi.mapLeft(api, fn),
         mapRight: (fn) => EitherApi.mapRight(api, fn),
         inspectLeft: (fn) => EitherApi.inspectLeft(api, fn),
@@ -24,6 +22,8 @@ export function create_either(v) {
         andThenRight: (fn) => EitherApi.andThenRight(api, fn),
         andLeft: (new_value) => EitherApi.andLeft(api, new_value),
         andRight: (new_value) => EitherApi.andRight(api, new_value),
+        toLeftOption: () => EitherApi.toLeftOption(api),
+        toRightOption: () => EitherApi.toRightOption(api),
     };
     return api;
 }
@@ -87,14 +87,14 @@ export var EitherApi;
         return either.isRight() && fn(either.unwrap());
     }
     EitherApi.isRightAnd = isRightAnd;
-    function optionLeft(either) {
+    function toLeftOption(either) {
         return either.isLeft() ? Some(either.unwrap()) : None();
     }
-    EitherApi.optionLeft = optionLeft;
-    function optionRight(either) {
+    EitherApi.toLeftOption = toLeftOption;
+    function toRightOption(either) {
         return either.isRight() ? Some(either.unwrap()) : None();
     }
-    EitherApi.optionRight = optionRight;
+    EitherApi.toRightOption = toRightOption;
     function mapLeft(either, fn) {
         if (either.isLeft()) {
             return Left(fn(either.unwrap()));

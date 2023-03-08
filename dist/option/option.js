@@ -1,3 +1,4 @@
+import { Left, Right } from "../either";
 export function create_option(v) {
     let inner = v;
     const api = {
@@ -16,6 +17,8 @@ export function create_option(v) {
         orElse: (fn) => OptionApi.orElse(api, fn),
         and: (new_value) => OptionApi.and(api, new_value),
         andThen: (fn) => OptionApi.andThen(api, fn),
+        toLeft: (fn) => OptionApi.toLeft(api, fn),
+        toRight: (fn) => OptionApi.toRight(api, fn),
     };
     return api;
 }
@@ -86,16 +89,24 @@ export var OptionApi;
         return current_value.isSome() ? current_value.clone() : new_value;
     }
     OptionApi.or = or;
-    function orElse(current_value, fn) {
-        return current_value.isSome() ? current_value.clone() : fn();
+    function orElse(option, fn) {
+        return option.isSome() ? option.clone() : fn();
     }
     OptionApi.orElse = orElse;
     function and(current_value, new_value) {
         return current_value.isSome() ? new_value : None();
     }
     OptionApi.and = and;
-    function andThen(current_value, fn) {
-        return current_value.isSome() ? fn(current_value.unwrap()) : None();
+    function andThen(option, fn) {
+        return option.isSome() ? fn(option.unwrap()) : None();
     }
     OptionApi.andThen = andThen;
+    function toLeft(option, right_default) {
+        return option.isSome() ? Left(option.unwrap()) : Right(right_default());
+    }
+    OptionApi.toLeft = toLeft;
+    function toRight(option, left_default) {
+        return option.isSome() ? Right(option.unwrap()) : Left(left_default());
+    }
+    OptionApi.toRight = toRight;
 })(OptionApi || (OptionApi = {}));
