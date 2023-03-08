@@ -1,3 +1,5 @@
+import type { Either } from "../either/interfaces";
+
 export interface Some<T> {
   type: "Some";
   value: T;
@@ -24,4 +26,6 @@ export interface Option<T> {
   orElse(fn: () => Option<T>): Option<T>;
   and<U>(v: Option<U>): Option<U>;
   andThen<U>(fn: (v: T) => Option<U>): Option<U>;
+  toLeft<R>(defaultRight: () => R): Either<T, R>;
+  toRight<L>(defaultLeft: () => L): Either<L, T>;
 }

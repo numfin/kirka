@@ -1,5 +1,7 @@
 import test from "ava";
-import { None, Some } from "./option";
+import { EitherApi, EitherFrom, Left, Right } from "../either";
+import { OptionFrom } from "./from";
+import { None, OptionApi, Some } from "./option";
 
 test(`.clone()`, (t) => {
   const option = Some(3);
@@ -139,4 +141,37 @@ test(`None.andThen()`, (t) => {
       .and(Some(10))
       .eq(None())
   );
+});
+test(`.toLeft()`, (t) => {
+  t.true(
+    Some("value")
+      .toLeft(() => 4)
+      .eq(Left("value"))
+  );
+  t.true(
+    None<string>()
+      .toLeft(() => 4)
+      .eq(Right(4))
+  );
+});
+test(`.toRight()`, (t) => {
+  t.true(
+    Some("value")
+      .toRight(() => 4)
+      .eq(Right("value"))
+  );
+  t.true(
+    None<string>()
+      .toRight(() => 4)
+      .eq(Left(4))
+  );
+});
+test(`OptionFrom.bool()`, (t) => {
+  t.true(OptionFrom.bool(true).eq(Some(true)));
+  t.true(OptionFrom.bool(false).eq(None()));
+});
+test(`OptionFrom.nullable()`, (t) => {
+  t.true(OptionFrom.nullable(null).eq(None()));
+  t.true(OptionFrom.nullable(undefined).eq(None()));
+  t.true(OptionFrom.nullable(3).eq(Some(3)));
 });

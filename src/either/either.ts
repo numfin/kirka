@@ -18,8 +18,6 @@ export function create_either<L, R>(v: EitherUnion<L, R>): Either<L, R> {
       EitherApi.unwrapRightOr(api, default_value),
     isLeftAnd: (fn) => EitherApi.isLeftAnd(api, fn),
     isRightAnd: (fn) => EitherApi.isRightAnd(api, fn),
-    optionLeft: () => EitherApi.optionLeft(api),
-    optionRight: () => EitherApi.optionRight(api),
     mapLeft: (fn) => EitherApi.mapLeft(api, fn),
     mapRight: (fn) => EitherApi.mapRight(api, fn),
     inspectLeft: (fn) => EitherApi.inspectLeft(api, fn),
@@ -28,6 +26,8 @@ export function create_either<L, R>(v: EitherUnion<L, R>): Either<L, R> {
     andThenRight: (fn) => EitherApi.andThenRight(api, fn),
     andLeft: (new_value) => EitherApi.andLeft(api, new_value),
     andRight: (new_value) => EitherApi.andRight(api, new_value),
+    toLeftOption: () => EitherApi.toLeftOption(api),
+    toRightOption: () => EitherApi.toRightOption(api),
   };
   return api;
 }
@@ -89,10 +89,10 @@ export namespace EitherApi {
   ) {
     return either.isRight() && fn(either.unwrap() as R);
   }
-  export function optionLeft<L, R>(either: Either<L, R>): Option<L> {
+  export function toLeftOption<L, R>(either: Either<L, R>): Option<L> {
     return either.isLeft() ? Some(either.unwrap() as L) : None();
   }
-  export function optionRight<L, R>(either: Either<L, R>): Option<R> {
+  export function toRightOption<L, R>(either: Either<L, R>): Option<R> {
     return either.isRight() ? Some(either.unwrap() as R) : None();
   }
   export function mapLeft<L, R, U>(

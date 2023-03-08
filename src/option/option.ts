@@ -1,3 +1,4 @@
+import { Either, Left, Right } from "../either";
 import { None, Option, Some, OptionUnion } from "./interfaces";
 
 export function create_option<T>(v: OptionUnion<T>): Option<T> {
@@ -19,6 +20,8 @@ export function create_option<T>(v: OptionUnion<T>): Option<T> {
     orElse: (fn) => OptionApi.orElse(api, fn),
     and: (new_value) => OptionApi.and(api, new_value),
     andThen: (fn) => OptionApi.andThen(api, fn),
+    toLeft: (fn) => OptionApi.toLeft(api, fn),
+    toRight: (fn) => OptionApi.toRight(api, fn),
   };
   return api;
 }
@@ -85,11 +88,8 @@ export namespace OptionApi {
   ): Option<T> {
     return current_value.isSome() ? current_value.clone() : new_value;
   }
-  export function orElse<T>(
-    current_value: Option<T>,
-    fn: () => Option<T>
-  ): Option<T> {
-    return current_value.isSome() ? current_value.clone() : fn();
+  export function orElse<T>(option: Option<T>, fn: () => Option<T>): Option<T> {
+    return option.isSome() ? option.clone() : fn();
   }
   export function and<T, U>(
     current_value: Option<T>,
@@ -98,9 +98,21 @@ export namespace OptionApi {
     return current_value.isSome() ? new_value : None();
   }
   export function andThen<T, U>(
-    current_value: Option<T>,
+    option: Option<T>,
     fn: (value: T) => Option<U>
   ): Option<U> {
-    return current_value.isSome() ? fn(current_value.unwrap()) : None();
+    return option.isSome() ? fn(option.unwrap()) : None();
+  }
+  export function toLeft<T, R>(
+    option: Option<T>,
+    right_default: () => R
+  ): Either<T, R> {
+    return option.isSome() ? Left(option.unwrap()) : Right(right_default());
+  }
+  export function toRight<L, R>(
+    option: Option<R>,
+    left_default: () => L
+  ): Either<L, R> {
+    return option.isSome() ? Right(option.unwrap()) : Left(left_default());
   }
 }
