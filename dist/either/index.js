@@ -2,6 +2,8 @@ import { None, Some } from "../option";
 function create_either(v) {
     let inner = v;
     const api = {
+        inner: () => inner,
+        eq: (other) => EitherApi.eq(api, other),
         format: () => EitherApi.format(inner),
         isLeft: () => EitherApi.isLeft(inner),
         isRight: () => EitherApi.isRight(inner),
@@ -37,6 +39,12 @@ export var EitherApi;
         return `Either.${either.type}(${either.value})`;
     }
     EitherApi.format = format;
+    function eq(self, other) {
+        const a = self.inner();
+        const b = other.inner();
+        return a.type === b.type && a.value === b.value;
+    }
+    EitherApi.eq = eq;
     function unwrap(either) {
         return either.value;
     }

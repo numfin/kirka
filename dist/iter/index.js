@@ -1,29 +1,73 @@
-import { iterFactory } from "./gen";
+import { iterEnumerate, iterFactory, iterInfinite, iterSkipWhile, iterTakeWhile, } from "./gen";
 function create_iter(source) {
-    let inner = source;
     const api = {
-        map: (fn) => IterApi.map(inner, fn),
-        filter: (fn) => IterApi.filter(inner, fn),
-        collect: () => IterApi.collect(inner),
+        collect: () => IterApi.collect(source),
+        map: (fn) => IterApi.map(source, fn),
+        filter: (fn) => IterApi.filter(source, fn),
+        enumerate: () => IterApi.enumerate(source),
+        skipWhile: (fn) => IterApi.skipWhile(source, fn),
+        skip: (i) => IterApi.skip(api, i),
+        takeWhile: (fn) => IterApi.takeWhile(source, fn),
+        take: (i) => IterApi.take(api, i),
     };
     return api;
 }
+export var IterFrom;
+(function (IterFrom) {
+    function array(source) {
+        return create_iter(() => iterFactory(source));
+    }
+    IterFrom.array = array;
+    function range(from, to, inclusive = false) {
+        if (from > to) {
+            throw new Error(`Invalid range: From(${from}) > To(${to})`);
+        }
+        const extra = inclusive ? 1 : 0;
+        return create_iter(() => iterInfinite())
+            .take(to - from + extra)
+            .enumerate()
+            .map(({ index }) => index + from);
+    }
+    IterFrom.range = range;
+})(IterFrom || (IterFrom = {}));
 export var IterApi;
 (function (IterApi) {
-    function fromArr(source) {
-        return create_iter(iterFactory(source));
+    function collect(source) {
+        return Array.from(source());
     }
-    IterApi.fromArr = fromArr;
+    IterApi.collect = collect;
     function map(source, fn) {
-        return create_iter(iterFactory(source, fn));
+        return create_iter(() => iterFactory(source(), fn));
     }
     IterApi.map = map;
     function filter(source, fn) {
-        return create_iter(iterFactory(source, (x) => x, fn));
+        return create_iter(() => iterFactory(source(), (x) => x, fn));
     }
     IterApi.filter = filter;
-    function collect(source) {
-        return Array.from(source);
+    function enumerate(source) {
+        return create_iter(() => iterEnumerate(source()));
     }
-    IterApi.collect = collect;
+    IterApi.enumerate = enumerate;
+    function skipWhile(source, fn) {
+        return create_iter(() => iterSkipWhile(source(), fn));
+    }
+    IterApi.skipWhile = skipWhile;
+    function skip(source, skipAmount) {
+        return source
+            .enumerate()
+            .skipWhile(({ index }) => index < skipAmount)
+            .map(({ item }) => item);
+    }
+    IterApi.skip = skip;
+    function takeWhile(source, fn) {
+        return create_iter(() => iterTakeWhile(source(), fn));
+    }
+    IterApi.takeWhile = takeWhile;
+    function take(source, takeAmount) {
+        return source
+            .enumerate()
+            .takeWhile(({ index }) => index < takeAmount)
+            .map(({ item }) => item);
+    }
+    IterApi.take = take;
 })(IterApi || (IterApi = {}));

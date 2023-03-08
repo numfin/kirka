@@ -4,6 +4,7 @@ export declare function Left<L, R>(value: L): Either<L, R>;
 export declare function Right<L, R>(value: R): Either<L, R>;
 export declare namespace EitherApi {
     function format<L, R>(either: EitherUnion<L, R>): string;
+    function eq<L, R>(self: Either<L, R>, other: Either<L, R>): boolean;
     function unwrap<L, R>(either: EitherUnion<L, R>): L | R;
     function isLeft<L, R>(either: EitherUnion<L, R>): boolean;
     function isRight<L, R>(either: EitherUnion<L, R>): boolean;

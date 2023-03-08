@@ -1,20 +1,7 @@
 import test from "ava";
 import { None, Some } from "../option";
+import { useSpy } from "../testutils/spy";
 import { Left, Right } from "./index";
-
-function useSpy<T extends unknown[], U>(fn: (...args: T) => U) {
-  let calledTimes = 0;
-  let calledWith: T;
-  return {
-    spy: (...args: T) => {
-      calledTimes += 1;
-      calledWith = args;
-      return fn(...args);
-    },
-    calledTimes: () => calledTimes,
-    calledWith: () => calledWith,
-  };
-}
 
 test(`x.eq(y) when x == y`, (t) => {
   t.true(Left(3).eq(Left(3)));
@@ -106,7 +93,7 @@ test(`.inspectLeft()`, (t) => {
   const spyA = useSpy((v) => {});
   Left(3).inspectLeft(spyA.spy);
   t.is(spyA.calledTimes(), 1);
-  t.deepEqual(spyA.calledWith(), [3]);
+  t.deepEqual(spyA.calledWith()[0], [3]);
 
   const spyB = useSpy((v) => {});
   Right(4).inspectLeft(spyB.spy);
@@ -116,7 +103,7 @@ test(`.inspectRight()`, (t) => {
   const spyA = useSpy((v) => {});
   Right(3).inspectRight(spyA.spy);
   t.is(spyA.calledTimes(), 1);
-  t.deepEqual(spyA.calledWith(), [3]);
+  t.deepEqual(spyA.calledWith()[0], [3]);
 
   const spyB = useSpy((v) => {});
   Left(4).inspectRight(spyB.spy);
