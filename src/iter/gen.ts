@@ -1,7 +1,5 @@
 import { WithIndex } from "./interfaces";
 
-export type ClonnableGenerator<T> = () => Generator<T>;
-
 export const defaultFilter = <T>(item: T) => true;
 export const defaultMap = <T, U>(item: T): U => item as unknown as U;
 

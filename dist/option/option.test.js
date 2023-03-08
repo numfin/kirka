@@ -1,5 +1,5 @@
 import test from "ava";
-import { None, Some } from ".";
+import { None, Some } from "./option";
 test(`.clone()`, (t) => {
     const option = Some(3);
     const clonedOption = option.clone();

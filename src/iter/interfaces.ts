@@ -10,3 +10,5 @@ export interface Iter<T> {
   takeWhile(fn: (item: T) => boolean): Iter<T>;
   take(i: number): Iter<T>;
 }
+
+export type ClonnableGenerator<T> = () => Generator<T>;
