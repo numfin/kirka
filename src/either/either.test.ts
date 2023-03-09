@@ -85,7 +85,7 @@ test(`.inspectLeft()`, (t) => {
   const spyA = useSpy((v) => {});
   Left(3).inspectLeft(spyA.spy);
   t.is(spyA.calledTimes(), 1);
-  t.deepEqual(spyA.calledWith()[0], [3]);
+  t.deepEqual(spyA.calledWith(0), [3]);
 
   const spyB = useSpy((v) => {});
   Right(4).inspectLeft(spyB.spy);
@@ -95,7 +95,7 @@ test(`.inspectRight()`, (t) => {
   const spyA = useSpy((v) => {});
   Right(3).inspectRight(spyA.spy);
   t.is(spyA.calledTimes(), 1);
-  t.deepEqual(spyA.calledWith()[0], [3]);
+  t.deepEqual(spyA.calledWith(0), [3]);
 
   const spyB = useSpy((v) => {});
   Left(4).inspectRight(spyB.spy);

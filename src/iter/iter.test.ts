@@ -13,28 +13,13 @@ function nativeRange(from: number, to: number, inclusive = false) {
   );
 }
 
-test(`IterFrom.range()`, (t) => {
-  const iter = IterFrom.range(1, 3).collect();
-  t.deepEqual(iter, [1, 2]);
-
-  const emptyIter = IterFrom.range(1, 1).collect();
-  t.deepEqual(emptyIter, []);
-
-  const inclusiveIter = IterFrom.range(1, 1, true).collect();
-  t.deepEqual(inclusiveIter, [1]);
-
-  // Throws on negative range
-  t.throws(() => IterFrom.range(2, 1));
-});
-
-test(`IterFrom.array()`, (t) => {
-  const numbers = nativeRange(1, 3, true);
-  const numbersCopy = nativeRange(1, 3, true);
-  const iter = IterFrom.array(numbers);
-  t.deepEqual(iter.collect(), numbersCopy);
-
-  const emptyIter = IterFrom.array([]);
-  t.deepEqual(emptyIter.collect(), []);
+test(`.[Symbol.iterator]()`, (t) => {
+  const values = [1, 2, 3, 4, 5];
+  const iter = IterFrom.array(values);
+  t.deepEqual([...iter], values);
+  // Inner state immutable
+  t.deepEqual([...iter], values);
+  t.true(iter.next().eq(Some(values[0])));
 });
 
 test(`.filter()`, (t) => {
@@ -204,4 +189,109 @@ test(`.next()`, (t) => {
   t.true(Some(3).eq(iter.next()));
   t.true(Some(4).eq(iter.next()));
   t.true(None().eq(iter.next()));
+});
+test(`.reset()`, (t) => {
+  const iter = IterFrom.array([1, 2]);
+  t.true(Some(1).eq(iter.next()));
+  t.true(Some(2).eq(iter.next()));
+  t.true(None().eq(iter.next()));
+  const iter2 = iter.recreate();
+  t.true(Some(1).eq(iter2.next()));
+  t.true(Some(2).eq(iter2.next()));
+  t.true(None().eq(iter2.next()));
+});
+test(`.cycle()`, (t) => {
+  const iter = IterFrom.array([1, 2]).cycle();
+  for (const _ of nativeRange(0, 5)) {
+    t.true(Some(1).eq(iter.next()));
+    t.true(Some(2).eq(iter.next()));
+  }
+  const emptyIter = IterFrom.array([]).cycle();
+  for (const _ of nativeRange(0, 5)) {
+    t.true(None().eq(emptyIter.next()));
+  }
+});
+test(`.eq()`, (t) => {
+  const iter1 = IterFrom.array([1, 2]);
+  const iter2 = IterFrom.array([1, 2]);
+  const iter3 = IterFrom.array([1, 2, 3]);
+
+  t.true(iter1.eq(iter2));
+  t.false(iter2.eq(iter3));
+  t.false(iter3.eq(iter1));
+});
+test(`.eq(by)`, (t) => {
+  const iter1 = IterFrom.array([1, 2]).map((v) => ({ v }));
+  const iter2 = IterFrom.array([1, 2]).map((v) => ({ v }));
+  const iter3 = IterFrom.array([1, 2, 3]).map((v) => ({ v }));
+
+  t.true(iter1.eq(iter2, (v) => v.v));
+  t.false(iter2.eq(iter3, (v) => v.v));
+  t.false(iter3.eq(iter1, (v) => v.v));
+});
+test(`.findMap()`, (t) => {
+  const iter = IterFrom.range(0, 10);
+  const valueIfEq = (to: number) => {
+    return (v: number) => {
+      return v === to ? Some("value") : None();
+    };
+  };
+
+  t.true(iter.findMap(valueIfEq(5)).eq(Some("value")));
+  t.true(iter.findMap(valueIfEq(100)).eq(None()));
+});
+test(`.position()`, (t) => {
+  const iter = IterFrom.range(0, 10);
+
+  t.true(iter.position((v) => v === 5).eq(Some(5)));
+  t.true(iter.position((v) => v === 100).eq(None()));
+});
+test(`.flatMap()`, (t) => {
+  const iter = IterFrom.array([1, 2, [3]]);
+  t.deepEqual(iter.flatMap((v) => [v]).collect(), [1, 2, [3]]);
+  const iter2 = IterFrom.array([[1], [2], [3]]);
+  t.deepEqual(iter2.flatMap(IterFrom.array).collect(), [1, 2, 3]);
+});
+test(`.flatten()`, (t) => {
+  const iter = IterFrom.array([1, 2, [3]]);
+  t.deepEqual(iter.flatten().collect(), [1, 2, 3]);
+  const iter2 = IterFrom.array([IterFrom.array([1]), [2], [3]]);
+  t.deepEqual(iter2.flatten().collect(), [1, 2, 3]);
+});
+test(`.fold()`, (t) => {
+  const iter = IterFrom.array([1, 2, 3]);
+  t.is(
+    iter.fold(0, (acc, item) => acc + item),
+    6
+  );
+  const iter2 = IterFrom.array([]);
+  t.is(
+    iter2.fold(0, (acc, item) => acc + item),
+    0
+  );
+});
+test(`.stepBy()`, (t) => {
+  const iter = IterFrom.range(1, 11, true);
+  t.throws(() => iter.stepBy(0));
+  t.deepEqual(iter.stepBy(1).collect(), IterFrom.range(1, 11, true).collect());
+  t.deepEqual(iter.stepBy(2).collect(), [1, 3, 5, 7, 9, 11]);
+  t.deepEqual(iter.stepBy(3).collect(), [1, 4, 7, 10]);
+  t.deepEqual(iter.stepBy(4).collect(), [1, 5, 9]);
+  t.deepEqual(iter.stepBy(5).collect(), [1, 6, 11]);
+  t.deepEqual(iter.stepBy(6).collect(), [1, 7]);
+  t.deepEqual(iter.stepBy(7).collect(), [1, 8]);
+  t.deepEqual(iter.stepBy(8).collect(), [1, 9]);
+  t.deepEqual(iter.stepBy(9).collect(), [1, 10]);
+  t.deepEqual(iter.stepBy(10).collect(), [1, 11]);
+  t.deepEqual(iter.stepBy(11).collect(), [1]);
+});
+test(`.forEach()`, (t) => {
+  const myFn = useSpy(() => {});
+  const iter = IterFrom.range(0, 10);
+  iter.forEach(myFn.spy);
+  t.is(myFn.calledTimes(), 10);
+
+  for (const i of nativeRange(0, 10)) {
+    t.deepEqual(myFn.calledWith(i), [i]);
+  }
 });

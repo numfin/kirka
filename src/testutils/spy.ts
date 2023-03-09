@@ -8,6 +8,6 @@ export function useSpy<T extends unknown[], U>(fn: (...args: T) => U) {
       return fn(...args);
     },
     calledTimes: () => calledTimes,
-    calledWith: () => calledWith,
+    calledWith: (i: number) => calledWith[i],
   };
 }

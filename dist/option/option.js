@@ -3,7 +3,7 @@ export function create_option(v) {
     let inner = v;
     const api = {
         inner: () => inner,
-        eq: (value) => OptionApi.eq(api, value),
+        eq: (value, by) => OptionApi.eq(api, value, by),
         format: () => OptionApi.format(inner),
         clone: () => OptionApi.clone(inner),
         unwrap: () => OptionApi.unwrap(inner),
@@ -34,11 +34,11 @@ export var OptionApi;
         return option.type === "Some" ? `Some(${option.value})` : `None`;
     }
     OptionApi.format = format;
-    function eq(option, value) {
+    function eq(option, value, by = (x) => x) {
         if (value.isNone() || option.isNone()) {
             return value.isNone() && option.isNone();
         }
-        return value.unwrap() === option.unwrap();
+        return by(value.unwrap()) === by(option.unwrap());
     }
     OptionApi.eq = eq;
     function clone(option) {

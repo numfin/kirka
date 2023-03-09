@@ -5,7 +5,7 @@ export declare function Some<T>(value: T): Option<T>;
 export declare function None<T>(): Option<T>;
 export declare namespace OptionApi {
     function format<T>(option: OptionUnion<T>): string;
-    function eq<T>(option: Option<T>, value: Option<T>): boolean;
+    function eq<T, U>(option: Option<T>, value: Option<T>, by?: (x: T) => U): boolean;
     function clone<T>(option: OptionUnion<T>): Option<T>;
     function isNone<T>(option: OptionUnion<T>): boolean;
     function isSome<T>(option: OptionUnion<T>): boolean;

@@ -15,6 +15,12 @@ test(`.eq()`, (t) => {
   t.false(Some(3).eq(None()));
   t.false(None().eq(Some(3)));
 });
+test(`.eq(by)`, (t) => {
+  t.true(Some({ x: 3 }).eq(Some({ x: 3 }), (v) => v.x));
+  t.true(None<{ x: number }>().eq(None(), (v) => v.x));
+  t.false(Some({ x: 3 }).eq(None(), (v) => v.x));
+  t.false(None<{ x: number }>().eq(Some({ x: 3 }), (v) => v.x));
+});
 test(`.unwrap()`, (t) => {
   t.is(Some(3).unwrap(), 3);
   t.throws(None().unwrap);

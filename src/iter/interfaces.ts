@@ -7,7 +7,7 @@ export enum Order {
   Less = -1,
 }
 
-export interface Iter<T> {
+export interface Iter<T> extends Iterable<T> {
   /**
    * Transforms iterator into array
    * # Example
@@ -195,6 +195,22 @@ export interface Iter<T> {
    */
   next(): Option<T>;
   /**
+   * Creates new iter with reset inner state
+   * # Example
+   * ```ts
+   * const iter = IterFrom::array([1, 2, 3]);
+   * assert(iter.next(), Some(1))
+   * assert(iter.next(), Some(2))
+   * assert(iter.next(), None())
+   *
+   * const iter2 = iter.recreate();
+   * assert(iter2.next(), Some(1))
+   * assert(iter2.next(), Some(2))
+   * assert(iter2.next(), None())
+   * ```
+   */
+  recreate(): Iter<T>;
+  /**
    * Repeats an iterator endlessly.
    *
    * Instead of stopping at `None()`, the iterator will instead start again, from the beginning. After iterating again, it will start at the beginning again. And again. And again. Forever.
@@ -213,7 +229,7 @@ export interface Iter<T> {
    * assert(iter.next(), None())
    * ```
    */
-  // cycle(): Iter<T>;
+  cycle(): Iter<T>;
   /**
    * Determines if the elements of this iter are equal to those of another
    * # Example
@@ -228,7 +244,7 @@ export interface Iter<T> {
    *
    * ```
    */
-  // eq(anotherIter: Iter<T>, by: (source: T, another: T) => boolean): boolean;
+  eq<U>(anotherIter: Iterable<T>, by?: (item: T) => U): boolean;
   /**
    * Searches for an element of an iterator that satisfies a predicate.
    *
@@ -243,7 +259,7 @@ export interface Iter<T> {
    * assert(iter.find((v) => v === 5), None())
    * ```
    */
-  // find(fn: (item: T) => boolean): Option<T>;
+  find(fn: (item: T) => boolean): Option<T>;
   /**
    * Applies function to the elements of iterator and returns the first non-none result.
    *
@@ -256,7 +272,7 @@ export interface Iter<T> {
    * assert(iter.findMap(asEven), Some(2))
    * ```
    */
-  // findMap<U>(fn: (item: T) => Option<U>): Option<U>;
+  findMap<U>(fn: (item: T) => Option<U>): Option<U>;
   /**
    * Searches for an element in an iterator, returning its index.
    * # Example
@@ -266,17 +282,80 @@ export interface Iter<T> {
    * assert(iter.position((v) => v === 2), Some(2));
    * ```
    */
-  // position(fn: (item: T) => boolean): Option<number>;
-  // flatMap<U>(fn: (item: T) => U[]): Iter<U>;
-  // flatten(): Iter<FlatArray<T, 1>>;
+  position(fn: (item: T) => boolean): Option<number>;
+  /**
+   * Creates an iterator that works like `map()`, but flattens nested structure.
+   *
+   * The map adapter is very useful, but only when the closure argument produces values. If it produces an iterator instead, there's an extra layer of indirection. `flatMap()` will remove this extra layer on its own.
+   * # Example
+   * ```ts
+   * const iter = IterFrom.array([1,2,[3]]);
+   * assert(iter.flatMap(v => [v]).collect(), [1,2,[3]])
+   *
+   * const iter = IterFrom.array([[1],[2],[3]]);
+   * assert(iter.flatMap(IterFrom.array).collect(), [1,2,3])
+   * ```
+   */
+  flatMap<U>(fn: (item: T) => Iterable<U>): Iter<U>;
+  /**
+   * Creates an iterator that flattens nested structure.
+   *
+   * This is useful when you have an iterator of iterators and you want to remove one level of indirection.
+   * # Example
+   * ```ts
+   * const iter = IterFrom.array([1,2,[3]]);
+   * assert(iter.flatten().collect(), [1,2,3])
+   *
+   * const iter = IterFrom.array([IterFrom.array([1]),[2],[3]]);
+   * assert(iter.flatten().collect(), [1,2,3])
+   * ```
+   */
+  flatten(): Iter<FlatArray<T, 1>>;
   // scan<U>(startFrom: U, fn: (acc: U, item: T) => U): Iter<U>;
-  // fold<U>(startFrom: U, fn: (acc: U, item: T) => U): U;
-  // stepBy(amount: number): Iter<T>;
-  // tryFold<U>(
-  //   startFrom: Option<U>,
-  //   fn: (acc: Option<U>, item: T) => Option<U>
-  // ): Option<U>;
-  // forEach(fn: (item: T) => void): void;
+  /**
+   * Same as `[].reduce()` folds every element into an accumulator by applying an operation, returning the final result.
+   *
+   * `fold()` takes two arguments: an initial value, and a closure with two arguments: an 'accumulator', and an element. The closure returns the value that the accumulator should have for the next iteration.
+   *
+   * The `startFrom` value is the value the accumulator will have on the first call.
+   * # Example
+   * ```ts
+   * const iter = IterFrom.array([1,2,3])
+   * const sum = iter.fold(0, (acc, item) => acc + item);
+   * assert(sum, 1 + 2 + 3)
+   * ```
+   */
+  fold<U>(startFrom: U, fn: (acc: U, item: T) => U): U;
+  /**
+   * Creates an iterator starting at the same point, but stepping by the given amount at each iteration.
+   *
+   * The first element of the iterator will always be returned, regardless of the step given.
+   *
+   * # Throws
+   * When `amount = 0`
+   * # Example
+   * ```ts
+   * const iter = IterFrom.array([1,2,3,4]);
+   * assert(iter.stepBy(1).collect(), [1,2,3,4])
+   * assert(iter.stepBy(2).collect(), [1,3])
+   * assert(iter.stepBy(3).collect(), [1,4])
+   * assert(iter.stepBy(4).collect(), [1])
+   * ```
+   */
+  stepBy(amount: number): Iter<T>;
+  /**
+   * Calls a closure on each element of an iterator.
+   *
+   * This is equivalent to using a `for` loop on the iterator, although `break` and `continue` are not possible from a closure. It's generally more idiomatic to use a `for` loop, but `forEach` may be more legible when processing items at the end of longer iterator chains.
+   *
+   * # Example
+   * ```ts
+   * IterFrom.array([1,2,3]).forEach((v) => {
+   *    // do smth with v
+   * })
+   * ```
+   */
+  forEach(fn: (item: T) => void): void;
   // intersperse(item: T): Iter<T>;
   // isEmpty(): boolean;
   // len(): number;

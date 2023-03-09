@@ -6,7 +6,7 @@ export function create_option<T>(v: OptionUnion<T>): Option<T> {
 
   const api: Option<T> = {
     inner: () => inner,
-    eq: (value) => OptionApi.eq(api, value),
+    eq: (value, by) => OptionApi.eq(api, value, by),
     format: () => OptionApi.format(inner),
     clone: () => OptionApi.clone(inner),
     unwrap: () => OptionApi.unwrap(inner),
@@ -37,11 +37,15 @@ export namespace OptionApi {
   export function format<T>(option: OptionUnion<T>) {
     return option.type === "Some" ? `Some(${option.value})` : `None`;
   }
-  export function eq<T>(option: Option<T>, value: Option<T>) {
+  export function eq<T, U>(
+    option: Option<T>,
+    value: Option<T>,
+    by = (x: T) => x as unknown as U
+  ) {
     if (value.isNone() || option.isNone()) {
       return value.isNone() && option.isNone();
     }
-    return value.unwrap() === option.unwrap();
+    return by(value.unwrap()) === by(option.unwrap());
   }
   export function clone<T>(option: OptionUnion<T>): Option<T> {
     return option.type === "Some" ? Some(option.value) : None();

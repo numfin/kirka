@@ -1,10 +1,17 @@
-import { iterEnumerate, iterFactory, iterSkipWhile, iterTakeWhile, } from "./gen";
+import { iterCycle, iterEnumerate, iterFactory, iterFlat, iterSkipWhile, iterTakeWhile, } from "./gen";
 import { None, OptionFrom, Some } from "../option";
+import { IterFrom } from "./from";
 export function create_iter(source) {
     /** `Generator<T>` with local state, used for `.next()` iteration */
     const inner = source();
     const api = {
+        *[Symbol.iterator]() {
+            for (const item of source()) {
+                yield item;
+            }
+        },
         next: () => IterApi.next(inner),
+        recreate: () => create_iter(source),
         collect: () => IterApi.collect(source),
         map: (fn) => IterApi.map(source, fn),
         filter: (fn) => IterApi.filter(source, fn),
@@ -17,6 +24,16 @@ export function create_iter(source) {
         nth: (i) => IterApi.nth(api, i),
         all: (fn) => IterApi.all(source, fn),
         any: (fn) => IterApi.any(source, fn),
+        cycle: () => IterApi.cycle(source),
+        eq: (another, by) => IterApi.eq(api, another, by),
+        find: (fn) => IterApi.find(api, fn),
+        findMap: (fn) => IterApi.findMap(api, fn),
+        position: (fn) => IterApi.position(api, fn),
+        flatMap: (fn) => IterApi.flatMap(api, fn),
+        flatten: () => IterApi.flatten(api),
+        fold: (startFrom, fn) => IterApi.fold(api, startFrom, fn),
+        stepBy: (amount) => IterApi.stepBy(api, amount),
+        forEach: (fn) => IterApi.forEach(api, fn),
     };
     return api;
 }
@@ -94,4 +111,88 @@ export var IterApi;
         return current.done ? None() : Some(current.value);
     }
     IterApi.next = next;
+    function cycle(source) {
+        return create_iter(() => iterCycle(source));
+    }
+    IterApi.cycle = cycle;
+    function eq(source, another, by) {
+        const sourceIter = source.recreate();
+        const anotherIter = IterFrom.iterable(another);
+        while (true) {
+            const sourceNext = sourceIter.next();
+            const anotherNext = anotherIter.next();
+            if (sourceNext.isSome() || anotherNext.isSome()) {
+                if (!sourceNext.eq(anotherNext, by)) {
+                    return false;
+                }
+            }
+            else {
+                return true;
+            }
+        }
+    }
+    IterApi.eq = eq;
+    function find(source, fn) {
+        const result = source
+            .skipWhile((item) => !fn(item))
+            .take(1)
+            .collect();
+        return result.length > 0 ? Some(result[0]) : None();
+    }
+    IterApi.find = find;
+    function findMap(source, fn) {
+        const result = source
+            .map(fn)
+            .skipWhile((v) => v.isNone())
+            .take(1)
+            .collect();
+        return result.length > 0 ? result[0] : None();
+    }
+    IterApi.findMap = findMap;
+    function position(source, fn) {
+        return source
+            .enumerate()
+            .find(({ item }) => fn(item))
+            .map(({ index }) => index);
+    }
+    IterApi.position = position;
+    function flatMap(source, fn) {
+        return create_iter(() => iterFlat(source.map(fn)));
+    }
+    IterApi.flatMap = flatMap;
+    function flatten(source) {
+        return source.map(toIterable).flatMap((v) => v);
+    }
+    IterApi.flatten = flatten;
+    function toIterable(source) {
+        if (source && typeof source === "object" && Symbol.iterator in source) {
+            return source;
+        }
+        return [source];
+    }
+    IterApi.toIterable = toIterable;
+    function fold(source, startFrom, fn) {
+        let lastAcc = startFrom;
+        for (const item of source) {
+            lastAcc = fn(lastAcc, item);
+        }
+        return lastAcc;
+    }
+    IterApi.fold = fold;
+    function stepBy(source, amount) {
+        if (amount <= 0) {
+            throw new Error(`.stepBy() amount should be > 0`);
+        }
+        return source
+            .enumerate()
+            .filter(({ index }) => index === 0 || index % amount === 0)
+            .map(({ item }) => item);
+    }
+    IterApi.stepBy = stepBy;
+    function forEach(source, fn) {
+        for (const item of source) {
+            fn(item);
+        }
+    }
+    IterApi.forEach = forEach;
 })(IterApi || (IterApi = {}));

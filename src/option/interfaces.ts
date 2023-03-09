@@ -12,7 +12,7 @@ export type OptionUnion<T> = None<T> | Some<T>;
 
 export interface Option<T> {
   inner(): OptionUnion<T>;
-  eq(v: Option<T>): boolean;
+  eq<U>(v: Option<T>, by?: (item: T) => U): boolean;
   format(): string;
   clone(): Option<T>;
   unwrap(): T;

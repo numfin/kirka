@@ -3,8 +3,11 @@ import { Iter } from "./interfaces";
 import { create_iter } from "./iter";
 
 export namespace IterFrom {
-  export function array<T>(source: T[]): Iter<T> {
+  export function iterable<T>(source: Iterable<T>): Iter<T> {
     return create_iter(() => iterFactory(source));
+  }
+  export function array<T>(source: T[]): Iter<T> {
+    return iterable(source);
   }
   export function range(from: number, to: number, inclusive = false) {
     if (from > to) {

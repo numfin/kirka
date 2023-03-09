@@ -1,9 +1,9 @@
-import { WithIndex } from "./interfaces";
+import { ClonnableGenerator, WithIndex } from "./interfaces";
 
-export const defaultFilter = <T>(item: T) => true;
+export const defaultFilter = <T>(_item: T) => true;
 export const defaultMap = <T, U>(item: T): U => item as unknown as U;
 
-export function* iterFactory<T, U>(
+export function* iterFactory<T, U = T>(
   source: Iterable<T>,
   map = defaultMap<T, U>,
   filter = defaultFilter<U>
@@ -16,7 +16,7 @@ export function* iterFactory<T, U>(
     }
   }
 }
-export function* iterInfinite<T>() {
+export function* iterInfinite() {
   while (true) {
     yield;
   }
@@ -49,6 +49,30 @@ export function* iterTakeWhile<T>(
       yield item;
     } else {
       return;
+    }
+  }
+}
+
+export function* iterCycle<T>(source: ClonnableGenerator<T>) {
+  let iter = source();
+  let firstValue = iter.next();
+  if (firstValue.done) return;
+  yield firstValue.value;
+
+  while (true) {
+    let nextValue = iter.next();
+    if (nextValue.done) {
+      iter = source();
+    } else {
+      yield nextValue.value;
+    }
+  }
+}
+
+export function* iterFlat<T>(source: Iterable<Iterable<T>>) {
+  for (const item of source) {
+    for (const subItem of item) {
+      yield subItem;
     }
   }
 }

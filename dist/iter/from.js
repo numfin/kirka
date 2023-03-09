@@ -2,8 +2,12 @@ import { iterFactory, iterInfinite } from "./gen";
 import { create_iter } from "./iter";
 export var IterFrom;
 (function (IterFrom) {
-    function array(source) {
+    function iterable(source) {
         return create_iter(() => iterFactory(source));
+    }
+    IterFrom.iterable = iterable;
+    function array(source) {
+        return iterable(source);
     }
     IterFrom.array = array;
     function range(from, to, inclusive = false) {
