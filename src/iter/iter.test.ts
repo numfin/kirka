@@ -1,4 +1,5 @@
 import test, { ExecutionContext } from "ava";
+import { None, Some } from "../option";
 import { useSpy } from "../testutils/spy";
 import { IterFrom } from "./index";
 
@@ -41,6 +42,23 @@ test(`.filter()`, (t) => {
   // Clone test: initial iter should be untouched
   const evenIter = iter.filter((v) => v % 2 === 0);
   const oddIter = iter.filter((v) => v % 2 !== 0);
+  const evenValues = nativeRange(0, 10).filter((v) => v % 2 === 0);
+  const oddValues = nativeRange(0, 10).filter((v) => v % 2 !== 0);
+
+  t.deepEqual(evenIter.collect(), evenValues);
+  t.deepEqual(oddIter.collect(), oddValues);
+});
+test(`.filterMap()`, (t) => {
+  const iter = IterFrom.range(0, 10);
+  function even(v: number) {
+    return v % 2 === 0 ? Some(v) : None();
+  }
+  function odd(v: number) {
+    return v % 2 !== 0 ? Some(v) : None();
+  }
+  // Clone test: initial iter should be untouched
+  const evenIter = iter.filterMap(even);
+  const oddIter = iter.filterMap(odd);
   const evenValues = nativeRange(0, 10).filter((v) => v % 2 === 0);
   const oddValues = nativeRange(0, 10).filter((v) => v % 2 !== 0);
 
@@ -159,4 +177,31 @@ test(`.take()`, (t) => {
 
   t.deepEqual(iter.collect(), values);
   t.deepEqual(takenIter.collect(), takenValues);
+});
+
+test(`.nth()`, (t) => {
+  const iter = IterFrom.range(0, 10);
+  t.true(Some(2).eq(iter.nth(2)));
+  t.true(Some(0).eq(iter.nth(0)));
+  t.true(None().eq(iter.nth(100)));
+});
+test(`.all()`, (t) => {
+  const iter = IterFrom.range(0, 10, true);
+  t.true(iter.all((v) => typeof v === "number"));
+  t.false(iter.all((v) => v < 10));
+  t.true(IterFrom.array([]).all(() => false));
+});
+test(`.any()`, (t) => {
+  const iter = IterFrom.range(0, 10, true);
+  t.true(iter.any((v) => v === 5));
+  t.false(iter.any((v) => v < 0));
+  t.false(IterFrom.array([]).any(() => true));
+});
+test(`.next()`, (t) => {
+  const iter = IterFrom.array([1, 2, 3, 4]);
+  t.true(Some(1).eq(iter.next()));
+  t.true(Some(2).eq(iter.next()));
+  t.true(Some(3).eq(iter.next()));
+  t.true(Some(4).eq(iter.next()));
+  t.true(None().eq(iter.next()));
 });
