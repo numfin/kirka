@@ -2,6 +2,10 @@
   "name": "kirka",
   "version": "1.0.0",
   "description": "Monoids Rust-style for Typescript",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/numfin/kirka.git"
+  },
   "type": "module",
   "exports": {
     ".": "./dist/index.js"
