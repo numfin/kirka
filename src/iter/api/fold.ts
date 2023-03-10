@@ -1,7 +1,5 @@
-import { Iter } from "../interfaces";
-
 export function fold<T, U>(
-  source: Iter<T>,
+  source: Iterable<T>,
   startFrom: U,
   fn: (acc: U, item: T) => U
 ): U {

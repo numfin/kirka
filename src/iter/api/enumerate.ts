@@ -1,6 +1,5 @@
 import { iterEnumerate } from "../generators/iterEnumerate";
-import { ClonnableGenerator } from "../interfaces";
 
-export function enumerate<T>(source: ClonnableGenerator<T>) {
-  return iterEnumerate(source());
+export function enumerate<T>(source: Iterable<T>) {
+  return iterEnumerate(source);
 }

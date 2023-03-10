@@ -1,1 +1,1 @@
-{"version":3,"file":"enumerate.d.ts","sourceRoot":"","sources":["../../../src/iter/api/enumerate.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,kBAAkB,EAAE,MAAM,eAAe,CAAC;AAEnD,wBAAgB,SAAS,CAAC,CAAC,EAAE,MAAM,EAAE,kBAAkB,CAAC,CAAC,CAAC;;;kBAEzD"}
+{"version":3,"file":"enumerate.d.ts","sourceRoot":"","sources":["../../../src/iter/api/enumerate.ts"],"names":[],"mappings":"AAEA,wBAAgB,SAAS,CAAC,CAAC,EAAE,MAAM,EAAE,QAAQ,CAAC,CAAC,CAAC;;;kBAE/C"}

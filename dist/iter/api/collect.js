@@ -1,3 +1,3 @@
 export function collect(source) {
-    return Array.from(source());
+    return Array.from(source);
 }

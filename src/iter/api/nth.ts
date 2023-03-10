@@ -1,6 +1,11 @@
 import { Iter } from "../interfaces";
-import { OptionFrom } from "../../option";
 
-export function nth<T>(source: Iter<T>, index: number) {
-  return OptionFrom.nullable(source.skip(index).take(1).collect()[0]);
+export function nth<T>(source: Iter<T>, amount: number) {
+  if (amount <= 0) {
+    throw new Error(`Cannot iterate ${amount} - 1 times`);
+  }
+  for (let i = 0; i < amount - 1; i++) {
+    source.next();
+  }
+  return source.next();
 }

@@ -1,5 +1,10 @@
 import { None, Some } from "../../option";
-export function next(generator) {
-    const current = generator.next();
-    return current.done ? None() : Some(current.value);
+export function next(source) {
+    const nextValue = source.next();
+    if (nextValue.done) {
+        return None();
+    }
+    else {
+        return Some(nextValue.value);
+    }
 }

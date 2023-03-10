@@ -18,6 +18,7 @@ import { eq } from "./api/eq";
 import { format } from "./api/format";
 import { NoneUnion } from "./api/NoneUnion";
 import { SomeUnion } from "./api/SomeUnion";
+import { filter } from "./api/filter";
 export function createOption(v) {
     let inner = v;
     const api = {
@@ -38,6 +39,7 @@ export function createOption(v) {
         andThen: (fn) => createOption(andThen(api, fn)),
         toLeft: (fn) => toLeft(api, fn),
         toRight: (fn) => toRight(api, fn),
+        filter: (fn) => filter(api, fn),
     };
     return api;
 }

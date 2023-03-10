@@ -1,3 +1,2 @@
-import { ClonnableGenerator } from "../interfaces";
-export declare function collect<T>(source: ClonnableGenerator<T>): T[];
+export declare function collect<T>(source: Iterable<T>): T[];
 //# sourceMappingURL=collect.d.ts.map

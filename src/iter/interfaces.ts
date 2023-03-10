@@ -13,7 +13,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [0, 1, 2, 3]
-   * const items = IterFrom::array(values);
+   * const items = IterFrom.array(values);
    * assert(items.collect(), values)
    * ```
    */
@@ -23,7 +23,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [0, 1, 2, 3]
-   * const items = IterFrom::array(values).map((v) => v * 2);
+   * const items = IterFrom.array(values).map((v) => v * 2);
    * assert(items.collect(), [0, 2, 4, 6])
    * ```
    */
@@ -35,7 +35,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [0, 1, 2, 3]
-   * const items = IterFrom::array(values).filter((v) => v % 2 === 0);
+   * const items = IterFrom.array(values).filter((v) => v % 2 === 0);
    * assert(items.collect(), [0, 2])
    * ```
    */
@@ -51,7 +51,7 @@ export interface Iter<T> extends Iterable<T> {
    * const values = [2, 3, 4, 5]
    *
    * function parseEven(v: number): Result<number, Err> {}
-   * const iter = IterFrom::array(values).filterMap((v) => parseEven(v).ok());
+   * const iter = IterFrom.array(values).filterMap((v) => parseEven(v).ok());
    *
    * assert(iter.collect(), [2, 4])
    * ```
@@ -62,7 +62,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [2, 3, 4, 5]
-   * const items = IterFrom::array(values).enumerate();
+   * const items = IterFrom.array(values).enumerate();
    * assert(items.collect(), [
    *   { index: 0, item: 2 },
    *   { index: 1, item: 3 },
@@ -81,7 +81,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [2, 3, 4, 5]
-   * const items = IterFrom::array(values).skipWhile((v) => v < 4);
+   * const items = IterFrom.array(values).skipWhile((v) => v < 4);
    * assert(items.collect(), [4, 5])
    * ```
    */
@@ -91,7 +91,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [2, 3, 4, 5]
-   * const iter = IterFrom::array(values);
+   * const iter = IterFrom.array(values);
    * assert(iter.skip(10).collect(), [])
    * assert(iter.skip(2).collect(), [4, 5])
    * assert(iter.skip(0).collect(), [2, 3, 4, 5])
@@ -107,7 +107,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [2, 3, 4, 5]
-   * const items = IterFrom::array(values).takeWhile((v) => v < 4);
+   * const items = IterFrom.array(values).takeWhile((v) => v < 4);
    * assert(items.collect(), [2, 3])
    * ```
    */
@@ -117,7 +117,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [2, 3, 4, 5]
-   * const iter = IterFrom::array(values);
+   * const iter = IterFrom.array(values);
    * assert(iter.take(0).collect(), [])
    * assert(iter.take(2).collect(), [2, 3])
    * assert(iter.take(10).collect(), [2, 3, 4, 5])
@@ -125,17 +125,38 @@ export interface Iter<T> extends Iterable<T> {
    */
   take(i: number): Iter<T>;
   /**
-   * Returns the nth element of the iterator.
+   * Returns the element from iterator on `position` or `None`
+   * # Example
+   * ```ts
+   * const values = [1,2,3,4,5]
+   * const iter = IterFrom.array(values)
+   * assert(iter.get(0), Some(1))
+   * assert(iter.get(1), Some(2))
+   * assert(iter.get(2), Some(3))
+   * assert(iter.get(3), Some(4))
+   * assert(iter.get(4), Some(5))
+   * assert(iter.get(5), None())
+   * assert(iter.get(-1), None())
+   * ```
+   */
+  get(position: number): Option<T>;
+  /**
+   * Advances iterator to the `amount` elements and returns the element
+   *
+   * Mutates inner state like `next()` so calling `nth()` twice will give different results
+   * # Throws
+   * When `amount < 1`
    * # Example
    * ```ts
    * const values = [2, 3, 4, 5]
-   * const iter = IterFrom::array(values);
-   * assert(iter.nth(0), Some(2))
+   * const iter = IterFrom.array(values);
+   * assert(iter.nth(1), Some(2))
    * assert(iter.nth(2), Some(4))
+   * assert(iter.nth(1), Some(5))
    * assert(iter.nth(10), None())
    * ```
    */
-  nth(i: number): Option<T>;
+  nth(amount: number): Option<T>;
   /**
    * Tests if every element of the iterator matches a predicate.
    *
@@ -147,11 +168,11 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [2, 3, 4, 5]
-   * const iter = IterFrom::array(values);
+   * const iter = IterFrom.array(values);
    * assert(iter.all((v) => typeof v === 'number'), true)
    * assert(iter.all((v) => v === 2), false)
    *
-   * const emptyIter = IterFrom::array([]);
+   * const emptyIter = IterFrom.array([]);
    * assert(emptyIter.all((v) => false), true)
    * ```
    */
@@ -167,11 +188,11 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [2, 3, 4, 5]
-   * const iter = IterFrom::array(values);
+   * const iter = IterFrom.array(values);
    * assert(iter.any((v) => typeof v === 'number'), true)
    * assert(iter.any((v) => v === 2), true)
    *
-   * const emptyIter = IterFrom::array([]);
+   * const emptyIter = IterFrom.array([]);
    * assert(emptyIter.any((v) => true), false)
    * ```
    */
@@ -186,7 +207,7 @@ export interface Iter<T> extends Iterable<T> {
    * Returns `None()` when iteration is finished.
    * # Example
    * ```ts
-   * const iter = IterFrom::array([1, 2, 3])
+   * const iter = IterFrom.array([1, 2, 3])
    * assert(iter.next(), Some(1))
    * assert(iter.next(), Some(2))
    * assert(iter.next(), Some(3))
@@ -198,7 +219,7 @@ export interface Iter<T> extends Iterable<T> {
    * Creates new iter with reset inner state
    * # Example
    * ```ts
-   * const iter = IterFrom::array([1, 2, 3]);
+   * const iter = IterFrom.array([1, 2, 3]);
    * assert(iter.next(), Some(1))
    * assert(iter.next(), Some(2))
    * assert(iter.next(), None())
@@ -218,14 +239,14 @@ export interface Iter<T> extends Iterable<T> {
    * Note that in case the original iterator is empty, the resulting iterator will also be empty.
    * # Example
    * ```ts
-   * const iter = IterFrom::array([1,2]);
+   * const iter = IterFrom.array([1,2]);
    * assert(iter.next(), Some(1))
    * assert(iter.next(), Some(2))
    * assert(iter.next(), Some(1))
    * assert(iter.next(), Some(2))
    * assert(iter.next(), Some(1))
    *
-   * const iter = IterFrom::array([]);
+   * const iter = IterFrom.array([]);
    * assert(iter.next(), None())
    * ```
    */
@@ -234,9 +255,9 @@ export interface Iter<T> extends Iterable<T> {
    * Determines if the elements of this iter are equal to those of another
    * # Example
    * ```ts
-   * const iter1 = IterFrom::array([1, 2]);
-   * const iter2 = IterFrom::array([1, 2]);
-   * const iter3 = IterFrom::array([1, 2, 3]);
+   * const iter1 = IterFrom.array([1, 2]);
+   * const iter2 = IterFrom.array([1, 2]);
+   * const iter3 = IterFrom.array([1, 2, 3]);
    *
    * assert(iter1.eq(iter2), true)
    * assert(iter2.eq(iter3), false)
@@ -254,7 +275,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [1, 2, 3, 4];
-   * const iter = IterFrom::array(values);
+   * const iter = IterFrom.array(values);
    * assert(iter.find((v) => v === 3), Some(3))
    * assert(iter.find((v) => v === 5), None())
    * ```
@@ -267,7 +288,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [1, 2, 3, 4];
-   * const iter = IterFrom::array(values);
+   * const iter = IterFrom.array(values);
    * function asEven(v: number): Option<T> {}
    * assert(iter.findMap(asEven), Some(2))
    * ```
@@ -278,7 +299,7 @@ export interface Iter<T> extends Iterable<T> {
    * # Example
    * ```ts
    * const values = [0, 1, 2, 3];
-   * const iter = IterFrom::array(values);
+   * const iter = IterFrom.array(values);
    * assert(iter.position((v) => v === 2), Some(2));
    * ```
    */
@@ -347,7 +368,8 @@ export interface Iter<T> extends Iterable<T> {
    * Calls a closure on each element of an iterator.
    *
    * This is equivalent to using a `for` loop on the iterator, although `break` and `continue` are not possible from a closure. It's generally more idiomatic to use a `for` loop, but `forEach` may be more legible when processing items at the end of longer iterator chains.
-   *
+   * # Warning
+   * Consumes an iterator, so be carefull on infinite iterators
    * # Example
    * ```ts
    * IterFrom.array([1,2,3]).forEach((v) => {
@@ -356,15 +378,119 @@ export interface Iter<T> extends Iterable<T> {
    * ```
    */
   forEach(fn: (item: T) => void): void;
-  // intersperse(item: T): Iter<T>;
-  // isEmpty(): boolean;
-  // len(): number;
-  // minBy(fn: (item: T) => number): Option<T>;
-  // maxBy(fn: (item: T) => number): Option<T>;
-  // first(): Option<T>;
-  // last(): Option<T>;
-  // partition(fn: (item: T) => boolean): [Iter<T>, Iter<T>];
-  // reverse(): Iter<T>;
+  /**
+   * Creates a new iterator which places a separator between items of the original iterator.
+   * # Example
+   * ```ts
+   * const iter = IterFrom.array([1,2,3]).intersperse(10);
+   * assert(iter.next(), Some(1))
+   * assert(iter.next(), Some(10))
+   * assert(iter.next(), Some(2))
+   * assert(iter.next(), Some(10))
+   * assert(iter.next(), Some(3))
+   * assert(iter.next(), None())
+   * ```
+   */
+  intersperse(item: T): Iter<T>;
+  /**
+   * Returns true if the iterator is empty.
+   * # Example
+   * ```ts
+   * assert(IterFrom.array([1,2,3]).isEmpty(), false)
+   * assert(IterFrom.array([]).isEmpty(), true)
+   * ```
+   */
+  isEmpty(): boolean;
+  /**
+   * Returns size of the iterator.
+   *
+   * # Warning
+   * `.len()` consumes entire array so it will freeze on infinite iterators.
+   * # Example
+   * ```ts
+   * assert(IterFrom.array([1,2,3]).isEmpty(), false)
+   * assert(IterFrom.array([]).isEmpty(), true)
+   * ```
+   */
+  len(): number;
+  /**
+   * Returns first element of the iterator or `None()` if its empty
+   *
+   * # Example
+   * ```ts
+   * assert(IterFrom.array([1,2,3]).first(), Some(1))
+   * assert(IterFrom.array([]).first(), None())
+   * ```
+   */
+  first(): Option<T>;
+  /**
+   * Returns last element of the iterator or `None()` if its empty
+   *
+   * # Warning
+   * Consumes entire iterator, so be carefull on infinite iterators
+   * # Example
+   * ```ts
+   * assert(IterFrom.array([1,2,3]).last(), Some(3))
+   * assert(IterFrom.array([]).first(), None())
+   * ```
+   */
+  last(): Option<T>;
+  /**
+   * Returns min element of the iterator or `None()` if its empty.
+   *
+   * `fn()` should return a value that must be used for comparison
+   *
+   * # Warning
+   * Consumes entire iterator, so be carefull on infinite iterators
+   * # Example
+   * ```ts
+   * assert(IterFrom.array([1,2,3]).minBy(x => x), Some(1))
+   * assert(IterFrom.array([]).minBy(x => x), None())
+   * ```
+   */
+  minBy(fn: (item: T) => number): Option<T>;
+  /**
+   * Returns max element of the iterator or `None()` if its empty.
+   *
+   * `fn()` should return a value that must be used for comparison
+   *
+   * If items are equal - last item is used
+   *
+   * # Warning
+   * Consumes entire iterator, so be carefull on infinite iterators
+   * # Example
+   * ```ts
+   * assert(IterFrom.array([1,2,3]).maxBy(x => x), Some(3))
+   * assert(IterFrom.array([]).maxBy(x => x), None())
+   * ```
+   */
+  maxBy(fn: (item: T) => number): Option<T>;
+  /**
+   * Split iterator in 2 by `fn()` filter.
+   *
+   * # Warning
+   * Consumes entire iterator, so be carefull on infinite iterators
+   * # Example
+   * ```ts
+   * const iter = IterFrom.array([1, 2, 3, 4, 5, 6, 7])
+   * const [even, odd] = iter.partition((v) => v % 2 === 0)
+   * assert(even.collect(), [2, 4, 6])
+   * assert(odd.collect(), [1, 3, 5, 7])
+   * ```
+   */
+  partition(fn: (item: T) => boolean): [Iter<T>, Iter<T>];
+  /**
+   * Reverses direction of iterator
+   *
+   * # Warning
+   * Consumes entire iterator, so be carefull on infinite iterators
+   * # Example
+   * ```ts
+   * const iter = IterFrom.array([1, 2, 3, 4])
+   * assert(iter.reverse().collect(), [4, 3, 2, 1])
+   * ```
+   */
+  reverse(): Iter<T>;
 }
 
 export type ClonnableGenerator<T> = () => Generator<T>;

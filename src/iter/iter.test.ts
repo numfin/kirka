@@ -2,6 +2,7 @@ import test, { ExecutionContext } from "ava";
 import { None, Some } from "../option";
 import { useSpy } from "../testutils/spy";
 import { IterFrom } from "./from";
+import { iterInfinite } from "./generators/iterInfinite";
 
 function nativeRange(from: number, to: number, inclusive = false) {
   if (from > to) {
@@ -17,9 +18,9 @@ test(`.[Symbol.iterator]()`, (t) => {
   const values = [1, 2, 3, 4, 5];
   const iter = IterFrom.array(values);
   t.deepEqual([...iter], values);
-  // Inner state immutable
+  t.true(iter.next().eq(Some(values[0]))); // inner state untouched
   t.deepEqual([...iter], values);
-  t.true(iter.next().eq(Some(values[0])));
+  t.true(iter.next().eq(Some(values[1])));
 });
 
 test(`.filter()`, (t) => {
@@ -164,11 +165,22 @@ test(`.take()`, (t) => {
   t.deepEqual(takenIter.collect(), takenValues);
 });
 
+test(`.get()`, (t) => {
+  const iter = IterFrom.range(0, 10);
+  t.true(iter.get(-1).eq(None()));
+  t.true(iter.get(0).eq(Some(0)));
+  t.true(iter.get(1).eq(Some(1)));
+  t.true(iter.get(2).eq(Some(2)));
+  t.true(iter.get(2).eq(Some(2)));
+  t.true(iter.get(100).eq(None()));
+});
 test(`.nth()`, (t) => {
   const iter = IterFrom.range(0, 10);
-  t.true(Some(2).eq(iter.nth(2)));
-  t.true(Some(0).eq(iter.nth(0)));
-  t.true(None().eq(iter.nth(100)));
+  t.true(iter.nth(1).eq(Some(0)));
+  t.throws(() => iter.nth(0));
+  t.true(iter.nth(2).eq(Some(2)));
+  t.true(iter.nth(2).eq(Some(4)));
+  t.true(iter.nth(100).eq(None()));
 });
 test(`.all()`, (t) => {
   const iter = IterFrom.range(0, 10, true);
@@ -294,4 +306,75 @@ test(`.forEach()`, (t) => {
   for (const i of nativeRange(0, 10)) {
     t.deepEqual(myFn.calledWith(i), [i]);
   }
+});
+test(`.intersperse()`, (t) => {
+  const iter = IterFrom.array([1, 2, 3]);
+  t.deepEqual(iter.intersperse(10).collect(), [1, 10, 2, 10, 3]);
+  const iter2 = IterFrom.array<number>([]);
+  t.deepEqual(iter2.intersperse(10).collect(), []);
+});
+test(`.isEmpty()`, (t) => {
+  t.is(IterFrom.array([]).isEmpty(), true);
+  t.is(IterFrom.array([1]).isEmpty(), false);
+  t.is(IterFrom.iterable(iterInfinite()).isEmpty(), false);
+});
+test(`.len()`, (t) => {
+  t.is(IterFrom.array([]).len(), 0);
+  t.is(IterFrom.array([1, 2, 3]).len(), 3);
+});
+test(`.first()`, (t) => {
+  t.true(IterFrom.array([1, 2, 3]).first().eq(Some(1)));
+  t.true(IterFrom.array([]).first().eq(None()));
+  t.true(IterFrom.iterable(iterInfinite()).first().isSome());
+});
+test(`.last()`, (t) => {
+  t.true(IterFrom.array([1, 2, 3]).last().eq(Some(3)));
+  t.true(IterFrom.array([]).last().eq(None()));
+});
+test(`.minBy()`, (t) => {
+  const id = ({ v }: { v: number }) => v;
+
+  const iter = IterFrom.array([1, 2, 3]).map((v) => ({ v }));
+  t.true(iter.minBy(id).eq(Some({ v: 1 }), id));
+  const iter2 = IterFrom.array([2, 1, 3]).map((v) => ({ v }));
+  t.true(iter2.minBy(id).eq(Some({ v: 1 }), id));
+  t.true(IterFrom.array<{ v: number }>([]).minBy(id).eq(None(), id));
+  t.true(
+    IterFrom.array([{ v: 1 }])
+      .minBy(id)
+      .eq(Some({ v: 1 }), id)
+  );
+});
+test(`.maxBy()`, (t) => {
+  const id = ({ v }: { v: number }) => v;
+
+  const iter = IterFrom.array([1, 2, 3]).map((v) => ({ v }));
+  t.true(iter.maxBy(id).eq(Some({ v: 3 }), id));
+  const iter2 = IterFrom.array([3, 1, 3]).map((v) => ({ v }));
+  t.true(iter2.maxBy(id).eq(Some({ v: 3 }), id));
+  t.true(IterFrom.array<{ v: number }>([]).maxBy(id).eq(None(), id));
+  t.true(
+    IterFrom.array([{ v: 1 }])
+      .maxBy(id)
+      .eq(Some({ v: 1 }), id)
+  );
+});
+test(`.partition()`, (t) => {
+  const values = nativeRange(0, 11, true);
+  const iter = IterFrom.array(values);
+  const even = (v: number) => v % 2 === 0;
+  const [evenIter, oddIter] = iter.partition(even);
+  t.deepEqual(evenIter.collect(), values.filter(even));
+  t.deepEqual(
+    oddIter.collect(),
+    values.filter((v) => !even(v))
+  );
+});
+
+test(`.reverse()`, (t) => {
+  const values = [1, 2, 3, 4, 5];
+  const valuesCopy = [...values];
+  const iter = IterFrom.array(values).reverse();
+  t.deepEqual(iter.collect(), valuesCopy.reverse());
+  t.deepEqual(IterFrom.array([]).reverse().collect(), [].reverse());
 });

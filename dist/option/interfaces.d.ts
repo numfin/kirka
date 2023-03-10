@@ -3,10 +3,10 @@ export interface Some<T> {
     type: "Some";
     value: T;
 }
-export interface None<T> {
+export interface None {
     type: "None";
 }
-export type OptionUnion<T> = None<T> | Some<T>;
+export type OptionUnion<T> = None | Some<T>;
 export interface Option<T> {
     inner(): OptionUnion<T>;
     eq<U>(v: Option<T>, by?: (item: T) => U): boolean;
@@ -25,5 +25,6 @@ export interface Option<T> {
     andThen<U>(fn: (v: T) => Option<U>): Option<U>;
     toLeft<R>(defaultRight: () => R): Either<T, R>;
     toRight<L>(defaultLeft: () => L): Either<L, T>;
+    filter(fn: (item: T) => boolean): Option<T>;
 }
 //# sourceMappingURL=interfaces.d.ts.map
