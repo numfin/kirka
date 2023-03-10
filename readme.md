@@ -7,14 +7,11 @@
 
 <h2> :book: Big inspiration from <a href="https://github.com/gcanti/fp-ts">fp-ts</a>, <a href="https://github.com/JSMonk/sweet-monads">@sweet-monads</a></h2>
 
-<details open="open">
-  <summary>Modules</summary>
-  <ul>
-    <li><a href="/src/option">Option&lt;T&gt;</a></li>
-    <li><a href="/src/either">Either&lt;L, R&gt;</a></li>
-    <li><a href="/src/iter">Iter&lt;T&gt;</a></li>
-  </ul>
-</details>
+### Modules
+
+- [Option&lt;T&gt;](/src/option/) - To define optional type
+- [Either&lt;L, R&gt;](/src/either/) - To define two-state type
+- [Iter&lt;T&gt;](/src/iter/) - To work with iterables (arrays, generators) lazy
 
 # Installation
 
