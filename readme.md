@@ -16,9 +16,9 @@
 # Installation
 
 ```bash
-npm i github:numfin/kirka
+npm i kirka
 # or
-npm i github.com/numfin/kirka
+npm i github:numfin/kirka
 # or fork it and instal from your own repo
 ```
 
