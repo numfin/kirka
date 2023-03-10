@@ -1,3 +1,5 @@
+export * from "./interfaces";
+export { IterFrom } from "./from";
 import { all } from "./api/all";
 import { any } from "./api/any";
 import { collect } from "./api/collect";
@@ -21,8 +23,6 @@ import { skipWhile } from "./api/skipWhile";
 import { stepBy } from "./api/stepBy";
 import { take } from "./api/take";
 import { takeWhile } from "./api/takeWhile";
-export * from "./interfaces";
-export { IterFrom } from "./from";
 export function createIter(source) {
     /** `Generator<T>` with local state, used for `.next()` iteration */
     const inner = source();

@@ -1,3 +1,6 @@
+export * from "./interfaces";
+export { IterFrom } from "./from";
+
 import { all } from "./api/all";
 import { any } from "./api/any";
 import { collect } from "./api/collect";
@@ -22,8 +25,6 @@ import { stepBy } from "./api/stepBy";
 import { take } from "./api/take";
 import { takeWhile } from "./api/takeWhile";
 import type { ClonnableGenerator, Iter } from "./interfaces";
-export * from "./interfaces";
-export { IterFrom } from "./from";
 
 export function createIter<T>(source: ClonnableGenerator<T>) {
   /** `Generator<T>` with local state, used for `.next()` iteration */
