@@ -1,3 +1,3 @@
-export function isRightAnd(either, fn) {
-    return either.isRight() && fn(either.unwrap());
+export function isErrAnd(result, fn) {
+    return result.isErr() && fn(result.unwrapErr());
 }

@@ -1,4 +1,4 @@
-import type { Either } from "../result/interfaces";
+import type { Result } from "../result/interfaces";
 
 export interface Some<T> {
   type: "Some";
@@ -26,7 +26,6 @@ export interface Option<T> {
   orElse(fn: () => Option<T>): Option<T>;
   and<U>(v: Option<U>): Option<U>;
   andThen<U>(fn: (v: T) => Option<U>): Option<U>;
-  toLeft<R>(defaultRight: () => R): Either<T, R>;
-  toRight<L>(defaultLeft: () => L): Either<L, T>;
+  result<E>(noneErr: () => E): Result<T, E>;
   filter(fn: (item: T) => boolean): Option<T>;
 }

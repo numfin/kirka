@@ -1,7 +1,5 @@
-import { optionLeft } from "./optionLeft";
-import { optionRight } from "./optionRight";
+import { option } from "./option";
 
-export const EitherFrom = {
-  optionLeft,
-  optionRight,
+export const ResultFrom = {
+  option,
 };

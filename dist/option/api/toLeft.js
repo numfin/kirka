@@ -1,4 +1,4 @@
-import { Left, Right } from "../../result";
-export function toLeft(option, right_default) {
-    return option.isSome() ? Left(option.unwrap()) : Right(right_default());
+import { Err, Ok } from "../../result";
+export function result(option, noneErr) {
+    return option.isSome() ? Ok(option.unwrap()) : Err(noneErr());
 }

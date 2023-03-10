@@ -1,11 +1,11 @@
 import { bool } from "./bool";
-import { eitherLeft } from "./eitherLeft";
-import { eitherRight } from "./eitherRight";
+import { ok } from "./ok";
+import { err } from "./err";
 import { nullable } from "./nullable";
 export declare const OptionFrom: {
     bool: typeof bool;
     nullable: typeof nullable;
-    eitherLeft: typeof eitherLeft;
-    eitherRight: typeof eitherRight;
+    ok: typeof ok;
+    err: typeof err;
 };
 //# sourceMappingURL=index.d.ts.map

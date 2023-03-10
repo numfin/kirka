@@ -1,8 +1,7 @@
 export * from "./interfaces";
 export { OptionFrom } from "./from";
 
-import { toRight } from "./api/toRight";
-import { toLeft } from "./api/toLeft";
+import { result } from "./api/toLeft";
 import { andThen } from "./api/andThen";
 import { and } from "./api/and";
 import { orElse } from "./api/orElse";
@@ -17,8 +16,8 @@ import { isNone } from "./api/isNone";
 import { clone } from "./api/clone";
 import { eq } from "./api/eq";
 import { format } from "./api/format";
-import { NoneUnion } from "./api/NoneUnion";
-import { SomeUnion } from "./api/SomeUnion";
+import { unionNone } from "./api/unionNone";
+import { unionSome } from "./api/unionSome";
 import type { Option, Some, OptionUnion, None } from "./interfaces";
 import { filter } from "./api/filter";
 
@@ -41,16 +40,15 @@ export function createOption<T>(v: OptionUnion<T>): Option<T> {
     orElse: (fn) => createOption(orElse(api, fn)),
     and: (new_value) => createOption(and(api, new_value)),
     andThen: (fn) => createOption(andThen(api, fn)),
-    toLeft: (fn) => toLeft(api, fn),
-    toRight: (fn) => toRight(api, fn),
+    result: (fn) => result(api, fn),
     filter: (fn) => filter(api, fn),
   };
   return api;
 }
 
 export function Some<T>(v: T) {
-  return createOption(SomeUnion(v));
+  return createOption(unionSome(v));
 }
 export function None<T>() {
-  return createOption(NoneUnion<T>());
+  return createOption(unionNone<T>());
 }

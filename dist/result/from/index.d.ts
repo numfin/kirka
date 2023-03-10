@@ -1,7 +1,5 @@
-import { optionLeft } from "./optionLeft";
-import { optionRight } from "./optionRight";
-export declare const EitherFrom: {
-    optionLeft: typeof optionLeft;
-    optionRight: typeof optionRight;
+import { option } from "./option";
+export declare const ResultFrom: {
+    option: typeof option;
 };
 //# sourceMappingURL=index.d.ts.map

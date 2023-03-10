@@ -1,3 +1,3 @@
-export function format(either) {
-    return `Either.${either.type}(${either.value})`;
+export function format(result) {
+    return `Result.${result.type}(${result.value})`;
 }

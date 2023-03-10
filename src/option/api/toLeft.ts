@@ -1,9 +1,9 @@
-import { Either, Left, Right } from "../../result";
+import { Result, Err, Ok } from "../../result";
 import { Option } from "../interfaces";
 
-export function toLeft<T, R>(
+export function result<T, E>(
   option: Option<T>,
-  right_default: () => R
-): Either<T, R> {
-  return option.isSome() ? Left(option.unwrap()) : Right(right_default());
+  noneErr: () => E
+): Result<T, E> {
+  return option.isSome() ? Ok(option.unwrap()) : Err(noneErr());
 }

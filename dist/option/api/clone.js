@@ -1,5 +1,5 @@
-import { NoneUnion } from "./NoneUnion";
-import { SomeUnion } from "./SomeUnion";
+import { unionNone } from "./unionNone";
+import { unionSome } from "./unionSome";
 export function clone(option) {
-    return option.type === "Some" ? SomeUnion(option.value) : NoneUnion();
+    return option.type === "Some" ? unionSome(option.value) : unionNone();
 }

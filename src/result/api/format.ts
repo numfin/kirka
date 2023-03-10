@@ -1,5 +1,5 @@
-import { EitherUnion } from "../interfaces";
+import { ResultUnion } from "../interfaces";
 
-export function format<L, R>(either: EitherUnion<L, R>) {
-  return `Either.${either.type}(${either.value})`;
+export function format<T, E>(result: ResultUnion<T, E>) {
+  return `Result.${result.type}(${result.value})`;
 }

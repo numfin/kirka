@@ -1,155 +1,145 @@
 import test from "ava";
 import { None, Some } from "../option";
 import { useSpy } from "../testutils/spy";
-import { Left, Right } from "./index";
+import { Err, Ok } from "./index";
 
 test(`x.eq(y) when x == y`, (t) => {
-  t.true(Left(3).eq(Left(3)));
-  t.false(Left(3).eq(Right(3)));
+  t.true(Err(3).eq(Err(3)));
+  t.false(Err(3).eq(Ok(3)));
 
-  t.true(Right(4).eq(Right(4)));
-  t.false(Right(4).eq(Left(4)));
+  t.true(Ok(4).eq(Ok(4)));
+  t.false(Ok(4).eq(Err(4)));
 });
 test(`x.eq(y) when x != y`, (t) => {
-  t.false(Left(3).eq(Left(4)));
-  t.false(Left(3).eq(Right(4)));
+  t.false(Err(3).eq(Err(4)));
+  t.false(Err(3).eq(Ok(4)));
 
-  t.false(Right(4).eq(Right(3)));
-  t.false(Right(4).eq(Left(3)));
+  t.false(Ok(4).eq(Ok(3)));
+  t.false(Ok(4).eq(Err(3)));
 });
-test(`.isLeft()`, (t) => {
-  t.true(Left(3).isLeft());
-  t.false(Right(3).isLeft());
+test(`.isOk()`, (t) => {
+  t.false(Err(3).isOk());
+  t.true(Ok(3).isOk());
 });
-test(`.isRight()`, (t) => {
-  t.true(Right(3).isRight());
-  t.false(Left(3).isRight());
+test(`.isErr()`, (t) => {
+  t.false(Ok(3).isErr());
+  t.true(Err(3).isErr());
 });
 test(`.unwrap()`, (t) => {
-  t.is(Left(3).unwrap(), 3);
-  t.is(Right(4).unwrap(), 4);
+  t.is(Ok(3).unwrap(), 3);
+  t.throws(Err(3).unwrap);
 });
-test(`.unwrapLeft()`, (t) => {
-  t.is(Left(3).unwrapLeft(), 3);
-  t.throws(Right(3).unwrapLeft);
+test(`.unwrapErr()`, (t) => {
+  t.is(Err(3).unwrapErr(), 3);
+  t.throws(Ok(3).unwrapErr);
 });
-test(`.unwrapRight()`, (t) => {
-  t.is(Right(3).unwrapRight(), 3);
-  t.throws(Left(3).unwrapRight);
+test(`.unwrapOr()`, (t) => {
+  t.is(Err(3).unwrapOr(5), 5);
+  t.is(Ok(3).unwrapOr(5), 3);
 });
-test(`.unwrapLeftOr()`, (t) => {
-  t.is(Left(3).unwrapLeftOr(5), 3);
-  t.is(Right(3).unwrapLeftOr(5), 5);
+test(`.unwrapErrOr()`, (t) => {
+  t.is(Ok(3).unwrapErrOr(5), 5);
+  t.is(Err(3).unwrapErrOr(5), 3);
 });
-test(`.unwrapRightOr()`, (t) => {
-  t.is(Right(3).unwrapRightOr(5), 3);
-  t.is(Left(3).unwrapRightOr(5), 5);
+test(`.isOkAnd()`, (t) => {
+  t.false(Err(3).isOkAnd((v) => true));
+  t.false(Err(3).isOkAnd((v) => false));
+  t.true(Ok(3).isOkAnd((v) => true));
+  t.false(Ok(3).isOkAnd((v) => false));
 });
-test(`.isLeftAnd()`, (t) => {
-  t.true(Left(3).isLeftAnd((v) => true));
-  t.false(Left(3).isLeftAnd((v) => false));
-  t.false(Right(3).isLeftAnd((v) => true));
-  t.false(Right(3).isLeftAnd((v) => false));
+test(`.isErrAnd()`, (t) => {
+  t.false(Ok(3).isErrAnd((v) => true));
+  t.false(Ok(3).isErrAnd((v) => false));
+  t.true(Err(3).isErrAnd((v) => true));
+  t.false(Err(3).isErrAnd((v) => false));
 });
-test(`.isRightAnd()`, (t) => {
-  t.true(Right(3).isRightAnd((v) => true));
-  t.false(Right(3).isRightAnd((v) => false));
-  t.false(Left(3).isRightAnd((v) => true));
-  t.false(Left(3).isRightAnd((v) => false));
-});
-test(`.mapLeft()`, (t) => {
+test(`.map()`, (t) => {
   t.true(
-    Left(3)
-      .mapLeft((v) => v * 2)
-      .eq(Left(6))
+    Err<number, number>(3)
+      .map((v) => v * 2)
+      .eq(Err(3))
   );
   t.true(
-    Right<number, number>(3)
-      .mapLeft((v) => v * 2)
-      .eq(Right(3))
+    Ok<number, number>(3)
+      .map((v) => v * 2)
+      .eq(Ok(6))
   );
 });
-test(`.mapRight()`, (t) => {
+test(`.mapErr()`, (t) => {
   t.true(
-    Right(3)
-      .mapRight((v) => v * 2)
-      .eq(Right(6))
+    Ok<number, number>(3)
+      .mapErr((v) => v * 2)
+      .eq(Ok(3))
   );
   t.true(
-    Left<number, number>(3)
-      .mapRight((v) => v * 2)
-      .eq(Left(3))
+    Err<number, number>(3)
+      .mapErr((v) => v * 2)
+      .eq(Err(6))
   );
 });
-test(`.inspectLeft()`, (t) => {
+test(`.inspect()`, (t) => {
   const spyA = useSpy((v) => {});
-  Left(3).inspectLeft(spyA.spy);
-  t.is(spyA.calledTimes(), 1);
-  t.deepEqual(spyA.calledWith(0), [3]);
+  Err(3).inspect(spyA.spy);
+  t.is(spyA.calledTimes(), 0);
 
   const spyB = useSpy((v) => {});
-  Right(4).inspectLeft(spyB.spy);
-  t.is(spyB.calledTimes(), 0);
+  Ok(4).inspect(spyB.spy);
+  t.is(spyB.calledTimes(), 1);
+  t.deepEqual(spyB.calledWith(0), [4]);
 });
-test(`.inspectRight()`, (t) => {
+test(`.inspectErr()`, (t) => {
   const spyA = useSpy((v) => {});
-  Right(3).inspectRight(spyA.spy);
-  t.is(spyA.calledTimes(), 1);
-  t.deepEqual(spyA.calledWith(0), [3]);
+  Ok(3).inspectErr(spyA.spy);
+  t.is(spyA.calledTimes(), 0);
 
   const spyB = useSpy((v) => {});
-  Left(4).inspectRight(spyB.spy);
-  t.is(spyB.calledTimes(), 0);
+  Err(4).inspectErr(spyB.spy);
+  t.is(spyB.calledTimes(), 1);
+  t.deepEqual(spyB.calledWith(0), [4]);
 });
-test(`.andThenLeft()`, (t) => {
-  const eitherL = Left<number, number>(3);
-  t.true(eitherL.andThenLeft((v) => Left(v * 2)).eq(Left(6)));
-  t.true(eitherL.andThenLeft((v) => Left("changed")).eq(Left("changed")));
-  t.true(eitherL.andThenLeft((v) => Right(3)).eq(Right(3)));
+test(`.andThen()`, (t) => {
+  const resultErr = Err<number, number>(3);
+  // notice we change type of Ok() from number to string
+  t.true(resultErr.andThen((v) => Err<string, number>(v * 2)).eq(Err(3)));
+  t.true(resultErr.andThen((v) => Ok("value")).eq(Err(3)));
 
-  const eitherR = Right<number, number>(4);
-  t.true(eitherR.andThenLeft((v) => Left(v * 2)).eq(Right(4)));
-  t.true(eitherR.andThenLeft((v) => Left("changed")).eq(Right(4)));
-  t.true(eitherR.andThenLeft((v) => Right(v * 2)).eq(Right(4)));
+  const resultOk = Ok<number, number>(4);
+  t.true(resultOk.andThen((v) => Err<string, number>(v * 2)).eq(Err(8)));
+  t.true(resultOk.andThen((v) => Ok("value")).eq(Ok("value")));
 });
-test(`.andThenRight()`, (t) => {
-  const eitherR = Right<number, number>(3);
-  t.true(eitherR.andThenRight((v) => Right(v * 2)).eq(Right(6)));
-  t.true(eitherR.andThenRight((v) => Right("changed")).eq(Right("changed")));
-  t.true(eitherR.andThenRight((v) => Left(v * 2)).eq(Left(6)));
+test(`.orElse()`, (t) => {
+  const resultOk = Ok<number, number>(3);
+  // notice we change type of Err() from number to string
+  t.true(resultOk.orElse((v) => Ok<number, string>(v * 2)).eq(Ok(3)));
+  t.true(resultOk.orElse((v) => Err(v * 2)).eq(Ok(3)));
 
-  const eitherL = Left<number, number>(4);
-  t.true(eitherL.andThenRight((v) => Right(v * 2)).eq(Left(4)));
-  t.true(eitherL.andThenRight((v) => Right("changed")).eq(Left(4)));
-  t.true(eitherL.andThenRight((v) => Left(v * 2)).eq(Left(4)));
+  const resultErr = Err<number, number>(4);
+  t.true(resultErr.orElse((v) => Ok<number, string>(v * 2)).eq(Ok(8)));
+  t.true(resultErr.orElse((v) => Err(v * 2)).eq(Err(8)));
 });
-test(`.andLeft()`, (t) => {
-  const eitherL = Left<number, number>(3);
-  t.true(eitherL.andLeft(Left(6)).eq(Left(6)));
-  t.true(eitherL.andLeft(Left("changed")).eq(Left("changed")));
-  t.true(eitherL.andLeft(Right(6)).eq(Right(6)));
+test(`.and()`, (t) => {
+  const resultErr = Err<number, number>(3);
+  t.true(resultErr.and(Err<string, number>(6)).eq(Err(3)));
+  t.true(resultErr.and(Ok(6)).eq(Err(3)));
 
-  const eitherR = Right<number, number>(4);
-  t.true(eitherR.andLeft(Left(8)).eq(Right(4)));
-  t.true(eitherR.andLeft(Left("changed")).eq(Right(4)));
-  t.true(eitherR.andLeft(Right(8)).eq(Right(4)));
+  const resultOk = Ok<number, number>(4);
+  t.true(resultOk.and(Err<string, number>(8)).eq(Err(8)));
+  t.true(resultOk.and(Ok(8)).eq(Ok(8)));
 });
-test(`.andRight()`, (t) => {
-  const eitherR = Right<number, number>(3);
-  t.true(eitherR.andRight(Right(6)).eq(Right(6)));
-  t.true(eitherR.andRight(Right("changed")).eq(Right("changed")));
-  t.true(eitherR.andRight(Left(6)).eq(Left(6)));
+test(`.or()`, (t) => {
+  const resultOk = Ok<number, number>(3);
+  t.true(resultOk.or(Ok<number, string>(6)).eq(Ok(3)));
+  t.true(resultOk.or(Err(6)).eq(Ok(3)));
 
-  const eitherL = Left<number, number>(4);
-  t.true(eitherL.andRight(Right(8)).eq(Left(4)));
-  t.true(eitherL.andRight(Right("changed")).eq(Left(4)));
-  t.true(eitherL.andRight(Left(8)).eq(Left(4)));
+  const resultErr = Err<number, number>(4);
+  t.true(resultErr.or(Ok<number, string>(8)).eq(Ok(8)));
+  t.true(resultErr.or(Err(8)).eq(Err(8)));
 });
-test(`.toLeftOption()`, (t) => {
-  t.true(Left(3).toLeftOption().eq(Some(3)));
-  t.true(Right(3).toLeftOption().eq(None()));
+test(`.ok()`, (t) => {
+  t.true(Err(3).ok().eq(None()));
+  t.true(Ok(3).ok().eq(Some(3)));
 });
-test(`.toRightOption()`, (t) => {
-  t.true(Right(3).toRightOption().eq(Some(3)));
-  t.true(Left(3).toRightOption().eq(None()));
+test(`.err()`, (t) => {
+  t.true(Ok(3).err().eq(None()));
+  t.true(Err(3).err().eq(Some(3)));
 });

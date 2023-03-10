@@ -1,6 +1,5 @@
 import test from "ava";
-import { Left, Right } from "../result";
-import { OptionFrom } from "./from";
+import { Ok, Err } from "../result";
 import { None, Some } from "..";
 
 test(`.clone()`, (t) => {
@@ -148,36 +147,15 @@ test(`None.andThen()`, (t) => {
       .eq(None())
   );
 });
-test(`.toLeft()`, (t) => {
+test(`.result()`, (t) => {
   t.true(
     Some("value")
-      .toLeft(() => 4)
-      .eq(Left("value"))
+      .result(() => 4)
+      .eq(Ok("value"))
   );
   t.true(
     None<string>()
-      .toLeft(() => 4)
-      .eq(Right(4))
+      .result(() => 4)
+      .eq(Err(4))
   );
-});
-test(`.toRight()`, (t) => {
-  t.true(
-    Some("value")
-      .toRight(() => 4)
-      .eq(Right("value"))
-  );
-  t.true(
-    None<string>()
-      .toRight(() => 4)
-      .eq(Left(4))
-  );
-});
-test(`OptionFrom.bool()`, (t) => {
-  t.true(OptionFrom.bool(true).eq(Some(true)));
-  t.true(OptionFrom.bool(false).eq(None()));
-});
-test(`OptionFrom.nullable()`, (t) => {
-  t.true(OptionFrom.nullable(null).eq(None()));
-  t.true(OptionFrom.nullable(undefined).eq(None()));
-  t.true(OptionFrom.nullable(3).eq(Some(3)));
 });

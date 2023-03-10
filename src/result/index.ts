@@ -1,61 +1,60 @@
-export { EitherFrom } from "./from";
+export { ResultFrom as EitherFrom } from "./from";
 export * from "./interfaces";
 
-import { andLeft } from "./api/andLeft";
-import { andRight } from "./api/andRight";
-import { andThenLeft } from "./api/andThenLeft";
-import { andThenRight } from "./api/andThenRight";
+import { and } from "./api/and";
+import { or } from "./api/or";
+import { andThen } from "./api/andThen";
+import { orElse } from "./api/orElse";
 import { eq } from "./api/eq";
 import { format } from "./api/format";
-import { inspectLeft } from "./api/inspectLeft";
-import { inspectRight } from "./api/inspectRight";
-import { isLeft } from "./api/isLeft";
-import { isLeftAnd } from "./api/isLeftAnd";
-import { isRight } from "./api/isRight";
-import { isRightAnd } from "./api/isRightAnd";
-import { mapLeft } from "./api/mapLeft";
-import { mapRight } from "./api/mapRight";
-import { toLeftOption } from "./api/toLeftOption";
-import { toRightOption } from "./api/toRightOption";
+import { inspect } from "./api/inspect";
+import { inspectErr } from "./api/inspectErr";
+import { isOk } from "./api/isOk";
+import { isOkAnd } from "./api/isOkAnd";
+import { isErr } from "./api/isErr";
+import { isErrAnd } from "./api/isRightAnd";
+import { map } from "./api/map";
+import { mapErr } from "./api/mapErr";
+import { ok } from "./api/ok";
+import { err } from "./api/err";
 import { unwrap } from "./api/unwrap";
-import { unwrapLeft } from "./api/unwrapLeft";
-import { unwrapLeftOr } from "./api/unwrapLeftOr";
-import { unwrapRight } from "./api/unwrapRight";
-import { unwrapRightOr } from "./api/unwrapRightOr";
-import type { Either, EitherUnion, Left, Right } from "./interfaces";
+import { uwnrapOr } from "./api/unwrapOr";
+import { unwrapErr } from "./api/unwrapErr";
+import { unwrapErrOr } from "./api/unwrapErrOr";
+import type { Result, ResultUnion, Ok, Err } from "./interfaces";
+import { unionOk } from "./api/unionOk";
+import { unionErr } from "./api/unionErr";
 
-export function createEither<L, R>(v: EitherUnion<L, R>): Either<L, R> {
-  let inner = v;
-  const api: Either<L, R> = {
-    inner: () => inner,
-    eq: (other: Either<L, R>) => eq(api, other),
-    format: () => format(inner),
-    isLeft: () => isLeft(inner),
-    isRight: () => isRight(inner),
-    unwrap: () => unwrap(inner),
-    unwrapLeft: () => unwrapLeft(api),
-    unwrapRight: () => unwrapRight(api),
-    unwrapLeftOr: (default_value) => unwrapLeftOr(api, default_value),
-    unwrapRightOr: (default_value) => unwrapRightOr(api, default_value),
-    isLeftAnd: (fn) => isLeftAnd(api, fn),
-    isRightAnd: (fn) => isRightAnd(api, fn),
-    mapLeft: (fn) => createEither(mapLeft(api, fn)),
-    mapRight: (fn) => createEither(mapRight(api, fn)),
-    inspectLeft: (fn) => inspectLeft(api, fn),
-    inspectRight: (fn) => inspectRight(api, fn),
-    andThenLeft: (fn) => createEither(andThenLeft(api, fn)),
-    andThenRight: (fn) => createEither(andThenRight(api, fn)),
-    andLeft: (new_value) => andLeft(api, new_value),
-    andRight: (new_value) => andRight(api, new_value),
-    toLeftOption: () => toLeftOption(api),
-    toRightOption: () => toRightOption(api),
+export function createResult<T, E>(result: ResultUnion<T, E>): Result<T, E> {
+  const api: Result<T, E> = {
+    inner: () => result,
+    eq: (other: Result<T, E>) => eq(api, other),
+    format: () => format(result),
+    isOk: () => isOk(result),
+    isErr: () => isErr(result),
+    unwrap: () => unwrap(api),
+    unwrapErr: () => unwrapErr(api),
+    unwrapOr: (default_value) => uwnrapOr(api, default_value),
+    unwrapErrOr: (default_value) => unwrapErrOr(api, default_value),
+    isOkAnd: (fn) => isOkAnd(api, fn),
+    isErrAnd: (fn) => isErrAnd(api, fn),
+    map: (fn) => createResult(map(result, fn)),
+    mapErr: (fn) => createResult(mapErr(result, fn)),
+    inspect: (fn) => inspect(api, fn),
+    inspectErr: (fn) => inspectErr(api, fn),
+    andThen: (fn) => createResult(andThen(api, fn)),
+    orElse: (fn) => createResult(orElse(api, fn)),
+    and: (new_value) => and(api, new_value),
+    or: (new_value) => or(api, new_value),
+    ok: () => ok(api),
+    err: () => err(api),
   };
   return api;
 }
 
-export function Left<L, R>(value: L) {
-  return createEither<L, R>({ value, type: "Left" });
+export function Ok<T, E>(value: T) {
+  return createResult<T, E>(unionOk(value));
 }
-export function Right<L, R>(value: R) {
-  return createEither<L, R>({ value, type: "Right" });
+export function Err<T, E>(value: E) {
+  return createResult<T, E>(unionErr(value));
 }

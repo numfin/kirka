@@ -1,5 +1,9 @@
-import { EitherUnion } from "../interfaces";
+import { Result } from "../interfaces";
 
-export function unwrap<L, R>(either: EitherUnion<L, R>) {
-  return either.value;
+export function unwrap<T, E>(result: Result<T, E>) {
+  const inner = result.inner();
+  if (result.isErr()) {
+    throw new Error(`unwrap() on ${result.format()}`);
+  }
+  return inner.value as T;
 }

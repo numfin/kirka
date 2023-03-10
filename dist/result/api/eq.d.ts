@@ -1,3 +1,3 @@
-import { Either } from "../interfaces";
-export declare function eq<L, R>(self: Either<L, R>, other: Either<L, R>): boolean;
+import { Result } from "../interfaces";
+export declare function eq<T, E>(self: Result<T, E>, other: Result<T, E>): boolean;
 //# sourceMappingURL=eq.d.ts.map

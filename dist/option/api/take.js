@@ -1,11 +1,11 @@
-import { NoneUnion } from "./NoneUnion";
-import { SomeUnion } from "./SomeUnion";
+import { unionNone } from "./unionNone";
+import { unionSome } from "./unionSome";
 export function take(option) {
     if (option.type === "Some") {
         option.type = "None";
         const value = option.value;
         option.value = undefined;
-        return SomeUnion(value);
+        return unionSome(value);
     }
-    return NoneUnion();
+    return unionNone();
 }

@@ -1,3 +1,3 @@
-import { Either } from "../interfaces";
-export declare function isRightAnd<L, R>(either: Either<L, R>, fn: (v: R) => boolean): boolean;
+import { Result } from "../interfaces";
+export declare function isErrAnd<T, E>(result: Result<T, E>, fn: (v: E) => boolean): boolean;
 //# sourceMappingURL=isRightAnd.d.ts.map
