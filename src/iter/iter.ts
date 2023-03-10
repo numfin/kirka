@@ -21,7 +21,7 @@ import { skipWhile } from "./api/skipWhile";
 import { stepBy } from "./api/stepBy";
 import { take } from "./api/take";
 import { takeWhile } from "./api/takeWhile";
-import { ClonnableGenerator, Iter } from "./interfaces";
+import type { ClonnableGenerator, Iter } from "./interfaces";
 
 export function createIter<T>(source: ClonnableGenerator<T>) {
   /** `Generator<T>` with local state, used for `.next()` iteration */
