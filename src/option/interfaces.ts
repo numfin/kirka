@@ -1,4 +1,4 @@
-import type { Either } from "../either/interfaces";
+import type { Either } from "../result/interfaces";
 
 export interface Some<T> {
   type: "Some";

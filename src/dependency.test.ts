@@ -1,5 +1,5 @@
 import test from "ava";
-import { EitherFrom, Left } from "./either";
+import { EitherFrom, Left } from "./result";
 import { OptionFrom, Some } from "./option";
 
 test(`Circular dependencies resolving`, (t) => {

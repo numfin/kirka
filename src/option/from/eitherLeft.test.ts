@@ -1,5 +1,5 @@
 import test from "ava";
-import { Left, Right } from "../../either";
+import { Left, Right } from "../../result";
 import { None, Some } from "..";
 import { OptionFrom } from ".";
 

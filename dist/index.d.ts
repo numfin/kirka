@@ -1,4 +1,4 @@
 export * from "./option";
-export * from "./either";
+export * from "./result";
 export * from "./iter";
 //# sourceMappingURL=index.d.ts.map

@@ -1,4 +1,4 @@
-import { Either, Left, Right } from "../../either";
+import { Either, Left, Right } from "../../result";
 import { Option } from "../interfaces";
 
 export function toLeft<T, R>(
