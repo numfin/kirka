@@ -1,5 +1,5 @@
 <h1 align="center">Kirka Modules</h1>
 
-- [Option&lt;T&gt;](/src/option/) - To define optional type
-- [Either&lt;L, R&gt;](/src/either/) - To define two-state type
-- [Iter&lt;T&gt;](/src/iter/) - To work with iterables (arrays, generators) lazy
+- [Option&lt;T&gt;](/src/option/) - Forget about nulls and undefined
+- [Result&lt;T, E&gt;](/src/result/) - Handle errors like a god
+- [Iter&lt;T&gt;](/src/iter/) - Lazy iterables with superpowers

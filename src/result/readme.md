@@ -1,23 +1,53 @@
-<h1 align="center">Either&lt;L, R&gt;</h1>
-<h3 align="center">For values that have 2 states (e.g. Errors)</h3>
+<h1 align="center">Result&lt;T, E&gt;</h1>
+<h3 align="center">Handle errors like a god</h3>
 
-Docs in progress
+`Result<T, E>` is the type used for returning and propagating errors. It is a union with the variants, `Ok(T)`, representing success and containing a value, and `Err(E)`, representing error and containing an error value.
+
+Functions return `Result` whenever errors are expected and recoverable.
+
+A simple function returning `Result` might be defined and used like so:
 
 ```ts
-import { Left } from "./";
-// Create Either<string, string>
-const StrOrNum = Left<string, number>("somestring");
-// Convert left side to number
-const NumOrNum = StrOrNum.mapLeft((_value) => 5);
-// Extract both sides as one
-// Will work same as NumOrNum.unwrapLeft()
-const NumOnly = NumOrNum.unwrap();
-// Everything above can be written this way too
-const NumOnly_2 = StrOrNum.unwrapRightOr(5);
-// Convert left side of Either if Left
-const StrOrNum10 = StrOrNum.andThenLeft((_value) => Left(10));
-// Same as
-const StrOrNum10_2 = StrOrNum.andLeft(Left(10));
-// Convert from Either<number, string> to Option<number>
-const MaybeNumber = StrOrNum.optionLeft();
+import { Ok, Err, tryFn, Result } from "kirka";
+
+enum ParseErrors {
+  NotANumber,
+  InfiniteNumber,
+  Null,
+}
+
+function parseNumber(v: unknown): Result<number, ParseErrors> {
+  const n = Number(v);
+  if (isNaN(n)) {
+    return Err(ParseErrors.NotANumber);
+  }
+  if (!isFinite(n)) {
+    return Err(ParseErrors.InfiniteNumber);
+  }
+  if (n === null) {
+    return Err(ParseErrors.Null);
+  }
+  return n;
+}
 ```
+
+`Result`'s error handling is clear and straightforward. His methods make working with it more succinct.
+
+```ts
+function decodeParseError(e: ParseErrors): string {
+  /* */
+}
+
+const badResult = parseNumber("")
+  .map((v) => v * 2)
+  .or((err) => decodeParseError(err)); // Result<number, string>
+const defaultResult = badResult.unwrapOr(3); // 3
+
+const goodResult = parseNumber(4).map((v) => v * 3); // Result<number, ParseErrors>
+```
+
+A common problem with using return values to indicate errors is that it is easy to ignore the return value, thus failing to handle the error.
+Unlike Rust there is no eslint rule that requires you to handle errors so don't ignore them! :D
+
+> This hints and a more you can just read from IntelliSense (your editor suggestions)
+> or in source code `./interfaces.ts`

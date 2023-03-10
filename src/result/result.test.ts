@@ -1,7 +1,7 @@
 import test from "ava";
 import { None, Some } from "../option";
 import { useSpy } from "../testutils/spy";
-import { Err, Ok } from "./index";
+import { Err, Ok, tryFn } from "./index";
 
 test(`x.eq(y) when x == y`, (t) => {
   t.true(Err(3).eq(Err(3)));
@@ -61,8 +61,8 @@ test(`.map()`, (t) => {
   );
   t.true(
     Ok<number, number>(3)
-      .map((v) => v * 2)
-      .eq(Ok(6))
+      .map((v) => "value")
+      .eq(Ok("value"))
   );
 });
 test(`.mapErr()`, (t) => {
@@ -73,8 +73,8 @@ test(`.mapErr()`, (t) => {
   );
   t.true(
     Err<number, number>(3)
-      .mapErr((v) => v * 2)
-      .eq(Err(6))
+      .mapErr((v) => "err")
+      .eq(Err("err"))
   );
 });
 test(`.inspect()`, (t) => {
@@ -142,4 +142,16 @@ test(`.ok()`, (t) => {
 test(`.err()`, (t) => {
   t.true(Ok(3).err().eq(None()));
   t.true(Err(3).err().eq(Some(3)));
+});
+test(`.tryFn()`, (t) => {
+  t.true(
+    tryFn(() => {
+      throw new Error("Oh no");
+    }).isErr()
+  );
+  t.true(
+    tryFn(() => {
+      return "good";
+    }).eq(Ok("good"))
+  );
 });

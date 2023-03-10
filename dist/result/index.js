@@ -1,4 +1,4 @@
-export { ResultFrom as EitherFrom } from "./from";
+export { ResultFrom } from "./from";
 export * from "./interfaces";
 import { and } from "./api/and";
 import { or } from "./api/or";
@@ -11,7 +11,7 @@ import { inspectErr } from "./api/inspectErr";
 import { isOk } from "./api/isOk";
 import { isOkAnd } from "./api/isOkAnd";
 import { isErr } from "./api/isErr";
-import { isErrAnd } from "./api/isRightAnd";
+import { isErrAnd } from "./api/isErrAnd";
 import { map } from "./api/map";
 import { mapErr } from "./api/mapErr";
 import { ok } from "./api/ok";
@@ -53,4 +53,23 @@ export function Ok(value) {
 }
 export function Err(value) {
     return createResult(unionErr(value));
+}
+/**
+ * Wrapps `fn` into `tryCatch` returning result as `Ok<T>` and error as `Err<E>`
+ * # Example
+ * ```ts
+ * tryFn(() => {
+ *  throw new Error(`Oh no!`)
+ * })
+ * .map(data => console.log(data))
+ * .or(err => console.log(err))
+ * ```
+ */
+export function tryFn(fn) {
+    try {
+        return Ok(fn());
+    }
+    catch (err) {
+        return Err(err);
+    }
 }

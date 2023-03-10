@@ -1,6 +1,6 @@
 export * from "./interfaces";
 export { OptionFrom } from "./from";
-import { result } from "./api/toLeft";
+import { result } from "./api/result";
 import { andThen } from "./api/andThen";
 import { and } from "./api/and";
 import { orElse } from "./api/orElse";
