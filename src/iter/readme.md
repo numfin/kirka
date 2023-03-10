@@ -1,7 +1,7 @@
 <h1 align="center">Iter&lt;T&gt;</h1>
 <h3 align="center">More efficient way to work with arrays</h3>
 
-If you’ve found yourself with a collection of some kind, and needed to perform an operation on the elements of said collection, you’ll quickly run into ‘iterators’. Iterators are heavily used in idiomatic Rust code, but it's very rare to find iterators (generators) in someone else's code.
+If you’ve found yourself with a collection of some kind, and needed to perform an operation on the elements of said collection, you’ll quickly run into ‘iterators’. Iterators are heavily used in idiomatic Rust code, but it's very rare to find iterators (generators) in someone else's JS/TS code.
 
 Let's change that!
 
