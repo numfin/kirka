@@ -1,9 +1,9 @@
 import { iterFactory, iterInfinite } from "./gen";
-import { create_iter } from "./iter";
+import { createIter } from "./iter";
 export var IterFrom;
 (function (IterFrom) {
     function iterable(source) {
-        return create_iter(() => iterFactory(source));
+        return createIter(() => iterFactory(source));
     }
     IterFrom.iterable = iterable;
     function array(source) {
@@ -15,7 +15,7 @@ export var IterFrom;
             throw new Error(`Invalid range: From(${from}) > To(${to})`);
         }
         const extra = inclusive ? 1 : 0;
-        return create_iter(() => iterInfinite())
+        return createIter(() => iterInfinite())
             .take(to - from + extra)
             .enumerate()
             .map(({ index }) => index + from);

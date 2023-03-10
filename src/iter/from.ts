@@ -1,10 +1,10 @@
 import { iterFactory, iterInfinite } from "./gen";
 import { Iter } from "./interfaces";
-import { create_iter } from "./iter";
+import { createIter } from "./iter";
 
 export namespace IterFrom {
   export function iterable<T>(source: Iterable<T>): Iter<T> {
-    return create_iter(() => iterFactory(source));
+    return createIter(() => iterFactory(source));
   }
   export function array<T>(source: T[]): Iter<T> {
     return iterable(source);
@@ -14,7 +14,7 @@ export namespace IterFrom {
       throw new Error(`Invalid range: From(${from}) > To(${to})`);
     }
     const extra = inclusive ? 1 : 0;
-    return create_iter(() => iterInfinite())
+    return createIter(() => iterInfinite())
       .take(to - from + extra)
       .enumerate()
       .map(({ index }) => index + from);

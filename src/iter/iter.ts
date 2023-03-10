@@ -1,16 +1,29 @@
+import { all } from "./api/all";
+import { any } from "./api/any";
+import { collect } from "./api/collect";
+import { cycle } from "./api/cycle";
+import { enumerate } from "./api/enumerate";
+import { eq } from "./api/eq";
+import { filter } from "./api/filter";
+import { filterMap } from "./api/filterMap";
+import { find } from "./api/find";
+import { findMap } from "./api/findMap";
+import { flatMap } from "./api/flatMap";
+import { flatten } from "./api/flatten";
+import { fold } from "./api/fold";
+import { forEach } from "./api/forEach";
+import { map } from "./api/map";
+import { next } from "./api/next";
+import { nth } from "./api/nth";
+import { position } from "./api/position";
+import { skip } from "./api/skip";
+import { skipWhile } from "./api/skipWhile";
+import { stepBy } from "./api/stepBy";
+import { take } from "./api/take";
+import { takeWhile } from "./api/takeWhile";
 import { ClonnableGenerator, Iter } from "./interfaces";
-import {
-  iterCycle,
-  iterEnumerate,
-  iterFactory,
-  iterFlat,
-  iterSkipWhile,
-  iterTakeWhile,
-} from "./gen";
-import { None, Option, OptionFrom, Some } from "../option";
-import { IterFrom } from "./from";
 
-export function create_iter<T>(source: ClonnableGenerator<T>) {
+export function createIter<T>(source: ClonnableGenerator<T>) {
   /** `Generator<T>` with local state, used for `.next()` iteration */
   const inner = source();
   const api: Iter<T> = {
@@ -19,200 +32,30 @@ export function create_iter<T>(source: ClonnableGenerator<T>) {
         yield item;
       }
     },
-    next: () => IterApi.next(inner),
-    recreate: () => create_iter(source),
-    collect: () => IterApi.collect(source),
-    map: (fn) => IterApi.map(source, fn),
-    filter: (fn) => IterApi.filter(source, fn),
-    filterMap: (fn) => IterApi.filterMap(api, fn),
-    enumerate: () => IterApi.enumerate(source),
-    skipWhile: (fn) => IterApi.skipWhile(source, fn),
-    skip: (i) => IterApi.skip(api, i),
-    takeWhile: (fn) => IterApi.takeWhile(source, fn),
-    take: (i) => IterApi.take(api, i),
-    nth: (i) => IterApi.nth(api, i),
-    all: (fn) => IterApi.all(source, fn),
-    any: (fn) => IterApi.any(source, fn),
-    cycle: () => IterApi.cycle(source),
-    eq: (another, by) => IterApi.eq(api, another, by),
-    find: (fn) => IterApi.find(api, fn),
-    findMap: (fn) => IterApi.findMap(api, fn),
-    position: (fn) => IterApi.position(api, fn),
-    flatMap: (fn) => IterApi.flatMap(api, fn),
-    flatten: () => IterApi.flatten(api),
-    fold: (startFrom, fn) => IterApi.fold(api, startFrom, fn),
-    stepBy: (amount: number) => IterApi.stepBy(api, amount),
-    forEach: (fn) => IterApi.forEach(api, fn),
+    next: () => next(inner),
+    recreate: () => createIter(source),
+    collect: () => collect(source),
+    map: (fn) => createIter(() => map(source, fn)),
+    filter: (fn) => createIter(() => filter(source, fn)),
+    filterMap: (fn) => filterMap(api, fn),
+    enumerate: () => createIter(() => enumerate(source)),
+    skipWhile: (fn) => createIter(() => skipWhile(source, fn)),
+    skip: (i) => skip(api, i),
+    takeWhile: (fn) => createIter(() => takeWhile(source, fn)),
+    take: (i) => take(api, i),
+    nth: (i) => nth(api, i),
+    all: (fn) => all(source, fn),
+    any: (fn) => any(source, fn),
+    cycle: () => createIter(() => cycle(source)),
+    eq: (another, by) => eq(api, another, by),
+    find: (fn) => find(api, fn),
+    findMap: (fn) => findMap(api, fn),
+    position: (fn) => position(api, fn),
+    flatMap: (fn) => createIter(() => flatMap(api, fn)),
+    flatten: () => flatten(api),
+    fold: (startFrom, fn) => fold(api, startFrom, fn),
+    stepBy: (amount: number) => stepBy(api, amount),
+    forEach: (fn) => forEach(api, fn),
   };
   return api;
-}
-
-export namespace IterApi {
-  export function collect<T>(source: ClonnableGenerator<T>) {
-    return Array.from(source());
-  }
-  export function map<T, U>(source: ClonnableGenerator<T>, fn: (item: T) => U) {
-    return create_iter(() => iterFactory(source(), fn));
-  }
-  export function filter<T>(
-    source: ClonnableGenerator<T>,
-    fn: (item: T) => boolean
-  ) {
-    return create_iter(() => iterFactory(source(), (x) => x, fn));
-  }
-  export function filterMap<T, U>(source: Iter<T>, fn: (item: T) => Option<U>) {
-    return source
-      .map(fn)
-      .filter((v) => v.isSome())
-      .map((v) => v.unwrap());
-  }
-  export function enumerate<T>(source: ClonnableGenerator<T>) {
-    return create_iter(() => iterEnumerate(source()));
-  }
-  export function skipWhile<T>(
-    source: ClonnableGenerator<T>,
-    fn: (item: T) => boolean
-  ) {
-    return create_iter(() => iterSkipWhile(source(), fn));
-  }
-  export function skip<T>(source: Iter<T>, skipAmount: number) {
-    return source
-      .enumerate()
-      .skipWhile(({ index }) => index < skipAmount)
-      .map(({ item }) => item);
-  }
-  export function takeWhile<T>(
-    source: ClonnableGenerator<T>,
-    fn: (item: T) => boolean
-  ) {
-    return create_iter(() => iterTakeWhile(source(), fn));
-  }
-  export function take<T>(source: Iter<T>, takeAmount: number) {
-    return source
-      .enumerate()
-      .takeWhile(({ index }) => index < takeAmount)
-      .map(({ item }) => item);
-  }
-  export function nth<T>(source: Iter<T>, index: number) {
-    return OptionFrom.nullable(source.skip(index).take(1).collect()[0]);
-  }
-  export function all<T>(
-    source: ClonnableGenerator<T>,
-    fn: (item: T) => boolean
-  ) {
-    for (let item of source()) {
-      if (!fn(item)) {
-        return false;
-      }
-    }
-    return true;
-  }
-  export function any<T>(
-    source: ClonnableGenerator<T>,
-    fn: (item: T) => boolean
-  ) {
-    for (let item of source()) {
-      if (fn(item)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  export function next<T>(generator: Generator<T>): Option<T> {
-    const current = generator.next();
-    return current.done ? None() : Some(current.value);
-  }
-  export function cycle<T>(source: ClonnableGenerator<T>) {
-    return create_iter(() => iterCycle(source));
-  }
-  export function eq<T, U>(
-    source: Iter<T>,
-    another: Iterable<T>,
-    by?: (item: T) => U
-  ) {
-    const sourceIter = source.recreate();
-    const anotherIter = IterFrom.iterable(another);
-    while (true) {
-      const sourceNext = sourceIter.next();
-      const anotherNext = anotherIter.next();
-      if (sourceNext.isSome() || anotherNext.isSome()) {
-        if (!sourceNext.eq(anotherNext, by)) {
-          return false;
-        }
-      } else {
-        return true;
-      }
-    }
-  }
-  export function find<T>(
-    source: Iter<T>,
-    fn: (item: T) => boolean
-  ): Option<T> {
-    const result = source
-      .skipWhile((item) => !fn(item))
-      .take(1)
-      .collect();
-    return result.length > 0 ? Some(result[0]) : None();
-  }
-  export function findMap<T, U>(
-    source: Iter<T>,
-    fn: (item: T) => Option<U>
-  ): Option<U> {
-    const result = source
-      .map(fn)
-      .skipWhile((v) => v.isNone())
-      .take(1)
-      .collect();
-    return result.length > 0 ? result[0] : None();
-  }
-  export function position<T>(
-    source: Iter<T>,
-    fn: (item: T) => boolean
-  ): Option<number> {
-    return source
-      .enumerate()
-      .find(({ item }) => fn(item))
-      .map(({ index }) => index);
-  }
-  export function flatMap<T, U>(
-    source: Iter<T>,
-    fn: (item: T) => Iterable<U>
-  ): Iter<U> {
-    return create_iter(() => iterFlat(source.map(fn)));
-  }
-  export function flatten<T>(source: Iter<T>): Iter<FlatArray<T, 1>> {
-    return source.map(toIterable).flatMap((v) => v);
-  }
-  export function toIterable<T>(source: T): Iterable<FlatArray<T, 1>> {
-    if (source && typeof source === "object" && Symbol.iterator in source) {
-      return source as Iterable<FlatArray<T, 1>>;
-    }
-    return [source] as FlatArray<T, 1>[];
-  }
-  export function fold<T, U>(
-    source: Iter<T>,
-    startFrom: U,
-    fn: (acc: U, item: T) => U
-  ): U {
-    let lastAcc = startFrom;
-    for (const item of source) {
-      lastAcc = fn(lastAcc, item);
-    }
-    return lastAcc;
-  }
-  export function stepBy<T>(source: Iter<T>, amount: number) {
-    if (amount <= 0) {
-      throw new Error(`.stepBy() amount should be > 0`);
-    }
-
-    return source
-      .enumerate()
-      .filter(({ index }) => index === 0 || index % amount === 0)
-      .map(({ item }) => item);
-  }
-  export function forEach<T>(source: Iter<T>, fn: (item: T) => void) {
-    for (const item of source) {
-      fn(item);
-    }
-  }
 }
