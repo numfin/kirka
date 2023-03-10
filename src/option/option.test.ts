@@ -1,7 +1,7 @@
 import test from "ava";
-import { EitherApi, EitherFrom, Left, Right } from "../either";
+import { Left, Right } from "../either";
 import { OptionFrom } from "./from";
-import { None, OptionApi, Some } from "./option";
+import { None, Some } from "./option";
 
 test(`.clone()`, (t) => {
   const option = Some(3);

@@ -1,0 +1,8 @@
+import { Option } from "../interfaces";
+
+export function isSomeAnd<T>(
+  option: Option<T>,
+  fn: (value: T) => boolean
+): boolean {
+  return option.isSome() && fn(option.unwrap());
+}
