@@ -1,3 +1,3 @@
-import { OptionUnion } from "../interfaces";
-export declare function format<T>(option: OptionUnion<T>): string;
+import { Option } from "../interfaces";
+export declare function format<T>(option: Option<T>, fn?: (option: Option<T>) => string): string;
 //# sourceMappingURL=format.d.ts.map

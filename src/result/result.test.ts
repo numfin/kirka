@@ -17,6 +17,18 @@ test(`x.eq(y) when x != y`, (t) => {
   t.false(Ok(4).eq(Ok(3)));
   t.false(Ok(4).eq(Err(3)));
 });
+test(`.format()`, (t) => {
+  t.is(Err(3).format(), `Result.Err(3)`);
+  t.is(Ok(3).format(), `Result.Ok(3)`);
+  t.is(
+    Err(3).format((t) => `${t.unwrapErr() * 2}`),
+    `Result.Err(6)`
+  );
+  t.is(
+    Ok(3).format((t) => `${t.unwrap() * 2}`),
+    `Result.Ok(6)`
+  );
+});
 test(`.isOk()`, (t) => {
   t.false(Err(3).isOk());
   t.true(Ok(3).isOk());

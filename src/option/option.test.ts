@@ -14,6 +14,18 @@ test(`.eq()`, (t) => {
   t.false(Some(3).eq(None()));
   t.false(None().eq(Some(3)));
 });
+test(`.format()`, (t) => {
+  t.is(Some(3).format(), `Some(3)`);
+  t.is(None().format(), `None`);
+  t.is(
+    Some(3).format((t) => `${t.unwrap() * 2}`),
+    `Some(6)`
+  );
+  t.is(
+    None().format((t) => `wow`),
+    `None`
+  );
+});
 test(`.eq(by)`, (t) => {
   t.true(Some({ x: 3 }).eq(Some({ x: 3 }), (v) => v.x));
   t.true(None<{ x: number }>().eq(None(), (v) => v.x));
@@ -61,6 +73,18 @@ test(`None.isSomeAnd()`, (t) => {
 
   t.false(option.isSomeAnd((v) => true));
   t.false(option.isSomeAnd((v) => false));
+});
+test(`Some.isNoneAnd()`, (t) => {
+  const option = Some(5);
+
+  t.false(option.isNoneAnd(() => true));
+  t.false(option.isNoneAnd(() => false));
+});
+test(`None.isNoneAnd()`, (t) => {
+  const option = None<number>();
+
+  t.true(option.isNoneAnd(() => true));
+  t.false(option.isNoneAnd(() => false));
 });
 test(`Some.map()`, (t) => {
   const optionSome = Some(5).map((v) => v * 2);

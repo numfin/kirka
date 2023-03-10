@@ -18,20 +18,22 @@ import { format } from "./api/format";
 import { unionNone } from "./api/unionNone";
 import { unionSome } from "./api/unionSome";
 import { filter } from "./api/filter";
+import { isNoneAnd } from "./api/isNoneAnd";
 export function createOption(v) {
     let inner = v;
     const api = {
         inner: () => inner,
         eq: (value, by) => eq(api, value, by),
-        format: () => format(inner),
+        format: (formatter) => format(api, formatter),
         clone: () => createOption(clone(inner)),
-        unwrap: () => unwrap(inner),
+        unwrap: () => unwrap(api),
         unwrapOr: (default_value) => unwrapOr(inner, default_value),
         isNone: () => isNone(inner),
         isSome: () => isSome(inner),
         take: () => createOption(take(inner)),
         isSomeAnd: (fn) => isSomeAnd(api, fn),
-        map: (fn) => createOption(map(inner, fn)),
+        isNoneAnd: (fn) => isNoneAnd(api, fn),
+        map: (fn) => createOption(map(api, fn)),
         or: (new_value) => createOption(or(api, new_value)),
         orElse: (fn) => createOption(orElse(api, fn)),
         and: (new_value) => createOption(and(api, new_value)),

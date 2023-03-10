@@ -29,7 +29,7 @@ export function createResult<T, E>(result: ResultUnion<T, E>): Result<T, E> {
   const api: Result<T, E> = {
     inner: () => result,
     eq: (other: Result<T, E>) => eq(api, other),
-    format: () => format(result),
+    format: (formatter) => format(api, formatter),
     isOk: () => isOk(result),
     isErr: () => isErr(result),
     unwrap: () => unwrap(api),

@@ -1,13 +1,21 @@
 <h1 align="center">Option&lt;T&gt;</h1>
 <h3 align="center">Forget about null and undefined</h3>
 
+Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not.
+
+Options can be used as:
+
+- Initial values
+- Return values for functions that are not defined over their input range
+- Return value for otherwise reporting simple errors, where None is returned on error
+- Optional struct fields
+- Struct fields that can be loaned or “taken”
+- Optional function arguments
+- Nulls
+
 ```ts
 import { None, Some } from "kirka";
-```
 
-Create Option
-
-```ts
 const MaybeNumber = Some(3);
 MaybeNumber.isSome(); // true
 const MaybeNumber = None<number>();
@@ -71,3 +79,4 @@ Some("value").isSomeAnd((v) => v === "value"); // or this
 ```
 
 > This hints and a more you can just read from IntelliSense (your editor suggestions)
+> or in source code `./interfaces.ts`

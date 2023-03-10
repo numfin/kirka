@@ -26,7 +26,7 @@ export function createResult(result) {
     const api = {
         inner: () => result,
         eq: (other) => eq(api, other),
-        format: () => format(result),
+        format: (formatter) => format(api, formatter),
         isOk: () => isOk(result),
         isErr: () => isErr(result),
         unwrap: () => unwrap(api),

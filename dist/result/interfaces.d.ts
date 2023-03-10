@@ -13,13 +13,13 @@ export interface Result<T, Err> {
      * Just a simple data formatter
      * # Example
      * ```ts
-     * Ok(3).format() === `Result.Ok(3)`
+     * Ok(3).format() // `Result.Ok(3)`
      *
      * // or if you want to format your value yourself
      * Err({ x: 3 }).format((v) => JSON.stringify(v.inner().value, null, 2))
      * ```
      */
-    format(fn?: (result: Result<T, Err>) => string): string;
+    format(formatter?: (result: Result<T, Err>) => string): string;
     /**
      * Compare two `Result`'s to each other
      * # Example
