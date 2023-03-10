@@ -1,5 +1,5 @@
+import { iterFactory } from "../generators/iterFactory";
 import { ClonnableGenerator } from "../interfaces";
-import { iterFactory } from "../gen";
 
 export function filter<T>(
   source: ClonnableGenerator<T>,

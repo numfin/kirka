@@ -1,5 +1,5 @@
+import { iterTakeWhile } from "../generators/iterTakeWhile";
 import { ClonnableGenerator } from "../interfaces";
-import { iterTakeWhile } from "../gen";
 
 export function takeWhile<T>(
   source: ClonnableGenerator<T>,

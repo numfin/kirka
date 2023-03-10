@@ -1,7 +1,7 @@
 import test, { ExecutionContext } from "ava";
 import { None, Some } from "../option";
 import { useSpy } from "../testutils/spy";
-import { IterFrom } from "./index";
+import { IterFrom } from "./from";
 
 function nativeRange(from: number, to: number, inclusive = false) {
   if (from > to) {
