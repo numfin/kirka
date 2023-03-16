@@ -35,13 +35,13 @@ for (const item of IterFrom.array(values)) {
   // item
 }
 // Get item by index
-item.get(2).eq(Some(values[2])); // Some(5)
+item.get(2).eq(Some(values[2])); // true
 ```
 
 Inherit from other iterators
 
 ```ts
-const iter = IterFrom.array(1, 2, 3, 4);
+const iter = IterFrom.array([1, 2, 3, 4]);
 const iterByTwo = iter.map((v) => v * 2); // [2,4,6,8]
 const iterByThree = iter.map((v) => v * 3); // [3,6,9,12]
 ```
@@ -49,7 +49,7 @@ const iterByThree = iter.map((v) => v * 3); // [3,6,9,12]
 Insert items between elements
 
 ```ts
-const iter = IterFrom.array(1, 2, 3, 4);
+const iter = IterFrom.array([1, 2, 3, 4]);
 iter.intersperse(10); // [1,10,2,10,3,10,4]
 ```
 
