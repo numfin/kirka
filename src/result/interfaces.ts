@@ -190,7 +190,7 @@ export interface Result<T, Err> {
    * Err<number, number>(3).andThen(v => Err(6)) // Err(3)
    * ```
    */
-  andThen<U>(fn: (v: T) => Result<U, Err>): Result<U, Err>;
+  andThen<U = T>(fn: (v: T) => Result<U, Err>): Result<U, Err>;
   /**
    * Calls `fn` if the result is `Err`, otherwise returns the `Ok` value.
    *
@@ -203,7 +203,7 @@ export interface Result<T, Err> {
    * Err<number, number>(3).orElse(v => Err("err")) // Err("err")
    * ```
    */
-  orElse<U>(fn: (v: Err) => Result<T, U>): Result<T, U>;
+  orElse<U = Err>(fn: (v: Err) => Result<T, U>): Result<T, U>;
   /**
    * Returns result if the result is `Ok`, otherwise returns the `Err` value.
    *
@@ -216,7 +216,7 @@ export interface Result<T, Err> {
    * Err<number, number>(3).and(Err(6)) // Err(3)
    * ```
    */
-  and<U>(result: Result<U, Err>): Result<U, Err>;
+  and<U = T>(result: Result<U, Err>): Result<U, Err>;
   /**
    * Returns result if the result is `Err`, otherwise returns the `Ok` value.
    *
@@ -229,7 +229,7 @@ export interface Result<T, Err> {
    * Err<number, number>(3).or(Err("err")) // Err("err")
    * ```
    */
-  or<U>(result: Result<T, U>): Result<T, U>;
+  or<U = Err>(result: Result<T, U>): Result<T, U>;
   /**
    * Converts from `Result<T, E>` to `Option<T>` discarding the error, if any.
    *

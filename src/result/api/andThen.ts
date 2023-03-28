@@ -1,7 +1,7 @@
 import { Result } from "../interfaces";
 import { unionErr } from "./unionErr";
 
-export function andThen<T, E, U>(
+export function andThen<T, E, U = T>(
   result: Result<T, E>,
   fn: (value: T) => Result<U, E>
 ) {
