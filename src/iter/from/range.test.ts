@@ -1,5 +1,5 @@
 import test from "ava";
-import { IterFrom } from ".";
+import { IterFrom } from "./index.js";
 
 test(`IterFrom.range()`, (t) => {
   t.throws(() => IterFrom.range(2, 1));

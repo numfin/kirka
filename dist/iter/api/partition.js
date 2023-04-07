@@ -1,4 +1,4 @@
-import { IterFrom } from "../from";
+import { IterFrom } from "../from/index.js";
 export function partition(source, fn) {
     const iterA = [];
     const iterB = [];

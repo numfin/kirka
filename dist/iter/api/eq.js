@@ -1,4 +1,4 @@
-import { IterFrom } from "../from";
+import { IterFrom } from "../from/index.js";
 export function eq(source, another, by) {
     const sourceIter = source.recreate();
     const anotherIter = IterFrom.iterable(another);

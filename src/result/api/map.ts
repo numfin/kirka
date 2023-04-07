@@ -1,6 +1,6 @@
-import { ResultUnion } from "../interfaces";
-import { unionOk } from "./unionOk";
-import { unionErr } from "./unionErr";
+import { ResultUnion } from "../interfaces.js";
+import { unionOk } from "./unionOk.js";
+import { unionErr } from "./unionErr.js";
 
 export function map<T, E, U>(result: ResultUnion<T, E>, fn: (value: T) => U) {
   if (result.type === "Ok") {

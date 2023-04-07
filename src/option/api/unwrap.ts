@@ -1,5 +1,5 @@
-import { Option, OptionUnion } from "../interfaces";
-import { format } from "./format";
+import { Option } from "../interfaces.js";
+import { format } from "./format.js";
 
 export function unwrap<T>(option: Option<T>) {
   const inner = option.inner();

@@ -1,5 +1,5 @@
-import { IterFrom } from "../from";
-import { Iter } from "../interfaces";
+import { IterFrom } from "../from/index.js";
+import { Iter } from "../interfaces.js";
 
 export function partition<T>(
   source: Iterable<T>,

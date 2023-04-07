@@ -1,1 +1,1 @@
-{"version":3,"file":"maxBy.d.ts","sourceRoot":"","sources":["../../../src/iter/api/maxBy.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,IAAI,EAAE,MAAM,eAAe,CAAC;AAErC,wBAAgB,KAAK,CAAC,CAAC,EAAE,MAAM,EAAE,IAAI,CAAC,CAAC,CAAC,EAAE,EAAE,EAAE,CAAC,IAAI,EAAE,CAAC,KAAK,MAAM,6BAShE"}
+{"version":3,"file":"maxBy.d.ts","sourceRoot":"","sources":["../../../src/iter/api/maxBy.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,IAAI,EAAE,MAAM,kBAAkB,CAAC;AAExC,wBAAgB,KAAK,CAAC,CAAC,EAAE,MAAM,EAAE,IAAI,CAAC,CAAC,CAAC,EAAE,EAAE,EAAE,CAAC,IAAI,EAAE,CAAC,KAAK,MAAM,sCAShE"}

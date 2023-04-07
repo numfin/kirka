@@ -1,4 +1,4 @@
-import { Option, OptionUnion } from "../interfaces";
+import { Option } from "../interfaces.js";
 
 export function format<T>(
   option: Option<T>,

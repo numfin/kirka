@@ -1,5 +1,5 @@
-import { Result } from "../interfaces";
-import { unionOk } from "./unionOk";
+import { Result } from "../interfaces.js";
+import { unionOk } from "./unionOk.js";
 
 export function orElse<T, E, U>(
   result: Result<T, E>,

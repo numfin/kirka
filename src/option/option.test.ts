@@ -1,6 +1,6 @@
 import test from "ava";
-import { Ok, Err } from "../result";
-import { None, Some } from "..";
+import { Ok, Err } from "../result/index.js";
+import { None, Some } from "../index.js";
 
 test(`.clone()`, (t) => {
   const option = Some(3);
@@ -18,7 +18,7 @@ test(`.format()`, (t) => {
   t.is(Some(3).format(), `Some(3)`);
   t.is(None().format(), `None`);
   t.is(
-    Some(3).format((t) => `${t.unwrap() * 2}`),
+    Some(3).format((v) => `${v.unwrap() * 2}`),
     `Some(6)`
   );
   t.is(

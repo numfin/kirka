@@ -1,5 +1,5 @@
-import { Result } from "../interfaces";
-import { unionErr } from "./unionErr";
+import { Result } from "../interfaces.js";
+import { unionErr } from "./unionErr.js";
 
 export function andThen<T, E, U = T>(
   result: Result<T, E>,

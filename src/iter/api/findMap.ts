@@ -1,5 +1,5 @@
-import { Iter } from "../interfaces";
-import { None, Option } from "../../option";
+import { Iter } from "../interfaces.js";
+import { None, Option } from "../../option/index.js";
 
 export function findMap<T, U>(
   source: Iter<T>,

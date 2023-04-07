@@ -1,7 +1,7 @@
-import { Option, OptionUnion } from "../interfaces";
-import { unionNone } from "./unionNone";
-import { unionSome } from "./unionSome";
-import { unwrap } from "./unwrap";
+import { Option } from "../interfaces.js";
+import { unionNone } from "./unionNone.js";
+import { unionSome } from "./unionSome.js";
+import { unwrap } from "./unwrap.js";
 
 export function map<T, U>(option: Option<T>, fn: (value: T) => U) {
   const inner = option.inner();

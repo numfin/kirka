@@ -1,29 +1,29 @@
-export { ResultFrom } from "./from";
-export * from "./interfaces";
+export { ResultFrom } from "./from/index.js";
+export * from "./interfaces.js";
 
-import { and } from "./api/and";
-import { or } from "./api/or";
-import { andThen } from "./api/andThen";
-import { orElse } from "./api/orElse";
-import { eq } from "./api/eq";
-import { format } from "./api/format";
-import { inspect } from "./api/inspect";
-import { inspectErr } from "./api/inspectErr";
-import { isOk } from "./api/isOk";
-import { isOkAnd } from "./api/isOkAnd";
-import { isErr } from "./api/isErr";
-import { isErrAnd } from "./api/isErrAnd";
-import { map } from "./api/map";
-import { mapErr } from "./api/mapErr";
-import { ok } from "./api/ok";
-import { err } from "./api/err";
-import { unwrap } from "./api/unwrap";
-import { uwnrapOr } from "./api/unwrapOr";
-import { unwrapErr } from "./api/unwrapErr";
-import { unwrapErrOr } from "./api/unwrapErrOr";
-import type { Result, ResultUnion, Ok, Err } from "./interfaces";
-import { unionOk } from "./api/unionOk";
-import { unionErr } from "./api/unionErr";
+import { and } from "./api/and.js";
+import { or } from "./api/or.js";
+import { andThen } from "./api/andThen.js";
+import { orElse } from "./api/orElse.js";
+import { eq } from "./api/eq.js";
+import { format } from "./api/format.js";
+import { inspect } from "./api/inspect.js";
+import { inspectErr } from "./api/inspectErr.js";
+import { isOk } from "./api/isOk.js";
+import { isOkAnd } from "./api/isOkAnd.js";
+import { isErr } from "./api/isErr.js";
+import { isErrAnd } from "./api/isErrAnd.js";
+import { map } from "./api/map.js";
+import { mapErr } from "./api/mapErr.js";
+import { ok } from "./api/ok.js";
+import { err } from "./api/err.js";
+import { unwrap } from "./api/unwrap.js";
+import { uwnrapOr } from "./api/unwrapOr.js";
+import { unwrapErr } from "./api/unwrapErr.js";
+import { unwrapErrOr } from "./api/unwrapErrOr.js";
+import type { Result, ResultUnion, Ok, Err } from "./interfaces.js";
+import { unionOk } from "./api/unionOk.js";
+import { unionErr } from "./api/unionErr.js";
 
 export function createResult<T, E>(result: ResultUnion<T, E>): Result<T, E> {
   const api: Result<T, E> = {

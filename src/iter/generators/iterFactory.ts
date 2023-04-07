@@ -1,5 +1,5 @@
-import { defaultMap } from "./defaultMap";
-import { defaultFilter } from "./defaultFilter";
+import { defaultMap } from "./defaultMap.js";
+import { defaultFilter } from "./defaultFilter.js";
 
 export function* iterFactory<T, U = T>(
   source: Iterable<T>,

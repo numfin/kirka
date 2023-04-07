@@ -1,4 +1,4 @@
-import { Iter } from "../interfaces";
+import { Iter } from "../interfaces.js";
 
 export function skip<T>(source: Iter<T>, skipAmount: number) {
   return source

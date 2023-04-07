@@ -1,5 +1,5 @@
-import { Iter } from "../interfaces";
-import { None, Option, Some } from "../../option";
+import { Iter } from "../interfaces.js";
+import { None, Option, Some } from "../../option/index.js";
 
 export function find<T>(source: Iter<T>, fn: (item: T) => boolean): Option<T> {
   const result = source

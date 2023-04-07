@@ -1,5 +1,5 @@
-import { unionNone } from "./unionNone";
-import { unionSome } from "./unionSome";
+import { unionNone } from "./unionNone.js";
+import { unionSome } from "./unionSome.js";
 export function take(option) {
     if (option.type === "Some") {
         option.type = "None";

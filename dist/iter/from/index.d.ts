@@ -1,6 +1,6 @@
-import { array } from "./array";
-import { iterable } from "./iterable";
-import { range } from "./range";
+import { array } from "./array.js";
+import { iterable } from "./iterable.js";
+import { range } from "./range.js";
 export declare const IterFrom: {
     array: typeof array;
     iterable: typeof iterable;

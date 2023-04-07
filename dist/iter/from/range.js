@@ -1,5 +1,5 @@
-import { createIter } from "..";
-import { iterInfinite } from "../generators/iterInfinite";
+import { createIter } from "../index.js";
+import { iterInfinite } from "../generators/iterInfinite.js";
 export function range(from, to, inclusive = false) {
     if (from > to) {
         throw new Error(`Invalid range: From(${from}) > To(${to})`);

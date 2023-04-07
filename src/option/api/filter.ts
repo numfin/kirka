@@ -1,5 +1,5 @@
-import { None } from "..";
-import { Option } from "../interfaces";
+import { None } from "../index.js";
+import { Option } from "../interfaces.js";
 
 export function filter<T>(source: Option<T>, fn: (item: T) => boolean) {
   if (source.isSomeAnd(fn)) {

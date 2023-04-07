@@ -1,5 +1,5 @@
-import { Iter } from "../interfaces";
-import { Option } from "../../option";
+import { Iter } from "../interfaces.js";
+import { Option } from "../../option/index.js";
 
 export function position<T>(
   source: Iter<T>,

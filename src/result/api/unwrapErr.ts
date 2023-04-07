@@ -1,4 +1,4 @@
-import { Result } from "../interfaces";
+import { Result } from "../interfaces.js";
 
 export function unwrapErr<T, E>(result: Result<T, E>) {
   if (result.isOk()) {

@@ -1,5 +1,5 @@
-import { Iter } from "../interfaces";
-import { IterFrom } from "../from";
+import { Iter } from "../interfaces.js";
+import { IterFrom } from "../from/index.js";
 
 export function eq<T, U>(
   source: Iter<T>,

@@ -1,5 +1,5 @@
-import { Result, Err, Ok } from "../../result";
-import { Option } from "../interfaces";
+import { Result, Err, Ok } from "../../result/index.js";
+import { Option } from "../interfaces.js";
 
 export function result<T, E>(
   option: Option<T>,

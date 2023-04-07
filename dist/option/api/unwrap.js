@@ -1,4 +1,4 @@
-import { format } from "./format";
+import { format } from "./format.js";
 export function unwrap(option) {
     const inner = option.inner();
     if (inner.type === "None") {

@@ -1,4 +1,4 @@
-import { Iter } from "../interfaces";
+import { Iter } from "../interfaces.js";
 
 export function nth<T>(source: Iter<T>, amount: number) {
   if (amount <= 0) {

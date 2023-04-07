@@ -1,7 +1,7 @@
 import test from "ava";
-import { None, Some } from "../option";
-import { useSpy } from "../testutils/spy";
-import { Err, Ok, tryFn } from "./index";
+import { None, Some } from "../option/index.js";
+import { useSpy } from "../testutils/spy.js";
+import { Err, Ok, tryFn } from "./index.js";
 
 test(`x.eq(y) when x == y`, (t) => {
   t.true(Err(3).eq(Err(3)));

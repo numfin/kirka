@@ -1,4 +1,4 @@
-import type { Option } from "../option/interfaces";
+import type { Option } from "../option/interfaces.js";
 export interface Ok<T> {
     type: "Ok";
     value: T;

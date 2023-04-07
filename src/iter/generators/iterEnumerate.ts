@@ -1,4 +1,4 @@
-import { WithIndex } from "../interfaces";
+import { WithIndex } from "../interfaces.js";
 
 export function* iterEnumerate<T>(source: Iterable<T>) {
   let index = 0;

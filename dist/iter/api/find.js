@@ -1,4 +1,4 @@
-import { None, Some } from "../../option";
+import { None, Some } from "../../option/index.js";
 export function find(source, fn) {
     const result = source
         .skipWhile((item) => !fn(item))

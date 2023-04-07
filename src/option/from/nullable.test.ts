@@ -1,6 +1,5 @@
 import test from "ava";
-import { None, Some } from "..";
-import { OptionFrom } from ".";
+import { None, OptionFrom, Some } from "../index.js";
 
 test(`OptionFrom.nullable()`, (t) => {
   t.true(OptionFrom.nullable(null).eq(None()));

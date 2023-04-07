@@ -1,4 +1,4 @@
-import { Iter } from "../interfaces";
+import { Iter } from "../interfaces.js";
 
 export function maxBy<T>(source: Iter<T>, fn: (item: T) => number) {
   let max = source.first();

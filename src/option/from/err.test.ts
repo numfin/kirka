@@ -1,7 +1,6 @@
 import test from "ava";
-import { Err, Ok } from "../../result";
-import { None, Some } from "..";
-import { OptionFrom } from ".";
+import { OptionFrom } from "./index.js";
+import { Err, None, Ok, Some } from "../../index.js";
 
 test(`OptionFrom.err()`, (t) => {
   t.true(OptionFrom.err(Ok<number, string>(3)).eq(None()));

@@ -1,4 +1,4 @@
-import { Option } from "../option";
+import { Option } from "../option/index.js";
 
 export type WithIndex<T> = { item: T; index: number };
 export enum Order {

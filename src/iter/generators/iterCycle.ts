@@ -1,4 +1,4 @@
-import { ClonnableGenerator } from "../interfaces";
+import { ClonnableGenerator } from "../interfaces.js";
 
 export function* iterCycle<T>(source: ClonnableGenerator<T>) {
   let iter = source();

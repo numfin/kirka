@@ -1,8 +1,8 @@
 import test, { ExecutionContext } from "ava";
-import { None, Some } from "../option";
-import { useSpy } from "../testutils/spy";
-import { IterFrom } from "./from";
-import { iterInfinite } from "./generators/iterInfinite";
+import { None, Some } from "../option/index.js";
+import { useSpy } from "../testutils/spy.js";
+import { IterFrom } from "./from/index.js";
+import { iterInfinite } from "./generators/iterInfinite.js";
 
 function nativeRange(from: number, to: number, inclusive = false) {
   if (from > to) {

@@ -1,7 +1,7 @@
 import test from "ava";
-import { Err, Ok } from "./result";
-import { None, OptionFrom, Some } from "./option";
-import { ResultFrom } from "./result/from";
+import { Err, Ok } from "./result/index.js";
+import { None, OptionFrom, Some } from "./option/index.js";
+import { ResultFrom } from "./result/from/index.js";
 
 test(`Circular dependencies resolving`, (t) => {
   // Apis

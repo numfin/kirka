@@ -1,4 +1,4 @@
-import { Result } from "../interfaces";
+import { Result } from "../interfaces.js";
 
 export function eq<T, E>(self: Result<T, E>, other: Result<T, E>) {
   const a = self.inner();

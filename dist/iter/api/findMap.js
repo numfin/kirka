@@ -1,4 +1,4 @@
-import { None } from "../../option";
+import { None } from "../../option/index.js";
 export function findMap(source, fn) {
     const result = source
         .map(fn)

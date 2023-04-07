@@ -1,4 +1,4 @@
-import { Result } from "../interfaces";
+import { Result } from "../interfaces.js";
 
 export function unwrap<T, E>(result: Result<T, E>) {
   const inner = result.inner();

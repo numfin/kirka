@@ -1,4 +1,4 @@
-import { Iter } from "../interfaces";
+import { Iter } from "../interfaces.js";
 
 export function minBy<T>(source: Iter<T>, fn: (item: T) => number) {
   let min = source.first();

@@ -1,6 +1,6 @@
-import { Result, ResultUnion } from "../interfaces";
-import { unionOk } from "./unionOk";
-import { unionErr } from "./unionErr";
+import { ResultUnion } from "../interfaces.js";
+import { unionOk } from "./unionOk.js";
+import { unionErr } from "./unionErr.js";
 
 export function mapErr<T, E, U>(
   result: ResultUnion<T, E>,

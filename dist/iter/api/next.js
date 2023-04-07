@@ -1,4 +1,4 @@
-import { None, Some } from "../../option";
+import { None, Some } from "../../option/index.js";
 export function next(source) {
     const nextValue = source.next();
     if (nextValue.done) {

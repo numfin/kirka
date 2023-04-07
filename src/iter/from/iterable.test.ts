@@ -1,5 +1,5 @@
 import test from "ava";
-import { IterFrom } from ".";
+import { IterFrom } from "./index.js";
 
 test(`IterFrom.iterable()`, (t) => {
   const fromArr = [1, 2, 3, 4];

@@ -1,7 +1,7 @@
-import { bool } from "./bool";
-import { ok } from "./ok";
-import { err } from "./err";
-import { nullable } from "./nullable";
+import { bool } from "./bool.js";
+import { ok } from "./ok.js";
+import { err } from "./err.js";
+import { nullable } from "./nullable.js";
 export declare const OptionFrom: {
     bool: typeof bool;
     nullable: typeof nullable;

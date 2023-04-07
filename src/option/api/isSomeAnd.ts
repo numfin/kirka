@@ -1,4 +1,4 @@
-import { Option } from "../interfaces";
+import { Option } from "../interfaces.js";
 
 export function isSomeAnd<T>(
   option: Option<T>,

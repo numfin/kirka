@@ -1,26 +1,26 @@
-export * from "./interfaces";
-export { OptionFrom } from "./from";
+export * from "./interfaces.js";
+export { OptionFrom } from "./from/index.js";
 
-import { result } from "./api/result";
-import { andThen } from "./api/andThen";
-import { and } from "./api/and";
-import { orElse } from "./api/orElse";
-import { or } from "./api/or";
-import { map } from "./api/map";
-import { unwrapOr } from "./api/unwrapOr";
-import { unwrap } from "./api/unwrap";
-import { isSomeAnd } from "./api/isSomeAnd";
-import { take } from "./api/take";
-import { isSome } from "./api/isSome";
-import { isNone } from "./api/isNone";
-import { clone } from "./api/clone";
-import { eq } from "./api/eq";
-import { format } from "./api/format";
-import { unionNone } from "./api/unionNone";
-import { unionSome } from "./api/unionSome";
-import type { Option, Some, OptionUnion, None } from "./interfaces";
-import { filter } from "./api/filter";
-import { isNoneAnd } from "./api/isNoneAnd";
+import { result } from "./api/result.js";
+import { andThen } from "./api/andThen.js";
+import { and } from "./api/and.js";
+import { orElse } from "./api/orElse.js";
+import { or } from "./api/or.js";
+import { map } from "./api/map.js";
+import { unwrapOr } from "./api/unwrapOr.js";
+import { unwrap } from "./api/unwrap.js";
+import { isSomeAnd } from "./api/isSomeAnd.js";
+import { take } from "./api/take.js";
+import { isSome } from "./api/isSome.js";
+import { isNone } from "./api/isNone.js";
+import { clone } from "./api/clone.js";
+import { eq } from "./api/eq.js";
+import { format } from "./api/format.js";
+import { unionNone } from "./api/unionNone.js";
+import { unionSome } from "./api/unionSome.js";
+import type { Option, Some, OptionUnion, None } from "./interfaces.js";
+import { filter } from "./api/filter.js";
+import { isNoneAnd } from "./api/isNoneAnd.js";
 
 export function createOption<T>(v: OptionUnion<T>): Option<T> {
   let inner = v;

@@ -1,4 +1,4 @@
-import type { Result } from "../result/interfaces";
+import type { Result } from "../result/interfaces.js";
 
 export interface Some<T> {
   type: "Some";

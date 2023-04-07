@@ -1,4 +1,4 @@
-import { Result, ResultUnion } from "../interfaces";
+import { Result, ResultUnion } from "../interfaces.js";
 
 export function format<T, E>(
   result: Result<T, E>,

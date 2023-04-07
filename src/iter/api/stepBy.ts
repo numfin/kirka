@@ -1,4 +1,4 @@
-import { Iter } from "../interfaces";
+import { Iter } from "../interfaces.js";
 
 export function stepBy<T>(source: Iter<T>, amount: number) {
   if (amount <= 0) {

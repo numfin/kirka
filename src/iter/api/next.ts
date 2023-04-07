@@ -1,4 +1,4 @@
-import { None, Option, Some } from "../../option";
+import { None, Option, Some } from "../../option/index.js";
 
 export function next<T>(source: Generator<T>): Option<T> {
   const nextValue = source.next();
