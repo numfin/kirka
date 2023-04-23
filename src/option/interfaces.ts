@@ -81,6 +81,15 @@ export interface Option<T> {
    */
   unwrapOr(v: T): T;
   /**
+   * Returns the contained `Some` or result of function
+   * # Example
+   * ```ts
+   * Some(3).unwrapOrElse(() => 4) // 3
+   * None().unwrapOrElse(() => 4) // 4
+   * ```
+   */
+  unwrapOrElse(v: () => T): T;
+  /**
    * Returns `true` if value is `None`
    * # Example
    * ```ts
@@ -219,4 +228,25 @@ export interface Option<T> {
    * ```
    */
   filter(fn: (item: T) => boolean): Option<T>;
+  /**
+   * This function is functional alternative to hand-written conditions for `Option<T>`
+   *
+   * It takes two functions as arguments:
+   * - What to return if we have value
+   * - What to return if we don't have value
+   *
+   * # Notice
+   * Both functions must return the same type
+   *
+   * # Example
+   * ```ts
+   * const data = Some("coolvalue");
+   * const result = match(
+   *   (v) => v + "!",
+   *   () => ""
+   * );
+   * assert(result, "coolvalue!");
+   * ```
+   */
+  match<U>(onSome: (item: T) => U, onNone: () => U): U;
 }

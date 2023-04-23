@@ -183,3 +183,29 @@ test(`.result()`, (t) => {
       .eq(Err(4))
   );
 });
+test(`.match()`, (t) => {
+  t.is(
+    Some("v").match(
+      (v) => v,
+      () => "_"
+    ),
+    "v"
+  );
+  t.is(
+    None().match(
+      (v) => v,
+      () => "_"
+    ),
+    "_"
+  );
+});
+test(`.unwrapOrElse()`, (t) => {
+  t.is(
+    Some("v").unwrapOrElse(() => "v2"),
+    "v"
+  );
+  t.is(
+    None().unwrapOrElse(() => "v2"),
+    "v2"
+  );
+});

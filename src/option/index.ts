@@ -21,6 +21,8 @@ import { unionSome } from "./api/unionSome.js";
 import type { Option, Some, OptionUnion, None } from "./interfaces.js";
 import { filter } from "./api/filter.js";
 import { isNoneAnd } from "./api/isNoneAnd.js";
+import { match } from "./api/match.js";
+import { unwrapOrElse } from "./api/unwrapOrElse.js";
 
 export function createOption<T>(v: OptionUnion<T>): Option<T> {
   let inner = v;
@@ -32,6 +34,7 @@ export function createOption<T>(v: OptionUnion<T>): Option<T> {
     clone: () => createOption(clone(inner)),
     unwrap: () => unwrap(api),
     unwrapOr: (default_value) => unwrapOr(inner, default_value),
+    unwrapOrElse: (fn) => unwrapOrElse(inner, fn),
     isNone: () => isNone(inner),
     isSome: () => isSome(inner),
     take: () => createOption(take(inner)),
@@ -44,6 +47,7 @@ export function createOption<T>(v: OptionUnion<T>): Option<T> {
     andThen: (fn) => createOption(andThen(api, fn)),
     result: (fn) => result(api, fn),
     filter: (fn) => filter(api, fn),
+    match: (onSome, onNone) => match(api, onSome, onNone),
   };
   return api;
 }
