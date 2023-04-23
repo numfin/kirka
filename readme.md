@@ -7,11 +7,17 @@
 
 <h2> :book: Big inspiration from <a href="https://github.com/gcanti/fp-ts">fp-ts</a>, <a href="https://github.com/JSMonk/sweet-monads">@sweet-monads</a></h2>
 
-### Modules
+# 👇👇👇 Modules
 
-- [Option&lt;T&gt;](/src/option/) - Forget about nulls and undefined
-- [Result&lt;T, E&gt;](/src/result/) - Handle errors like a god
-- [Iter&lt;T&gt;](/src/iter/) - Lazy iterables with superpowers
+### - [Option&lt;T&gt;](/src/option/) - Forget about nulls and undefined
+
+### - [Result&lt;T, E&gt;](/src/result/) - Handle errors like a god
+
+### - [Iter&lt;T&gt;](/src/iter/) - Lazy iterables with superpowers
+
+### - [Schema](/src/schema/) - Pseudo pattern-matching for js
+
+# 👆👆👆 Everything is described within modules
 
 # Installation
 
