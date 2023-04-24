@@ -1,5 +1,5 @@
 <h1 align="center">Schema</h1>
-<h3 align="center">Pesudo pattern-matching for js</h3>
+<h3 align="center">Pseudo pattern-matching for js</h3>
 
 Original idea was to create Rust-`enum` alternative for javascript. But I realized that js type-system is too weak and to create complete algebraic types I need to implement entire compiler (typescript alternative) lol.
 
