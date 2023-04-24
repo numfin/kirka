@@ -1,6 +1,6 @@
 {
   "name": "kirka",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Monoids Rust-style for Typescript",
   "repository": {
     "type": "git",
