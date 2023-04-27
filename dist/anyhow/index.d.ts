@@ -1,5 +1,4 @@
-import { Result } from "../index.js";
-interface Display {
+export interface Display {
     toString(): string;
 }
 export declare class AnyHow implements Display {
@@ -10,7 +9,6 @@ export declare class AnyHow implements Display {
     static expect(expected: Display, got: Display): AnyHow;
     wrapWith(msgFn: () => string): this;
     toString(): string;
-    toErr<T>(): Result<T, AnyHow>;
+    toErr<T>(): import("../index.js").Result<T, AnyHow>;
 }
-export {};
 //# sourceMappingURL=index.d.ts.map

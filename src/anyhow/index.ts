@@ -1,6 +1,6 @@
-import { Err, IterFrom, Result } from "../index.js";
+import { Err } from "../index.js";
 
-interface Display {
+export interface Display {
   toString(): string;
 }
 
