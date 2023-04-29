@@ -220,7 +220,7 @@ export interface Iter<T> extends Iterable<T> {
      * Creates new iter with reset inner state
      * # Example
      * ```ts
-     * const iter = IterFrom.array([1, 2, 3]);
+     * const iter = IterFrom.array([1, 2]);
      * assert(iter.next(), Some(1))
      * assert(iter.next(), Some(2))
      * assert(iter.next(), None())
