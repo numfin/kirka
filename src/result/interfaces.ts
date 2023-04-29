@@ -250,4 +250,25 @@ export interface Result<T, Err> {
    * ```
    */
   err(): Option<Err>;
+  /**
+   * This function is functional alternative to hand-written conditions for `Result<T, Err>`
+   *
+   * It takes two functions as arguments:
+   * - What to return if Ok
+   * - What to return if Err
+   *
+   * # Notice
+   * Both functions must return the same type
+   *
+   * # Example
+   * ```ts
+   * const data = Ok("coolvalue");
+   * const result = match(
+   *   (v) => v + "!",
+   *   (err) => err
+   * );
+   * assert(result, "coolvalue!");
+   * ```
+   */
+  match<U>(onOk: (v: T) => U, onErr: (e: Err) => U): U;
 }

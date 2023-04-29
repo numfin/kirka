@@ -22,6 +22,7 @@ import { unwrapErr } from "./api/unwrapErr.js";
 import { unwrapErrOr } from "./api/unwrapErrOr.js";
 import { unionOk } from "./api/unionOk.js";
 import { unionErr } from "./api/unionErr.js";
+import { match } from "./api/match.js";
 export function createResult(result) {
     const api = {
         inner: () => result,
@@ -45,6 +46,7 @@ export function createResult(result) {
         or: (new_value) => or(api, new_value),
         ok: () => ok(api),
         err: () => err(api),
+        match: (onOk, onErr) => match(result, onOk, onErr),
     };
     return api;
 }

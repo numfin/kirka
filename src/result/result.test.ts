@@ -167,3 +167,19 @@ test(`.tryFn()`, (t) => {
     }).eq(Ok("good"))
   );
 });
+test(`.match()`, (t) => {
+  t.is(
+    Ok("v").match(
+      (v) => v,
+      (e) => e
+    ),
+    "v"
+  );
+  t.is(
+    Err("e").match(
+      (v) => v,
+      (e) => e
+    ),
+    "e"
+  );
+});
