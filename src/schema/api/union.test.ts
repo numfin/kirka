@@ -114,11 +114,22 @@ test("matchSome union", (t) => {
 
 test("Union inside dict", (t) => {
   const schema = SchemaDict({
-    a: SchemaUnion({
-      v: SchemaStr<string>(),
-      z: SchemaNum<number>(),
+    field: SchemaUnion({
+      str: SchemaStr<string>(),
+      num: SchemaNum<number>(),
     }),
   });
 
-  t.true(schema.parse({ a: "" }).unwrap().a.is("v"));
+  t.true(schema.parse({ field: "" }).unwrap().field.is("str"));
+});
+
+test("Optional union", (t) => {
+  const schema = SchemaDict({
+    inner: SchemaUnion({
+      str: SchemaStr<string>(),
+      num: SchemaNum<number>(),
+    }).optional(),
+  });
+
+  t.true(schema.parse({ inner: 3 }).unwrap().inner.unwrap().is("num"));
 });
