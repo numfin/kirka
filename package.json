@@ -15,7 +15,8 @@
   "scripts": {
     "build": "rimraf ./dist && tsc -p tsconfig.build.json",
     "test": "ava",
-    "test:w": "ava -w"
+    "test:w": "ava -w",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "nextgen-samurai",

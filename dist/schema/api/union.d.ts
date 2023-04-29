@@ -1,10 +1,10 @@
 import { Option } from "../../index.js";
 import { Schema, FromSchema } from "../interface.js";
-import { SchemaCustom } from "./custom.js";
-export type Matcher<T extends Record<PropertyKey, Schema<unknown>>, U> = {
+export type UnionSchemaDeclaration = Record<PropertyKey, Schema<unknown>>;
+export type Matcher<T extends UnionSchemaDeclaration, U> = {
     [key in keyof T]: (v: FromSchema<T[key]>) => U;
 };
-export interface UnionInstance<T extends Record<PropertyKey, Schema<unknown>>> {
+export interface UnionInstance<T extends UnionSchemaDeclaration> {
     /**
      * # Description
      * Extract inner value and use it. All functions must return the same type
@@ -68,12 +68,13 @@ export interface UnionInstance<T extends Record<PropertyKey, Schema<unknown>>> {
      */
     is<K extends keyof T>(tag: K, cond?: (value: FromSchema<T[K]>) => boolean): boolean;
 }
-export type UnionVariants<T extends Record<PropertyKey, Schema<unknown>>> = {
+export type UnionVariants<T extends UnionSchemaDeclaration> = {
     [key in keyof T]: (v: FromSchema<T[key]>) => UnionInstance<T>;
 };
-export declare function Union<T extends Record<PropertyKey, Schema<unknown>>>(_unionSchemas: T): UnionVariants<T>;
-export declare function UnionInstance<T extends Record<PropertyKey, Schema<unknown>>>(currentTag: keyof T, value: FromSchema<T[typeof currentTag]>): UnionInstance<T>;
-export interface SchemaUnion<S extends Record<PropertyKey, Schema<unknown>>, ParsedType = UnionInstance<S>> extends Schema<ParsedType> {
+export declare function Union<T extends UnionSchemaDeclaration>(_unionSchemas: T): UnionVariants<T>;
+export declare function UnionInstance<T extends UnionSchemaDeclaration>(currentTag: keyof T, value: FromSchema<T[typeof currentTag]>): UnionInstance<T>;
+export interface SchemaUnion<S extends UnionSchemaDeclaration, ParsedType = UnionInstance<S>> extends Schema<ParsedType> {
+    optional(): SchemaUnion<S, Option<UnionInstance<S>>>;
 }
-export declare function SchemaUnion<S extends Record<PropertyKey, Schema<unknown>>, ParsedType = UnionInstance<S>>(schema: S, vahter?: SchemaCustom<UnionInstance<S>, ParsedType>): UnionVariants<S> & SchemaUnion<S, ParsedType>;
+export declare const SchemaUnion: <S extends UnionSchemaDeclaration>(schema: S) => UnionVariants<S> & SchemaUnion<S, UnionInstance<S>>;
 //# sourceMappingURL=union.d.ts.map

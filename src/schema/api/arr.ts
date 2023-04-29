@@ -1,5 +1,5 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { IterFrom, Ok, Option, Result } from "../../index.js";
+import { IterFrom, Ok, Option } from "../../index.js";
 import { Checker, Transformer, Schema, FromSchema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 

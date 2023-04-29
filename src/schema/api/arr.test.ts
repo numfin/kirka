@@ -1,7 +1,6 @@
 import test from "ava";
-import { None, Ok, Some } from "../../index.js";
+import { None, Ok } from "../../index.js";
 import { SchemaStr } from "./str.js";
-import { SchemaNum } from "./num.js";
 import { SchemaArr } from "./arr.js";
 
 const genSchema = () => SchemaArr(SchemaStr<string>());

@@ -135,6 +135,6 @@ export declare const Schema: {
      * const isV3 = v3.is("v3") // true
      * ```
      */
-    union: typeof SchemaUnion;
+    union: <S extends import("./api/union.js").UnionSchemaDeclaration>(schema: S) => import("./api/union.js").UnionVariants<S> & SchemaUnion<S, import("./api/union.js").UnionInstance<S>>;
 };
 //# sourceMappingURL=index.d.ts.map

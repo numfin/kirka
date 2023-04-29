@@ -3,9 +3,8 @@ import { SchemaStr } from "./str.js";
 import { SchemaNum } from "./num.js";
 import { SchemaDict } from "./dict.js";
 import { SchemaArr } from "./arr.js";
-import { SchemaUnion, Union } from "./union.js";
+import { SchemaUnion } from "./union.js";
 import { Option, Some } from "../../index.js";
-import { FromSchema } from "../interface.js";
 
 test("Convert value to union", (t) => {
   const s = SchemaUnion({
@@ -111,4 +110,15 @@ test("matchSome union", (t) => {
       })
       .eq(Some("v3"))
   );
+});
+
+test("Union inside dict", (t) => {
+  const schema = SchemaDict({
+    a: SchemaUnion({
+      v: SchemaStr<string>(),
+      z: SchemaNum<number>(),
+    }),
+  });
+
+  t.true(schema.parse({ a: "" }).unwrap().a.is("v"));
 });

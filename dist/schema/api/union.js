@@ -39,8 +39,11 @@ function defaultVahter(unionSchemas) {
             .result(() => AnyHow.expect("renum", String(v)));
     });
 }
-export function SchemaUnion(schema, vahter = defaultVahter(schema)) {
+function SchemaUnionInternal(schema, vahter = defaultVahter(schema)) {
     const api = {
+        optional() {
+            return vahter.optional();
+        },
         parse(v) {
             return vahter.parse(v);
         },
@@ -57,3 +60,4 @@ export function SchemaUnion(schema, vahter = defaultVahter(schema)) {
         },
     });
 }
+export const SchemaUnion = (schema) => SchemaUnionInternal(schema);

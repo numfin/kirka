@@ -3,11 +3,13 @@ import { IterFrom, None, Option, Some } from "../../index.js";
 import { Schema, FromSchema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
-export type Matcher<T extends Record<PropertyKey, Schema<unknown>>, U> = {
+export type UnionSchemaDeclaration = Record<PropertyKey, Schema<unknown>>;
+
+export type Matcher<T extends UnionSchemaDeclaration, U> = {
   [key in keyof T]: (v: FromSchema<T[key]>) => U;
 };
 
-export interface UnionInstance<T extends Record<PropertyKey, Schema<unknown>>> {
+export interface UnionInstance<T extends UnionSchemaDeclaration> {
   /**
    * # Description
    * Extract inner value and use it. All functions must return the same type
@@ -76,13 +78,11 @@ export interface UnionInstance<T extends Record<PropertyKey, Schema<unknown>>> {
   ): boolean;
 }
 
-export type UnionVariants<T extends Record<PropertyKey, Schema<unknown>>> = {
+export type UnionVariants<T extends UnionSchemaDeclaration> = {
   [key in keyof T]: (v: FromSchema<T[key]>) => UnionInstance<T>;
 };
 
-export function Union<T extends Record<PropertyKey, Schema<unknown>>>(
-  _unionSchemas: T
-) {
+export function Union<T extends UnionSchemaDeclaration>(_unionSchemas: T) {
   return new Proxy(
     {},
     {
@@ -93,7 +93,7 @@ export function Union<T extends Record<PropertyKey, Schema<unknown>>>(
   ) as UnionVariants<T>;
 }
 
-export function UnionInstance<T extends Record<PropertyKey, Schema<unknown>>>(
+export function UnionInstance<T extends UnionSchemaDeclaration>(
   currentTag: keyof T,
   value: FromSchema<T[typeof currentTag]>
 ): UnionInstance<T> {
@@ -119,13 +119,13 @@ export function UnionInstance<T extends Record<PropertyKey, Schema<unknown>>>(
 }
 
 export interface SchemaUnion<
-  S extends Record<PropertyKey, Schema<unknown>>,
+  S extends UnionSchemaDeclaration,
   ParsedType = UnionInstance<S>
-> extends Schema<ParsedType> {}
+> extends Schema<ParsedType> {
+  optional(): SchemaUnion<S, Option<UnionInstance<S>>>;
+}
 
-function defaultVahter<S extends Record<PropertyKey, Schema<unknown>>>(
-  unionSchemas: S
-) {
+function defaultVahter<S extends UnionSchemaDeclaration>(unionSchemas: S) {
   return SchemaCustom((v) => {
     return IterFrom.array(Object.entries(unionSchemas))
       .findMap(([tag, schema]) =>
@@ -140,10 +140,7 @@ function defaultVahter<S extends Record<PropertyKey, Schema<unknown>>>(
   });
 }
 
-export function SchemaUnion<
-  S extends Record<PropertyKey, Schema<unknown>>,
-  ParsedType = UnionInstance<S>
->(
+function SchemaUnionInternal<ParsedType, S extends UnionSchemaDeclaration>(
   schema: S,
   vahter = defaultVahter(schema) as unknown as SchemaCustom<
     UnionInstance<S>,
@@ -151,6 +148,9 @@ export function SchemaUnion<
   >
 ) {
   const api: SchemaUnion<S, ParsedType> = {
+    optional() {
+      return vahter.optional();
+    },
     parse(v) {
       return vahter.parse(v);
     },
@@ -170,3 +170,6 @@ export function SchemaUnion<
     }
   ) as UnionVariants<S> & SchemaUnion<S, ParsedType>;
 }
+
+export const SchemaUnion = <S extends UnionSchemaDeclaration>(schema: S) =>
+  SchemaUnionInternal<UnionInstance<S>, S>(schema);
