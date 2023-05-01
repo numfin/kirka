@@ -1,7 +1,6 @@
 import { Option } from "../../index.js";
-import { Checker, Transformer, Schema, FromSchema } from "../interface.js";
-import { SchemaCustom } from "./custom.js";
-export interface SchemaArr<T extends Schema<unknown>, ParsedType = FromSchema<T>[]> extends Schema<ParsedType> {
+import { Checker, Transformer, Schema } from "../interface.js";
+export interface SchemaArr<T, ParsedType = T[]> extends Schema<ParsedType> {
     /**
      * # Description
      * Make schema optional. All null/undefined become `Option<T>`
@@ -11,7 +10,7 @@ export interface SchemaArr<T extends Schema<unknown>, ParsedType = FromSchema<T>
      * const v: Option<string>[] = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaArr<T, Option<FromSchema<T>[]>>;
+    optional(): SchemaArr<T, Option<T[]>>;
     /**
      * # Description
      * Add validation rule to schema
@@ -20,7 +19,7 @@ export interface SchemaArr<T extends Schema<unknown>, ParsedType = FromSchema<T>
      * const s = Schema.arr(Schema.str()).is((v) => v.length > 0)
      * ```
      */
-    is: Checker<FromSchema<T>[], SchemaArr<T, ParsedType>>;
+    is: Checker<T[], SchemaArr<T, ParsedType>>;
     /**
      * # Description
      * Add transformation to schema. You cannot change the type of value.
@@ -37,7 +36,7 @@ export interface SchemaArr<T extends Schema<unknown>, ParsedType = FromSchema<T>
      *   })
      * ```
      */
-    transform: Transformer<FromSchema<T>[], SchemaArr<T, ParsedType>>;
+    transform: Transformer<T[], SchemaArr<T, ParsedType>>;
 }
-export declare function SchemaArr<T extends Schema<unknown>, ParsedType = FromSchema<T>[]>(schema: T, vahter?: SchemaCustom<FromSchema<T>[], ParsedType>): SchemaArr<T, ParsedType>;
+export declare const SchemaArr: <T>(schema: Schema<T>) => SchemaArr<T, T[]>;
 //# sourceMappingURL=arr.d.ts.map

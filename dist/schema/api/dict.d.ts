@@ -1,10 +1,6 @@
 import { Option } from "../../index.js";
-import { Checker, Transformer, Schema, FromSchema } from "../interface.js";
-import { SchemaCustom } from "./custom.js";
-type ExtractDict<S extends Record<PropertyKey, Schema<unknown>>> = {
-    [key in keyof S]: FromSchema<S[key]>;
-};
-export interface SchemaDict<S extends Record<PropertyKey, Schema<unknown>>, ParsedType = ExtractDict<S>> extends Schema<ParsedType> {
+import { Checker, Transformer, Schema } from "../interface.js";
+export interface SchemaDict<S extends Record<PropertyKey, unknown>, ParsedType = S> extends Schema<ParsedType> {
     /**
      * # Description
      * Make schema optional. All null/undefined become `Option<T>`
@@ -16,7 +12,7 @@ export interface SchemaDict<S extends Record<PropertyKey, Schema<unknown>>, Pars
      * const v: Option<{ a: string }> = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaDict<S, Option<ExtractDict<S>>>;
+    optional(): SchemaDict<S, Option<S>>;
     /**
      * # Description
      * Add validation rule to schema
@@ -27,7 +23,7 @@ export interface SchemaDict<S extends Record<PropertyKey, Schema<unknown>>, Pars
      * }).is((v) => v.a.length > 0)
      * ```
      */
-    is: Checker<ExtractDict<S>, SchemaDict<S, ParsedType>>;
+    is: Checker<S, SchemaDict<S, ParsedType>>;
     /**
      * # Description
      * Add transformation to schema. You cannot change the type of value.
@@ -46,8 +42,11 @@ export interface SchemaDict<S extends Record<PropertyKey, Schema<unknown>>, Pars
      *   })
      * ```
      */
-    transform: Transformer<ExtractDict<S>, SchemaDict<S, ParsedType>>;
+    transform: Transformer<S, SchemaDict<S, ParsedType>>;
 }
-export declare function SchemaDict<S extends Record<PropertyKey, Schema<unknown>>, ParsedType = ExtractDict<S>>(schema: S, vahter?: SchemaCustom<ExtractDict<S>, ExtractDict<S>>): SchemaDict<S, ExtractDict<S>>;
+type DictSchema<T extends Record<PropertyKey, unknown>> = {
+    [key in keyof T]: Schema<T[key]>;
+};
+export declare const SchemaDict: <T extends Record<PropertyKey, unknown>>(schema: DictSchema<T>) => SchemaDict<T, T>;
 export {};
 //# sourceMappingURL=dict.d.ts.map

@@ -83,7 +83,7 @@ export declare const Schema: {
      *   })
      * ```
      */
-    dict: typeof SchemaDict;
+    dict: <T extends Record<PropertyKey, unknown>>(schema: { [key in keyof T]: import("./interface.js").Schema<T[key]>; }) => SchemaDict<T, T>;
     /**
      * # Description
      * Array type
@@ -99,7 +99,7 @@ export declare const Schema: {
      *   })
      * ```
      */
-    arr: typeof SchemaArr;
+    arr: <T_1>(schema: import("./interface.js").Schema<T_1>) => SchemaArr<T_1, T_1[]>;
     /**
      * # Description
      * Tagged union. Used to describe different variants of type

@@ -8,8 +8,8 @@ type ExtractDict<S extends Record<PropertyKey, Schema<unknown>>> = {
 };
 
 export interface SchemaDict<
-  S extends Record<PropertyKey, Schema<unknown>>,
-  ParsedType = ExtractDict<S>
+  S extends Record<PropertyKey, unknown>,
+  ParsedType = S
 > extends Schema<ParsedType> {
   /**
    * # Description
@@ -22,7 +22,7 @@ export interface SchemaDict<
    * const v: Option<{ a: string }> = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaDict<S, Option<ExtractDict<S>>>;
+  optional(): SchemaDict<S, Option<S>>;
   /**
    * # Description
    * Add validation rule to schema
@@ -33,7 +33,7 @@ export interface SchemaDict<
    * }).is((v) => v.a.length > 0)
    * ```
    */
-  is: Checker<ExtractDict<S>, SchemaDict<S, ParsedType>>;
+  is: Checker<S, SchemaDict<S, ParsedType>>;
   /**
    * # Description
    * Add transformation to schema. You cannot change the type of value.
@@ -52,49 +52,48 @@ export interface SchemaDict<
    *   })
    * ```
    */
-  transform: Transformer<ExtractDict<S>, SchemaDict<S, ParsedType>>;
+  transform: Transformer<S, SchemaDict<S, ParsedType>>;
 }
 
-function defaultVahter<S extends Record<PropertyKey, Schema<unknown>>>(
-  schema: S
-) {
+type DictSchema<T extends Record<PropertyKey, unknown>> = {
+  [key in keyof T]: Schema<T[key]>;
+};
+
+function defaultVahter<T extends Record<PropertyKey, unknown>>(
+  schema: DictSchema<T>
+): SchemaCustom<T> {
   return SchemaCustom((v) => {
-    type Return = ExtractDict<S>;
     if (typeof v !== "object") {
-      return AnyHow.expect("object", typeof v).toErr<Return>();
+      return AnyHow.expect("object", typeof v).toErr<T>();
     } else if (v === null) {
-      return AnyHow.expect("object", "null").toErr<Return>();
+      return AnyHow.expect("object", "null").toErr<T>();
     } else if (Array.isArray(v)) {
-      return AnyHow.expect("object", v).toErr<Return>();
+      return AnyHow.expect("object", v).toErr<T>();
     }
-    const parsedObj = {} as Return;
+    const parsedObj = {} as T;
 
     for (const [prop, propSchema] of Object.entries(schema)) {
-      const result = propSchema.parse(v[prop as keyof typeof v]);
+      const result = (propSchema as Schema<T>).parse(v[prop as keyof typeof v]);
       if (result.isOk()) {
-        type schemaKey = keyof Return;
-        parsedObj[prop as schemaKey] = result.unwrap() as Return[schemaKey];
+        parsedObj[prop as keyof T] = result.unwrap() as T[keyof T];
       } else {
         return result
           .unwrapErr()
           .wrapWith(() => `Field: ${prop}`)
-          .toErr<Return>();
+          .toErr<T>();
       }
     }
     return Ok(parsedObj);
   });
 }
 
-export function SchemaDict<
-  S extends Record<PropertyKey, Schema<unknown>>,
-  ParsedType = ExtractDict<S>
->(schema: S, vahter = defaultVahter(schema)) {
+function SchemaDictInternal<
+  T extends Record<PropertyKey, unknown>,
+  ParsedType = T
+>(vahter: SchemaCustom<T, ParsedType>) {
   const api = {
     optional() {
-      return SchemaDict(
-        schema,
-        vahter.optional() as SchemaCustom<ExtractDict<S>>
-      );
+      return SchemaDictInternal<T, Option<T>>(vahter.optional());
     },
     parse(v) {
       return vahter.parse(v);
@@ -103,11 +102,14 @@ export function SchemaDict<
       return vahter.check(v);
     },
     is(fn) {
-      return SchemaDict(schema, vahter.is(fn));
+      return SchemaDictInternal(vahter.is(fn));
     },
     transform(fn) {
-      return SchemaDict(schema, vahter.transform(fn));
+      return SchemaDictInternal(vahter.transform(fn));
     },
-  } as SchemaDict<S, ExtractDict<S>>;
+  } as SchemaDict<T, ParsedType>;
   return api;
 }
+export const SchemaDict = <T extends Record<PropertyKey, unknown>>(
+  schema: DictSchema<T>
+) => SchemaDictInternal(defaultVahter(schema));

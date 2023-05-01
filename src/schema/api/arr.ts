@@ -3,10 +3,7 @@ import { IterFrom, Ok, Option } from "../../index.js";
 import { Checker, Transformer, Schema, FromSchema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
-export interface SchemaArr<
-  T extends Schema<unknown>,
-  ParsedType = FromSchema<T>[]
-> extends Schema<ParsedType> {
+export interface SchemaArr<T, ParsedType = T[]> extends Schema<ParsedType> {
   /**
    * # Description
    * Make schema optional. All null/undefined become `Option<T>`
@@ -16,7 +13,7 @@ export interface SchemaArr<
    * const v: Option<string>[] = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaArr<T, Option<FromSchema<T>[]>>;
+  optional(): SchemaArr<T, Option<T[]>>;
   /**
    * # Description
    * Add validation rule to schema
@@ -25,7 +22,7 @@ export interface SchemaArr<
    * const s = Schema.arr(Schema.str()).is((v) => v.length > 0)
    * ```
    */
-  is: Checker<FromSchema<T>[], SchemaArr<T, ParsedType>>;
+  is: Checker<T[], SchemaArr<T, ParsedType>>;
   /**
    * # Description
    * Add transformation to schema. You cannot change the type of value.
@@ -42,12 +39,12 @@ export interface SchemaArr<
    *   })
    * ```
    */
-  transform: Transformer<FromSchema<T>[], SchemaArr<T, ParsedType>>;
+  transform: Transformer<T[], SchemaArr<T, ParsedType>>;
 }
 
-function defaultVahter<T extends Schema<unknown>>(schema: T) {
+function defaultVahter<T>(schema: Schema<T>) {
   return SchemaCustom((items) => {
-    type Return = FromSchema<T>[];
+    type Return = T[];
     if (!Array.isArray(items)) {
       return AnyHow.expect("array", String(items)).toErr<Return>();
     }
@@ -57,7 +54,7 @@ function defaultVahter<T extends Schema<unknown>>(schema: T) {
       const result = schema.parse(item);
 
       if (result.isOk()) {
-        parsedArr.push(result.unwrap() as FromSchema<T>);
+        parsedArr.push(result.unwrap());
       } else {
         return result
           .unwrapErr()
@@ -69,19 +66,12 @@ function defaultVahter<T extends Schema<unknown>>(schema: T) {
   });
 }
 
-export function SchemaArr<
-  T extends Schema<unknown>,
-  ParsedType = FromSchema<T>[]
->(
-  schema: T,
-  vahter = defaultVahter(schema) as unknown as SchemaCustom<
-    FromSchema<T>[],
-    ParsedType
-  >
+function SchemaArrInternal<T, ParsedType = T[]>(
+  vahter: SchemaCustom<T[], ParsedType>
 ) {
   const api: SchemaArr<T, ParsedType> = {
     optional() {
-      return SchemaArr<T, Option<FromSchema<T>[]>>(schema, vahter.optional());
+      return SchemaArrInternal(vahter.optional());
     },
     parse(v) {
       return vahter.parse(v);
@@ -90,11 +80,14 @@ export function SchemaArr<
       return vahter.check(v);
     },
     is(fn) {
-      return SchemaArr(schema, vahter.is(fn));
+      return SchemaArrInternal(vahter.is(fn));
     },
     transform(fn) {
-      return SchemaArr(schema, vahter.transform(fn));
+      return SchemaArrInternal(vahter.transform(fn));
     },
   };
   return api;
 }
+
+export const SchemaArr = <T>(schema: Schema<T>) =>
+  SchemaArrInternal(defaultVahter(schema));

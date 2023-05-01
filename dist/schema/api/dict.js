@@ -28,10 +28,10 @@ function defaultVahter(schema) {
         return Ok(parsedObj);
     });
 }
-export function SchemaDict(schema, vahter = defaultVahter(schema)) {
+function SchemaDictInternal(vahter) {
     const api = {
         optional() {
-            return SchemaDict(schema, vahter.optional());
+            return SchemaDictInternal(vahter.optional());
         },
         parse(v) {
             return vahter.parse(v);
@@ -40,11 +40,12 @@ export function SchemaDict(schema, vahter = defaultVahter(schema)) {
             return vahter.check(v);
         },
         is(fn) {
-            return SchemaDict(schema, vahter.is(fn));
+            return SchemaDictInternal(vahter.is(fn));
         },
         transform(fn) {
-            return SchemaDict(schema, vahter.transform(fn));
+            return SchemaDictInternal(vahter.transform(fn));
         },
     };
     return api;
 }
+export const SchemaDict = (schema) => SchemaDictInternal(defaultVahter(schema));
