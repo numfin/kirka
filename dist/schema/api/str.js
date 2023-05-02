@@ -11,10 +11,10 @@ function defaultVahter() {
         }
     });
 }
-export function SchemaStr(vahter = defaultVahter()) {
+function SchemaStrInternal(vahter) {
     const api = {
         optional() {
-            return SchemaStr(vahter.optional());
+            return SchemaStrInternal(vahter.optional());
         },
         parse(v) {
             return vahter.parse(v);
@@ -23,16 +23,16 @@ export function SchemaStr(vahter = defaultVahter()) {
             return vahter.check(v);
         },
         is(fn) {
-            return SchemaStr(vahter.is(fn));
+            return SchemaStrInternal(vahter.is(fn));
         },
         transform(fn) {
-            return SchemaStr(vahter.transform(fn));
+            return SchemaStrInternal(vahter.transform(fn));
         },
         max(len) {
-            return SchemaStr(vahter.is((v) => v.length <= len));
+            return SchemaStrInternal(vahter.is((v) => v.length <= len));
         },
         min(len) {
-            return SchemaStr(vahter.is((v) => v.length >= len));
+            return SchemaStrInternal(vahter.is((v) => v.length >= len));
         },
         numeric() {
             return api.re(() => /^\d*$/gmu, "numeric string");
@@ -44,7 +44,7 @@ export function SchemaStr(vahter = defaultVahter()) {
             return api.re(() => /^[\p{Letter}\p{Mark}\d]*$/gmu, "alphanumeric string");
         },
         re(re, kind) {
-            return SchemaStr(vahter.transform((v) => {
+            return SchemaStrInternal(vahter.transform((v) => {
                 const invokedRe = re();
                 return regexp(invokedRe, kind ?? invokedRe.source, v);
             }));
@@ -56,3 +56,4 @@ const regexp = (re, kind, value) => OptionFrom.bool(re.test(value))
     .result(() => AnyHow.expect(kind, value))
     .map(() => value)
     .orElse((err) => err.toErr());
+export const SchemaStr = () => SchemaStrInternal(defaultVahter());

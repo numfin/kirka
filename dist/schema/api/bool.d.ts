@@ -37,5 +37,5 @@ export interface SchemaBool<ParsedType = boolean> extends Schema<ParsedType> {
      */
     transform: Transformer<boolean, SchemaBool<ParsedType>>;
 }
-export declare function SchemaBool<ParsedType = boolean>(vahter?: SchemaBool<ParsedType>): SchemaBool<ParsedType>;
+export declare const SchemaBool: () => SchemaBool<boolean>;
 //# sourceMappingURL=bool.d.ts.map

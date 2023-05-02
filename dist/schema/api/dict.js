@@ -1,7 +1,7 @@
 import { AnyHow } from "../../anyhow/index.js";
 import { Ok } from "../../index.js";
 import { SchemaCustom } from "./custom.js";
-function defaultVahter(schema) {
+function defaultVahter(schema, options) {
     return SchemaCustom((v) => {
         if (typeof v !== "object") {
             return AnyHow.expect("object", typeof v).toErr();
@@ -12,7 +12,7 @@ function defaultVahter(schema) {
         else if (Array.isArray(v)) {
             return AnyHow.expect("object", v).toErr();
         }
-        const parsedObj = {};
+        const parsedObj = (options.trimExtra ? {} : v);
         for (const [prop, propSchema] of Object.entries(schema)) {
             const result = propSchema.parse(v[prop]);
             if (result.isOk()) {
@@ -48,4 +48,6 @@ function SchemaDictInternal(vahter) {
     };
     return api;
 }
-export const SchemaDict = (schema) => SchemaDictInternal(defaultVahter(schema));
+export const SchemaDict = (schema, options) => SchemaDictInternal(defaultVahter(schema, {
+    trimExtra: options?.trimExtra ?? true,
+}));

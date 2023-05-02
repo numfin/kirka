@@ -56,12 +56,12 @@ function defaultVahter() {
   });
 }
 
-export function SchemaNum<ParsedType = number>(
-  vahter = defaultVahter() as SchemaCustom<number, ParsedType>
+function SchemaNumInternal<ParsedType = number>(
+  vahter: SchemaCustom<number, ParsedType>
 ) {
   const api: SchemaNum<ParsedType> = {
     optional() {
-      return SchemaNum<Option<number>>(vahter.optional());
+      return SchemaNumInternal<Option<number>>(vahter.optional());
     },
     parse(v) {
       return vahter.parse(v);
@@ -70,11 +70,12 @@ export function SchemaNum<ParsedType = number>(
       return vahter.check(v);
     },
     is(fn) {
-      return SchemaNum(vahter.is(fn));
+      return SchemaNumInternal(vahter.is(fn));
     },
     transform(fn) {
-      return SchemaNum(vahter.transform(fn));
+      return SchemaNumInternal(vahter.transform(fn));
     },
   };
   return api;
 }
+export const SchemaNum = () => SchemaNumInternal(defaultVahter());

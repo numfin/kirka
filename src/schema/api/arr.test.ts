@@ -3,7 +3,7 @@ import { None, Ok } from "../../index.js";
 import { SchemaStr } from "./str.js";
 import { SchemaArr } from "./arr.js";
 
-const genSchema = () => SchemaArr(SchemaStr<string>());
+const genSchema = () => SchemaArr(SchemaStr());
 
 test("Contains array", (t) => {
   let s = SchemaArr(SchemaStr());
@@ -13,7 +13,7 @@ test("Contains array", (t) => {
   t.true(s.parse(["asd", 3]).isErr());
 });
 test("Optional values replaced with Option<T>", (t) => {
-  let so = SchemaArr(SchemaStr<string>().optional());
+  let so = SchemaArr(SchemaStr().optional());
   t.true(
     so.parse([, "asd"]).isOkAnd((v) => {
       return v[0].isNone() && v[1].isSomeAnd((v) => v === "asd");

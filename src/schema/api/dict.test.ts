@@ -7,9 +7,9 @@ import { SchemaBool } from "./bool.js";
 
 const genSchema = () =>
   SchemaDict({
-    s: SchemaStr<string>(),
-    n: SchemaNum<number>(),
-    b: SchemaBool<boolean>(),
+    s: SchemaStr(),
+    n: SchemaNum(),
+    b: SchemaBool(),
   });
 
 test("Contains dict structure", (t) => {
@@ -34,7 +34,7 @@ test("Checks if all fields are present", (t) => {
 });
 test("Optional fields replaced with Option<T>", (t) => {
   let so = SchemaDict({
-    s: SchemaStr<string>(),
+    s: SchemaStr(),
     o: SchemaNum().optional(),
   });
   t.true(
@@ -90,5 +90,22 @@ test("Can transform value", (t) => {
     s: "",
     n: 8,
     b: true,
+  });
+});
+
+test("Options.trimExtra", (t) => {
+  const defaultSchema = SchemaDict<Record<string, string>>({
+    a: SchemaStr(),
+  });
+  const falseTrimSchema = SchemaDict<Record<string, string>>(
+    { a: SchemaStr() },
+    { trimExtra: false }
+  );
+  t.deepEqual(defaultSchema.parse({ a: "hi", b: "hello" }).unwrap(), {
+    a: "hi",
+  });
+  t.deepEqual(falseTrimSchema.parse({ a: "hi", b: "hello" }).unwrap(), {
+    a: "hi",
+    b: "hello",
   });
 });

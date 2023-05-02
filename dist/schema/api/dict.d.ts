@@ -44,9 +44,22 @@ export interface SchemaDict<S extends Record<PropertyKey, unknown>, ParsedType =
      */
     transform: Transformer<S, SchemaDict<S, ParsedType>>;
 }
-type DictSchema<T extends Record<PropertyKey, unknown>> = {
+export type RecordAsSchema<T extends Record<PropertyKey, unknown>> = {
     [key in keyof T]: Schema<T[key]>;
 };
-export declare const SchemaDict: <T extends Record<PropertyKey, unknown>>(schema: DictSchema<T>) => SchemaDict<T, T>;
-export {};
+export interface DictVahterOptions {
+    /**
+     * # Description
+     * - Remove extra keys of dict
+     * - Default: `true`
+     *
+     * # Example
+     * ```ts
+     * const schema = Schema.dict<Record<string, string>>({}, { trimExtra: false })
+     * const result: Result<Record<string, string>> = schema.parse(...)
+     * ```
+     */
+    trimExtra: boolean;
+}
+export declare const SchemaDict: <T extends Record<PropertyKey, unknown>>(schema: RecordAsSchema<T>, options?: Partial<DictVahterOptions>) => SchemaDict<T, T>;
 //# sourceMappingURL=dict.d.ts.map

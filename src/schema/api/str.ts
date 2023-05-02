@@ -119,30 +119,30 @@ function defaultVahter() {
   });
 }
 
-export function SchemaStr<ParsedType = string>(
-  vahter = defaultVahter() as SchemaCustom<string, ParsedType>
+function SchemaStrInternal<ParsedType = string>(
+  vahter: SchemaCustom<string, ParsedType>
 ) {
   const api: SchemaStr<ParsedType> = {
     optional() {
-      return SchemaStr<Option<string>>(vahter.optional());
+      return SchemaStrInternal(vahter.optional());
     },
     parse(v) {
-      return vahter.parse(v) as Result<ParsedType, SchemaError>;
+      return vahter.parse(v);
     },
     check(v): v is ParsedType {
       return vahter.check(v);
     },
     is(fn) {
-      return SchemaStr(vahter.is(fn));
+      return SchemaStrInternal(vahter.is(fn));
     },
     transform(fn) {
-      return SchemaStr(vahter.transform(fn));
+      return SchemaStrInternal(vahter.transform(fn));
     },
     max(len) {
-      return SchemaStr(vahter.is((v) => v.length <= len));
+      return SchemaStrInternal(vahter.is((v) => v.length <= len));
     },
     min(len) {
-      return SchemaStr(vahter.is((v) => v.length >= len));
+      return SchemaStrInternal(vahter.is((v) => v.length >= len));
     },
     numeric() {
       return api.re(() => /^\d*$/gmu, "numeric string");
@@ -157,7 +157,7 @@ export function SchemaStr<ParsedType = string>(
       );
     },
     re(re: () => RegExp, kind?: string) {
-      return SchemaStr(
+      return SchemaStrInternal(
         vahter.transform((v) => {
           const invokedRe = re();
           return regexp(invokedRe, kind ?? invokedRe.source, v);
@@ -173,3 +173,5 @@ const regexp = (re: RegExp, kind: string, value: string) =>
     .result(() => AnyHow.expect(kind, value))
     .map(() => value)
     .orElse((err) => err.toErr());
+
+export const SchemaStr = () => SchemaStrInternal(defaultVahter());

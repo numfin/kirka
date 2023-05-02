@@ -1,6 +1,5 @@
 import { Option } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
-import { SchemaCustom } from "./custom.js";
 export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
     /**
      * # Description
@@ -38,5 +37,5 @@ export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
      */
     transform: Transformer<number, SchemaNum<ParsedType>>;
 }
-export declare function SchemaNum<ParsedType = number>(vahter?: SchemaCustom<number, ParsedType>): SchemaNum<ParsedType>;
+export declare const SchemaNum: () => SchemaNum<number>;
 //# sourceMappingURL=num.d.ts.map

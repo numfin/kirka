@@ -74,7 +74,7 @@ export declare const Schema: {
      *   str: Schema.str(),
      *   num: Schema.num(),
      *   bool: Schema.bool()
-     * })
+     * }, { ...options })
      *   .optional()
      *   .is((v) => v.str.length > 0)
      *   .transform((v) => {
@@ -83,7 +83,25 @@ export declare const Schema: {
      *   })
      * ```
      */
-    dict: <T extends Record<PropertyKey, unknown>>(schema: { [key in keyof T]: import("./interface.js").Schema<T[key]>; }) => SchemaDict<T, T>;
+    dict: <T extends Record<PropertyKey, unknown>>(schema: import("./api/dict.js").RecordAsSchema<T>, options?: Partial<import("./api/dict.js").DictVahterOptions> | undefined) => SchemaDict<T, T>;
+    /**
+     * # Description
+     * Helper over `Schema.dict` to define `Record<K, T>` object
+     *
+     * # Example
+     * ```ts
+     * const s = Schema.record(Schema.str(), Schema.num())
+     *   .optional()
+     *   .is((v) => Object.keys(v).length > 0)
+     *   .transform((v) => {
+     *     v.a *= 2;
+     *     return Ok(v)
+     *   });
+     * const value: Record<string, Option<number>> = s.parse({a: 3}).unwrap();
+     *
+     * ```
+     */
+    record: <Key extends PropertyKey, Value>(keySchema: import("./interface.js").Schema<Key>, valueSchema: import("./interface.js").Schema<Value>) => SchemaDict<Record<Key, Value>, Record<Key, Value>>;
     /**
      * # Description
      * Array type

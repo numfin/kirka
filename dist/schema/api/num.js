@@ -17,10 +17,10 @@ function defaultVahter() {
         }
     });
 }
-export function SchemaNum(vahter = defaultVahter()) {
+function SchemaNumInternal(vahter) {
     const api = {
         optional() {
-            return SchemaNum(vahter.optional());
+            return SchemaNumInternal(vahter.optional());
         },
         parse(v) {
             return vahter.parse(v);
@@ -29,11 +29,12 @@ export function SchemaNum(vahter = defaultVahter()) {
             return vahter.check(v);
         },
         is(fn) {
-            return SchemaNum(vahter.is(fn));
+            return SchemaNumInternal(vahter.is(fn));
         },
         transform(fn) {
-            return SchemaNum(vahter.transform(fn));
+            return SchemaNumInternal(vahter.transform(fn));
         },
     };
     return api;
 }
+export const SchemaNum = () => SchemaNumInternal(defaultVahter());

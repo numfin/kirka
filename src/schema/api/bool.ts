@@ -50,12 +50,12 @@ function defaultVahter() {
     }
   });
 }
-export function SchemaBool<ParsedType = boolean>(
-  vahter = defaultVahter() as SchemaBool<ParsedType>
+function SchemaBoolInternal<ParsedType = boolean>(
+  vahter: SchemaBool<ParsedType>
 ) {
   const api: SchemaBool<ParsedType> = {
     optional() {
-      return SchemaBool(vahter.optional());
+      return SchemaBoolInternal(vahter.optional());
     },
     parse(v) {
       return vahter.parse(v);
@@ -64,11 +64,13 @@ export function SchemaBool<ParsedType = boolean>(
       return vahter.check(v);
     },
     is(fn) {
-      return SchemaBool(vahter.is(fn));
+      return SchemaBoolInternal(vahter.is(fn));
     },
     transform(fn) {
-      return SchemaBool(vahter.transform(fn));
+      return SchemaBoolInternal(vahter.transform(fn));
     },
   };
   return api;
 }
+
+export const SchemaBool = () => SchemaBoolInternal(defaultVahter());

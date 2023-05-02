@@ -1,6 +1,5 @@
 import { Option } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
-import { SchemaCustom } from "./custom.js";
 export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
     /**
      * # Description
@@ -103,5 +102,5 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
     re(re: () => RegExp, 
     /** Name of the regex rule */ kind?: string): SchemaStr<ParsedType>;
 }
-export declare function SchemaStr<ParsedType = string>(vahter?: SchemaCustom<string, ParsedType>): SchemaStr<ParsedType>;
+export declare const SchemaStr: () => SchemaStr<string>;
 //# sourceMappingURL=str.d.ts.map

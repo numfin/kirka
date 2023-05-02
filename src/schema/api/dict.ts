@@ -3,10 +3,6 @@ import { Ok, Option } from "../../index.js";
 import { Checker, Transformer, Schema, FromSchema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
-type ExtractDict<S extends Record<PropertyKey, Schema<unknown>>> = {
-  [key in keyof S]: FromSchema<S[key]>;
-};
-
 export interface SchemaDict<
   S extends Record<PropertyKey, unknown>,
   ParsedType = S
@@ -55,12 +51,27 @@ export interface SchemaDict<
   transform: Transformer<S, SchemaDict<S, ParsedType>>;
 }
 
-type DictSchema<T extends Record<PropertyKey, unknown>> = {
+export type RecordAsSchema<T extends Record<PropertyKey, unknown>> = {
   [key in keyof T]: Schema<T[key]>;
 };
 
+export interface DictVahterOptions {
+  /**
+   * # Description
+   * - Remove extra keys of dict
+   * - Default: `true`
+   *
+   * # Example
+   * ```ts
+   * const schema = Schema.dict<Record<string, string>>({}, { trimExtra: false })
+   * const result: Result<Record<string, string>> = schema.parse(...)
+   * ```
+   */
+  trimExtra: boolean;
+}
 function defaultVahter<T extends Record<PropertyKey, unknown>>(
-  schema: DictSchema<T>
+  schema: RecordAsSchema<T>,
+  options: DictVahterOptions
 ): SchemaCustom<T> {
   return SchemaCustom((v) => {
     if (typeof v !== "object") {
@@ -70,7 +81,7 @@ function defaultVahter<T extends Record<PropertyKey, unknown>>(
     } else if (Array.isArray(v)) {
       return AnyHow.expect("object", v).toErr<T>();
     }
-    const parsedObj = {} as T;
+    const parsedObj = (options.trimExtra ? {} : v) as T;
 
     for (const [prop, propSchema] of Object.entries(schema)) {
       const result = (propSchema as Schema<T>).parse(v[prop as keyof typeof v]);
@@ -91,7 +102,7 @@ function SchemaDictInternal<
   T extends Record<PropertyKey, unknown>,
   ParsedType = T
 >(vahter: SchemaCustom<T, ParsedType>) {
-  const api = {
+  const api: SchemaDict<T, ParsedType> = {
     optional() {
       return SchemaDictInternal<T, Option<T>>(vahter.optional());
     },
@@ -107,9 +118,15 @@ function SchemaDictInternal<
     transform(fn) {
       return SchemaDictInternal(vahter.transform(fn));
     },
-  } as SchemaDict<T, ParsedType>;
+  };
   return api;
 }
 export const SchemaDict = <T extends Record<PropertyKey, unknown>>(
-  schema: DictSchema<T>
-) => SchemaDictInternal(defaultVahter(schema));
+  schema: RecordAsSchema<T>,
+  options?: Partial<DictVahterOptions>
+) =>
+  SchemaDictInternal(
+    defaultVahter(schema, {
+      trimExtra: options?.trimExtra ?? true,
+    })
+  );

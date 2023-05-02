@@ -5,6 +5,7 @@ import { SchemaCustom } from "./api/custom.js";
 import { SchemaDict } from "./api/dict.js";
 import { SchemaStr } from "./api/str.js";
 import { SchemaUnion } from "./api/union.js";
+import { SchemaRecord } from "./api/record.js";
 
 export const Schema = {
   /**
@@ -19,7 +20,7 @@ export const Schema = {
    *   .transform((v) => Ok(v * 2))
    * ```
    */
-  num: () => SchemaNum<number>(),
+  num: SchemaNum,
   /**
    * # Description
    * Number type
@@ -32,7 +33,7 @@ export const Schema = {
    *   .transform((v) => Ok(v + "asd"))
    * ```
    */
-  str: () => SchemaStr<string>(),
+  str: SchemaStr,
   /**
    * # Description
    * Boolean type
@@ -45,7 +46,7 @@ export const Schema = {
    *   .transform((v) => Ok(!v))
    * ```
    */
-  bool: () => SchemaBool<boolean>(),
+  bool: SchemaBool,
   /**
    * # Description
    * Boilerplate for your own type. Contains transformation and validation functionality.
@@ -75,7 +76,7 @@ export const Schema = {
    *   str: Schema.str(),
    *   num: Schema.num(),
    *   bool: Schema.bool()
-   * })
+   * }, { ...options })
    *   .optional()
    *   .is((v) => v.str.length > 0)
    *   .transform((v) => {
@@ -85,6 +86,24 @@ export const Schema = {
    * ```
    */
   dict: SchemaDict,
+  /**
+   * # Description
+   * Helper over `Schema.dict` to define `Record<K, T>` object
+   *
+   * # Example
+   * ```ts
+   * const s = Schema.record(Schema.str(), Schema.num())
+   *   .optional()
+   *   .is((v) => Object.keys(v).length > 0)
+   *   .transform((v) => {
+   *     v.a *= 2;
+   *     return Ok(v)
+   *   });
+   * const value: Record<string, Option<number>> = s.parse({a: 3}).unwrap();
+   *
+   * ```
+   */
+  record: SchemaRecord,
   /**
    * # Description
    * Array type

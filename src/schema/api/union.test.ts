@@ -1,21 +1,16 @@
 import test from "ava";
-import { SchemaStr } from "./str.js";
-import { SchemaNum } from "./num.js";
-import { SchemaDict } from "./dict.js";
-import { SchemaArr } from "./arr.js";
-import { SchemaUnion } from "./union.js";
-import { Option, Some } from "../../index.js";
+import { Option, Schema, Some } from "../../index.js";
 
 test("Convert value to union", (t) => {
-  const s = SchemaUnion({
-    v1: SchemaStr<string>(),
-    v2: SchemaNum<number>(),
-    v3: SchemaNum<number>().optional(),
-    v4: SchemaDict({
-      f1: SchemaNum<number>(),
-      f2: SchemaUnion({
-        f2v1: SchemaArr(SchemaStr<string>()),
-        f2v2: SchemaNum<number>(),
+  const s = Schema.union({
+    v1: Schema.str(),
+    v2: Schema.num(),
+    v3: Schema.num().optional(),
+    v4: Schema.dict({
+      f1: Schema.num(),
+      f2: Schema.union({
+        f2v1: Schema.arr(Schema.str()),
+        f2v2: Schema.num(),
       }),
     }),
   });
@@ -43,10 +38,10 @@ test("Convert value to union", (t) => {
 });
 
 test("match union", (t) => {
-  const tUnion = SchemaUnion({
-    v1: SchemaStr<string>(),
-    v2: SchemaNum<number>(),
-    v3: SchemaNum<number>().optional(),
+  const tUnion = Schema.union({
+    v1: Schema.str(),
+    v2: Schema.num(),
+    v3: Schema.num().optional(),
   });
   const matcher = {
     v1(v: string) {
@@ -67,10 +62,10 @@ test("match union", (t) => {
   t.is(tUnion.v3(Some(20)).match(matcher), "v3");
 });
 test("matchSome union", (t) => {
-  const tUnion = SchemaUnion({
-    v1: SchemaStr<string>(),
-    v2: SchemaNum<number>(),
-    v3: SchemaNum<number>().optional(),
+  const tUnion = Schema.union({
+    v1: Schema.str(),
+    v2: Schema.num(),
+    v3: Schema.num().optional(),
   });
   const matcher = {
     v1(v: string) {
@@ -113,10 +108,10 @@ test("matchSome union", (t) => {
 });
 
 test("Union inside dict", (t) => {
-  const schema = SchemaDict({
-    field: SchemaUnion({
-      str: SchemaStr<string>(),
-      num: SchemaNum<number>(),
+  const schema = Schema.dict({
+    field: Schema.union({
+      str: Schema.str(),
+      num: Schema.num(),
     }),
   });
 
@@ -124,10 +119,10 @@ test("Union inside dict", (t) => {
 });
 
 test("Optional union", (t) => {
-  const schema = SchemaDict({
-    inner: SchemaUnion({
-      str: SchemaStr<string>(),
-      num: SchemaNum<number>(),
+  const schema = Schema.dict({
+    inner: Schema.union({
+      str: Schema.str(),
+      num: Schema.num(),
     }).optional(),
   });
 
