@@ -11,6 +11,7 @@ export type Matcher<T extends Record<PropertyKey, unknown>, U> = {
 };
 
 export interface UnionInstance<T extends Record<PropertyKey, unknown>> {
+  _tag: keyof T;
   /**
    * # Description
    * Extract inner value and use it. All functions must return the same type
@@ -98,6 +99,7 @@ export function UnionInstance<T extends Record<PropertyKey, unknown>>(
   value: T[typeof currentTag]
 ) {
   const api: UnionInstance<T> = {
+    _tag: currentTag,
     is(tag, cond) {
       const condition = cond ?? (() => true);
       return tag === currentTag && condition(value);
