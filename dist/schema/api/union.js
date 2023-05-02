@@ -11,6 +11,7 @@ export function Union(_unionSchemas) {
 export function UnionInstance(currentTag, value) {
     const api = {
         _tag: currentTag,
+        _value: value,
         is(tag, cond) {
             const condition = cond ?? (() => true);
             return tag === currentTag && condition(value);

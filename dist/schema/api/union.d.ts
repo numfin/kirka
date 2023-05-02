@@ -5,7 +5,16 @@ export type Matcher<T extends Record<PropertyKey, unknown>, U> = {
     [key in keyof T]: (v: T[key]) => U;
 };
 export interface UnionInstance<T extends Record<PropertyKey, unknown>> {
+    /**
+     * # Description
+     * Tag of union
+     */
     _tag: keyof T;
+    /**
+     * # Description
+     * Value of union
+     */
+    _value: T[keyof T];
     /**
      * # Description
      * Extract inner value and use it. All functions must return the same type
