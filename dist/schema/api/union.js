@@ -1,5 +1,5 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { IterFrom, None, Some } from "../../index.js";
+import { None, Ok, Some } from "../../index.js";
 import { SchemaCustom } from "./custom.js";
 export function Union(_unionSchemas) {
     return new Proxy({}, {
@@ -31,15 +31,17 @@ export function UnionInstance(currentTag, value) {
 }
 function defaultVahter(unionSchemas) {
     return SchemaCustom((v) => {
-        return IterFrom.array(Object.entries(unionSchemas))
-            .findMap(([tag, schema]) => schema
-            .parse(v)
-            .map((parsedValue) => UnionInstance(tag, parsedValue))
-            .ok())
-            .result(() => AnyHow.expect("renum", String(v)));
+        for (const [tag, tagSchema] of Object.entries(unionSchemas)) {
+            const result = tagSchema.parse(v).inner();
+            if (result.type === "Ok") {
+                return Ok(UnionInstance(tag, result.value));
+            }
+        }
+        const variants = Object.keys(unionSchemas);
+        return AnyHow.expect(`Union of [${variants}]`, String(v)).toErr();
     });
 }
-function SchemaUnionInternal(schema, vahter = defaultVahter(schema)) {
+function SchemaUnionInternal(schema, vahter) {
     const api = {
         optional() {
             return vahter.optional();
@@ -60,4 +62,4 @@ function SchemaUnionInternal(schema, vahter = defaultVahter(schema)) {
         },
     });
 }
-export const SchemaUnion = (schema) => SchemaUnionInternal(schema);
+export const SchemaUnion = (schema) => SchemaUnionInternal(schema, defaultVahter(schema));

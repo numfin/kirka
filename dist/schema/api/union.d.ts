@@ -1,10 +1,10 @@
 import { Option } from "../../index.js";
-import { Schema, FromSchema } from "../interface.js";
-export type UnionSchemaDeclaration = Record<PropertyKey, Schema<unknown>>;
-export type Matcher<T extends UnionSchemaDeclaration, U> = {
-    [key in keyof T]: (v: FromSchema<T[key]>) => U;
+import { Schema } from "../interface.js";
+import { RecordAsSchema } from "./dict.js";
+export type Matcher<T extends Record<PropertyKey, unknown>, U> = {
+    [key in keyof T]: (v: T[key]) => U;
 };
-export interface UnionInstance<T extends UnionSchemaDeclaration> {
+export interface UnionInstance<T extends Record<PropertyKey, unknown>> {
     /**
      * # Description
      * Extract inner value and use it. All functions must return the same type
@@ -66,15 +66,15 @@ export interface UnionInstance<T extends UnionSchemaDeclaration> {
      * const isV2 = v1.is("v2") // false
      * ```
      */
-    is<K extends keyof T>(tag: K, cond?: (value: FromSchema<T[K]>) => boolean): boolean;
+    is(tag: keyof T, cond?: (value: T[typeof tag]) => boolean): boolean;
 }
-export type UnionVariants<T extends UnionSchemaDeclaration> = {
-    [key in keyof T]: (v: FromSchema<T[key]>) => UnionInstance<T>;
+export type UnionVariants<T extends Record<PropertyKey, unknown>> = {
+    [key in keyof T]: (v: T[key]) => UnionInstance<T>;
 };
-export declare function Union<T extends UnionSchemaDeclaration>(_unionSchemas: T): UnionVariants<T>;
-export declare function UnionInstance<T extends UnionSchemaDeclaration>(currentTag: keyof T, value: FromSchema<T[typeof currentTag]>): UnionInstance<T>;
-export interface SchemaUnion<S extends UnionSchemaDeclaration, ParsedType = UnionInstance<S>> extends Schema<ParsedType> {
-    optional(): SchemaUnion<S, Option<UnionInstance<S>>>;
+export declare function Union<T extends Record<PropertyKey, unknown>>(_unionSchemas: T): UnionVariants<T>;
+export declare function UnionInstance<T extends Record<PropertyKey, unknown>>(currentTag: keyof T, value: T[typeof currentTag]): UnionInstance<T>;
+export interface SchemaUnion<T extends Record<PropertyKey, unknown>, ParsedType = UnionInstance<T>> extends Schema<ParsedType> {
+    optional(): SchemaUnion<T, Option<UnionInstance<T>>>;
 }
-export declare const SchemaUnion: <S extends UnionSchemaDeclaration>(schema: S) => UnionVariants<S> & SchemaUnion<S, UnionInstance<S>>;
+export declare const SchemaUnion: <T extends Record<PropertyKey, unknown>>(schema: RecordAsSchema<T>) => UnionVariants<T> & SchemaUnion<T, UnionInstance<T>>;
 //# sourceMappingURL=union.d.ts.map

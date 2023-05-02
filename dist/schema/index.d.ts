@@ -153,6 +153,6 @@ export declare const Schema: {
      * const isV3 = v3.is("v3") // true
      * ```
      */
-    union: <S extends import("./api/union.js").UnionSchemaDeclaration>(schema: S) => import("./api/union.js").UnionVariants<S> & SchemaUnion<S, import("./api/union.js").UnionInstance<S>>;
+    union: <T_2 extends Record<PropertyKey, unknown>>(schema: import("./api/dict.js").RecordAsSchema<T_2>) => import("./api/union.js").UnionVariants<T_2> & SchemaUnion<T_2, import("./api/union.js").UnionInstance<T_2>>;
 };
 //# sourceMappingURL=index.d.ts.map
