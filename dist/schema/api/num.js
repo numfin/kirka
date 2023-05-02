@@ -1,7 +1,7 @@
 import { AnyHow } from "../../anyhow/index.js";
 import { Ok } from "../../index.js";
 import { SchemaCustom } from "./custom.js";
-function defaultVahter() {
+function defaultVahter(equalTo) {
     return SchemaCustom((v) => {
         if (typeof v !== "number") {
             return AnyHow.expect("number", typeof v).toErr();
@@ -11,6 +11,9 @@ function defaultVahter() {
         }
         else if (!isFinite(v)) {
             return AnyHow.expect("finite number", v).toErr();
+        }
+        else if (typeof equalTo === "number") {
+            return v === equalTo ? Ok(v) : AnyHow.expect(equalTo, v).toErr();
         }
         else {
             return Ok(v);
@@ -37,4 +40,4 @@ function SchemaNumInternal(vahter) {
     };
     return api;
 }
-export const SchemaNum = () => SchemaNumInternal(defaultVahter());
+export const SchemaNum = (equalTo) => SchemaNumInternal(defaultVahter(equalTo));

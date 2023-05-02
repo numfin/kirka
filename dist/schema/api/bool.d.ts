@@ -1,6 +1,6 @@
 import { Option } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
-export interface SchemaBool<ParsedType = boolean> extends Schema<ParsedType> {
+export interface SchemaBool<T extends boolean, ParsedType = T> extends Schema<ParsedType> {
     /**
      * # Description
      * Make schema optional. All null/undefined become `Option<T>`
@@ -10,7 +10,7 @@ export interface SchemaBool<ParsedType = boolean> extends Schema<ParsedType> {
      * const v: Option<boolean> = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaBool<Option<boolean>>;
+    optional(): SchemaBool<T, Option<T>>;
     /**
      * # Description
      * Add validation rule to schema
@@ -19,7 +19,7 @@ export interface SchemaBool<ParsedType = boolean> extends Schema<ParsedType> {
      * const s = Schema.bool().is((v) => v === true)
      * ```
      */
-    is: Checker<boolean, SchemaBool<ParsedType>>;
+    is: Checker<T, SchemaBool<T, ParsedType>>;
     /**
      * # Description
      * Add transformation to schema. You cannot change the type of value.
@@ -35,7 +35,7 @@ export interface SchemaBool<ParsedType = boolean> extends Schema<ParsedType> {
      *   })
      * ```
      */
-    transform: Transformer<boolean, SchemaBool<ParsedType>>;
+    transform: Transformer<T, SchemaBool<T, ParsedType>>;
 }
-export declare const SchemaBool: () => SchemaBool<boolean>;
+export declare const SchemaBool: <T extends boolean>(equalTo?: T | undefined) => SchemaBool<T, T>;
 //# sourceMappingURL=bool.d.ts.map

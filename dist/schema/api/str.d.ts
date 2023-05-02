@@ -1,6 +1,6 @@
 import { Option } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
-export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
+export interface SchemaStr<T extends string, ParsedType = T> extends Schema<ParsedType> {
     /**
      * # Description
      * Make schema optional. All null/undefined become `Option<T>`
@@ -10,7 +10,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
      * const v: Option<string> = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaStr<Option<string>>;
+    optional(): SchemaStr<T, Option<T>>;
     /**
      * # Description
      * Add validation rule to schema
@@ -19,7 +19,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
      * const s = Schema.str().is((v) => v.length > 0)
      * ```
      */
-    is: Checker<string, SchemaStr<ParsedType>>;
+    is: Checker<T, SchemaStr<T, ParsedType>>;
     /**
      * # Description
      * Add transformation to schema. You cannot change the type of value.
@@ -35,7 +35,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
      *   })
      * ```
      */
-    transform: Transformer<string, SchemaStr<ParsedType>>;
+    transform: Transformer<T, SchemaStr<T, ParsedType>>;
     /**
      * # Description
      * Set min length of the string.
@@ -45,7 +45,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
      * s.parse("") // Err()
      * s.parse("asd") // Ok("asd")
      */
-    min(len: number): SchemaStr<ParsedType>;
+    min(len: number): SchemaStr<T, ParsedType>;
     /**
      * # Description
      * Set max length of the string.
@@ -55,7 +55,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
      * s.parse("") // Ok("")
      * s.parse("asd") // Err()
      */
-    max(len: number): SchemaStr<ParsedType>;
+    max(len: number): SchemaStr<T, ParsedType>;
     /**
      * # Description
      * Accept only numeric characters.
@@ -66,7 +66,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
      * s.parse("0123") // Ok("0123")
      * s.parse("asd0123") // Err()
      */
-    numeric(): SchemaStr<ParsedType>;
+    numeric(): SchemaStr<T, ParsedType>;
     /**
      * # Description
      * Accept only alphabetic characters.
@@ -77,7 +77,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
      * s.parse("") // Ok("")
      * s.parse("0asd") // Err()
      */
-    alphabetic(): SchemaStr<ParsedType>;
+    alphabetic(): SchemaStr<T, ParsedType>;
     /**
      * # Description
      * Accept only alphanumeric characters.
@@ -88,7 +88,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
      * s.parse("asd0") // Ok("asd0")
      * s.parse(" 0asd") // Err()
      */
-    alphanumeric(): SchemaStr<ParsedType>;
+    alphanumeric(): SchemaStr<T, ParsedType>;
     /**
      * # Description
      * Validate with your own regex.
@@ -100,7 +100,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
      * s.parse("") // Err()
      */
     re(re: () => RegExp, 
-    /** Name of the regex rule */ kind?: string): SchemaStr<ParsedType>;
+    /** Name of the regex rule */ kind?: string): SchemaStr<T, ParsedType>;
 }
-export declare const SchemaStr: () => SchemaStr<string>;
+export declare const SchemaStr: <T extends string>(equalTo?: T | undefined) => SchemaStr<T, T>;
 //# sourceMappingURL=str.d.ts.map

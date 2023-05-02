@@ -1,6 +1,6 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { IterFrom, None, Ok, Option, Some } from "../../index.js";
-import { Schema, FromSchema } from "../interface.js";
+import { None, Ok, Option, Some } from "../../index.js";
+import { Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 import { RecordAsSchema } from "./dict.js";
 

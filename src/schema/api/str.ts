@@ -3,7 +3,8 @@ import { Ok, Option, OptionFrom, Result } from "../../index.js";
 import { Checker, Transformer, Schema, SchemaError } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
-export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
+export interface SchemaStr<T extends string, ParsedType = T>
+  extends Schema<ParsedType> {
   /**
    * # Description
    * Make schema optional. All null/undefined become `Option<T>`
@@ -13,7 +14,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
    * const v: Option<string> = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaStr<Option<string>>;
+  optional(): SchemaStr<T, Option<T>>;
   /**
    * # Description
    * Add validation rule to schema
@@ -22,7 +23,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
    * const s = Schema.str().is((v) => v.length > 0)
    * ```
    */
-  is: Checker<string, SchemaStr<ParsedType>>;
+  is: Checker<T, SchemaStr<T, ParsedType>>;
   /**
    * # Description
    * Add transformation to schema. You cannot change the type of value.
@@ -38,7 +39,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
    *   })
    * ```
    */
-  transform: Transformer<string, SchemaStr<ParsedType>>;
+  transform: Transformer<T, SchemaStr<T, ParsedType>>;
   /**
    * # Description
    * Set min length of the string.
@@ -48,7 +49,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
    * s.parse("") // Err()
    * s.parse("asd") // Ok("asd")
    */
-  min(len: number): SchemaStr<ParsedType>;
+  min(len: number): SchemaStr<T, ParsedType>;
   /**
    * # Description
    * Set max length of the string.
@@ -58,7 +59,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
    * s.parse("") // Ok("")
    * s.parse("asd") // Err()
    */
-  max(len: number): SchemaStr<ParsedType>;
+  max(len: number): SchemaStr<T, ParsedType>;
   /**
    * # Description
    * Accept only numeric characters.
@@ -69,7 +70,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
    * s.parse("0123") // Ok("0123")
    * s.parse("asd0123") // Err()
    */
-  numeric(): SchemaStr<ParsedType>;
+  numeric(): SchemaStr<T, ParsedType>;
   /**
    * # Description
    * Accept only alphabetic characters.
@@ -80,7 +81,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
    * s.parse("") // Ok("")
    * s.parse("0asd") // Err()
    */
-  alphabetic(): SchemaStr<ParsedType>;
+  alphabetic(): SchemaStr<T, ParsedType>;
   /**
    * # Description
    * Accept only alphanumeric characters.
@@ -91,7 +92,7 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
    * s.parse("asd0") // Ok("asd0")
    * s.parse(" 0asd") // Err()
    */
-  alphanumeric(): SchemaStr<ParsedType>;
+  alphanumeric(): SchemaStr<T, ParsedType>;
   /**
    * # Description
    * Validate with your own regex.
@@ -105,24 +106,26 @@ export interface SchemaStr<ParsedType = string> extends Schema<ParsedType> {
   re(
     re: () => RegExp,
     /** Name of the regex rule */ kind?: string
-  ): SchemaStr<ParsedType>;
+  ): SchemaStr<T, ParsedType>;
 }
 
-function defaultVahter() {
+function defaultVahter<T extends string>(equalTo?: T) {
   return SchemaCustom((v) => {
-    type Return = string;
+    type Return = T;
     if (typeof v !== "string") {
       return AnyHow.expect("string", typeof v).toErr<Return>();
+    } else if (typeof equalTo === "string") {
+      return v === equalTo ? Ok(v as T) : AnyHow.expect(equalTo, v).toErr<T>();
     } else {
-      return Ok(v);
+      return Ok(v as T);
     }
   });
 }
 
-function SchemaStrInternal<ParsedType = string>(
-  vahter: SchemaCustom<string, ParsedType>
+function SchemaStrInternal<T extends string, ParsedType = T>(
+  vahter: SchemaCustom<T, ParsedType>
 ) {
-  const api: SchemaStr<ParsedType> = {
+  const api: SchemaStr<T, ParsedType> = {
     optional() {
       return SchemaStrInternal(vahter.optional());
     },
@@ -168,10 +171,11 @@ function SchemaStrInternal<ParsedType = string>(
   return api;
 }
 
-const regexp = (re: RegExp, kind: string, value: string) =>
+const regexp = <T extends string>(re: RegExp, kind: string, value: T) =>
   OptionFrom.bool(re.test(value))
     .result(() => AnyHow.expect(kind, value))
     .map(() => value)
     .orElse((err) => err.toErr());
 
-export const SchemaStr = () => SchemaStrInternal(defaultVahter());
+export const SchemaStr = <T extends string>(equalTo?: T) =>
+  SchemaStrInternal(defaultVahter(equalTo));

@@ -1,10 +1,13 @@
 import { AnyHow } from "../../anyhow/index.js";
 import { Ok } from "../../index.js";
 import { SchemaCustom } from "./custom.js";
-function defaultVahter() {
+function defaultVahter(equalTo) {
     return SchemaCustom((v) => {
         if (typeof v !== "boolean") {
             return AnyHow.expect("boolean", typeof v).toErr();
+        }
+        else if (typeof equalTo === "boolean") {
+            return equalTo === v ? Ok(v) : AnyHow.expect(equalTo, v).toErr();
         }
         else {
             return Ok(v);
@@ -31,4 +34,4 @@ function SchemaBoolInternal(vahter) {
     };
     return api;
 }
-export const SchemaBool = () => SchemaBoolInternal(defaultVahter());
+export const SchemaBool = (equalTo) => SchemaBoolInternal(defaultVahter(equalTo));

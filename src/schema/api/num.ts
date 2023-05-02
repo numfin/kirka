@@ -3,7 +3,8 @@ import { Ok, Option } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
-export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
+export interface SchemaNum<T extends number, ParsedType = T>
+  extends Schema<ParsedType> {
   /**
    * # Description
    * Make schema optional. All null/undefined become `Option<T>`
@@ -13,7 +14,7 @@ export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
    * const v: Option<number> = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaNum<Option<number>>;
+  optional(): SchemaNum<T, Option<T>>;
   /**
    * # Description
    * Add validation rule to schema
@@ -22,7 +23,7 @@ export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
    * const s = Schema.num().is((v) => v > 5)
    * ```
    */
-  is: Checker<number, SchemaNum<ParsedType>>;
+  is: Checker<T, SchemaNum<T, ParsedType>>;
   /**
    * # Description
    * Add transformation to schema. You cannot change the type of value.
@@ -38,30 +39,31 @@ export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
    *   })
    * ```
    */
-  transform: Transformer<number, SchemaNum<ParsedType>>;
+  transform: Transformer<T, SchemaNum<T, ParsedType>>;
 }
 
-function defaultVahter() {
+function defaultVahter<T extends number>(equalTo?: T) {
   return SchemaCustom((v) => {
-    type Return = number;
     if (typeof v !== "number") {
-      return AnyHow.expect("number", typeof v).toErr<Return>();
+      return AnyHow.expect("number", typeof v).toErr<T>();
     } else if (isNaN(v)) {
-      return AnyHow.expect("number", v).toErr<Return>();
+      return AnyHow.expect("number", v).toErr<T>();
     } else if (!isFinite(v)) {
-      return AnyHow.expect("finite number", v).toErr<Return>();
+      return AnyHow.expect("finite number", v).toErr<T>();
+    } else if (typeof equalTo === "number") {
+      return v === equalTo ? Ok(v as T) : AnyHow.expect(equalTo, v).toErr<T>();
     } else {
-      return Ok(v);
+      return Ok(v as T);
     }
   });
 }
 
-function SchemaNumInternal<ParsedType = number>(
-  vahter: SchemaCustom<number, ParsedType>
+function SchemaNumInternal<T extends number, ParsedType = T>(
+  vahter: SchemaCustom<T, ParsedType>
 ) {
-  const api: SchemaNum<ParsedType> = {
+  const api: SchemaNum<T, ParsedType> = {
     optional() {
-      return SchemaNumInternal<Option<number>>(vahter.optional());
+      return SchemaNumInternal(vahter.optional());
     },
     parse(v) {
       return vahter.parse(v);
@@ -78,4 +80,5 @@ function SchemaNumInternal<ParsedType = number>(
   };
   return api;
 }
-export const SchemaNum = () => SchemaNumInternal(defaultVahter());
+export const SchemaNum = <T extends number>(equalTo?: T) =>
+  SchemaNumInternal(defaultVahter(equalTo));

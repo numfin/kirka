@@ -1,10 +1,13 @@
 import { AnyHow } from "../../anyhow/index.js";
 import { Ok, OptionFrom } from "../../index.js";
 import { SchemaCustom } from "./custom.js";
-function defaultVahter() {
+function defaultVahter(equalTo) {
     return SchemaCustom((v) => {
         if (typeof v !== "string") {
             return AnyHow.expect("string", typeof v).toErr();
+        }
+        else if (typeof equalTo === "string") {
+            return v === equalTo ? Ok(v) : AnyHow.expect(equalTo, v).toErr();
         }
         else {
             return Ok(v);
@@ -56,4 +59,4 @@ const regexp = (re, kind, value) => OptionFrom.bool(re.test(value))
     .result(() => AnyHow.expect(kind, value))
     .map(() => value)
     .orElse((err) => err.toErr());
-export const SchemaStr = () => SchemaStrInternal(defaultVahter());
+export const SchemaStr = (equalTo) => SchemaStrInternal(defaultVahter(equalTo));

@@ -3,7 +3,8 @@ import { Ok, Option } from "../../index.js";
 import { Checker, Transformer, Schema, SchemaError } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
-export interface SchemaBool<ParsedType = boolean> extends Schema<ParsedType> {
+export interface SchemaBool<T extends boolean, ParsedType = T>
+  extends Schema<ParsedType> {
   /**
    * # Description
    * Make schema optional. All null/undefined become `Option<T>`
@@ -13,7 +14,7 @@ export interface SchemaBool<ParsedType = boolean> extends Schema<ParsedType> {
    * const v: Option<boolean> = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaBool<Option<boolean>>;
+  optional(): SchemaBool<T, Option<T>>;
   /**
    * # Description
    * Add validation rule to schema
@@ -22,7 +23,7 @@ export interface SchemaBool<ParsedType = boolean> extends Schema<ParsedType> {
    * const s = Schema.bool().is((v) => v === true)
    * ```
    */
-  is: Checker<boolean, SchemaBool<ParsedType>>;
+  is: Checker<T, SchemaBool<T, ParsedType>>;
   /**
    * # Description
    * Add transformation to schema. You cannot change the type of value.
@@ -38,22 +39,24 @@ export interface SchemaBool<ParsedType = boolean> extends Schema<ParsedType> {
    *   })
    * ```
    */
-  transform: Transformer<boolean, SchemaBool<ParsedType>>;
+  transform: Transformer<T, SchemaBool<T, ParsedType>>;
 }
-function defaultVahter() {
+function defaultVahter<T extends boolean>(equalTo?: T) {
   return SchemaCustom((v) => {
-    type Return = boolean;
+    type Return = T;
     if (typeof v !== "boolean") {
       return AnyHow.expect("boolean", typeof v).toErr<Return>();
+    } else if (typeof equalTo === "boolean") {
+      return equalTo === v ? Ok(v as T) : AnyHow.expect(equalTo, v).toErr<T>();
     } else {
-      return Ok(v);
+      return Ok(v as T);
     }
   });
 }
-function SchemaBoolInternal<ParsedType = boolean>(
-  vahter: SchemaBool<ParsedType>
+function SchemaBoolInternal<T extends boolean, ParsedType = T>(
+  vahter: SchemaBool<T, ParsedType>
 ) {
-  const api: SchemaBool<ParsedType> = {
+  const api: SchemaBool<T, ParsedType> = {
     optional() {
       return SchemaBoolInternal(vahter.optional());
     },
@@ -73,4 +76,5 @@ function SchemaBoolInternal<ParsedType = boolean>(
   return api;
 }
 
-export const SchemaBool = () => SchemaBoolInternal(defaultVahter());
+export const SchemaBool = <T extends boolean>(equalTo?: T) =>
+  SchemaBoolInternal(defaultVahter(equalTo));

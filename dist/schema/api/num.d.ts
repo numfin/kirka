@@ -1,6 +1,6 @@
 import { Option } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
-export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
+export interface SchemaNum<T extends number, ParsedType = T> extends Schema<ParsedType> {
     /**
      * # Description
      * Make schema optional. All null/undefined become `Option<T>`
@@ -10,7 +10,7 @@ export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
      * const v: Option<number> = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaNum<Option<number>>;
+    optional(): SchemaNum<T, Option<T>>;
     /**
      * # Description
      * Add validation rule to schema
@@ -19,7 +19,7 @@ export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
      * const s = Schema.num().is((v) => v > 5)
      * ```
      */
-    is: Checker<number, SchemaNum<ParsedType>>;
+    is: Checker<T, SchemaNum<T, ParsedType>>;
     /**
      * # Description
      * Add transformation to schema. You cannot change the type of value.
@@ -35,7 +35,7 @@ export interface SchemaNum<ParsedType = number> extends Schema<ParsedType> {
      *   })
      * ```
      */
-    transform: Transformer<number, SchemaNum<ParsedType>>;
+    transform: Transformer<T, SchemaNum<T, ParsedType>>;
 }
-export declare const SchemaNum: () => SchemaNum<number>;
+export declare const SchemaNum: <T extends number>(equalTo?: T | undefined) => SchemaNum<T, T>;
 //# sourceMappingURL=num.d.ts.map
