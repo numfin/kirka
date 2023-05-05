@@ -41,5 +41,5 @@ export interface SchemaCustom<T, ParsedType = T> extends Schema<ParsedType> {
 }
 export declare function SchemaCustom<T, ParsedType = T>(createFn: (v: unknown) => Result<T, SchemaError>, flags?: {
     isOptional: boolean;
-}, rules?: ((v: T) => boolean)[], transforms?: Pipe<Result<T, SchemaError>, Result<T, SchemaError>>): SchemaCustom<T, ParsedType>;
+}, rules?: ((v: T) => boolean)[], transforms?: Pipe<[v: Result<T, SchemaError>], Result<T, SchemaError>>): SchemaCustom<T, ParsedType>;
 //# sourceMappingURL=custom.d.ts.map

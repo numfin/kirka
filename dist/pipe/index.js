@@ -1,7 +1,7 @@
-export function Pipe(identity = (v) => v, members = []) {
+export function Pipe(identity, members = []) {
     const pipe = {
-        call(v) {
-            return members.reduce((lastV, member) => member(lastV), identity(v));
+        call(...v) {
+            return members.reduce((lastV, member) => member(lastV), identity(...v));
         },
         chain(member) {
             members.push(member);

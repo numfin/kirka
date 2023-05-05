@@ -54,7 +54,7 @@ export function SchemaCustom<T, ParsedType = T>(
   createFn: (v: unknown) => Result<T, SchemaError>,
   flags = { isOptional: false },
   rules = [] as ((v: T) => boolean)[],
-  transforms = Pipe<Result<T, SchemaError>>()
+  transforms = Pipe((v: Result<T, SchemaError>) => v)
 ) {
   const validate = (v: T) =>
     IterFrom.array(rules)

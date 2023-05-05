@@ -1,7 +1,7 @@
 import { AnyHow } from "../../anyhow/index.js";
 import { IterFrom, None, Ok, OptionFrom, Some, } from "../../index.js";
 import { Pipe } from "../../pipe/index.js";
-export function SchemaCustom(createFn, flags = { isOptional: false }, rules = [], transforms = Pipe()) {
+export function SchemaCustom(createFn, flags = { isOptional: false }, rules = [], transforms = Pipe((v) => v)) {
     const validate = (v) => IterFrom.array(rules)
         .enumerate()
         .findMap(({ index, item }) => (item(v) ? None() : Some(index)))
