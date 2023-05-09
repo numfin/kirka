@@ -1,5 +1,5 @@
 <h1 align="center">Kirka</h1>
-<h3 align="center">Monoids Rust-style for Typescript</h3>
+<h3 align="center">Algebraic data types Rust-style for Typescript</h3>
 
 > If you want to ask something - Go to Discussions
 >
