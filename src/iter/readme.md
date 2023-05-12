@@ -35,7 +35,7 @@ for (const item of IterFrom.array(values)) {
   // item
 }
 // Get item by index
-item.get(2).eq(Some(values[2])); // true
+IterFrom.array(values).get(2); // Some(5)
 ```
 
 Inherit from other iterators
