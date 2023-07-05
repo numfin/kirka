@@ -27,7 +27,7 @@ function parseNumber(v: unknown): Result<number, ParseErrors> {
   if (n === null) {
     return Err(ParseErrors.Null);
   }
-  return n;
+  return Ok(n);
 }
 ```
 
