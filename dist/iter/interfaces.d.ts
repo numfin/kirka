@@ -8,7 +8,13 @@ export declare enum Order {
     Equal = 0,
     Less = -1
 }
-export interface Iter<T> extends Iterable<T> {
+export interface IntoIter<T> extends Iterable<T> {
+    /**
+     * Creates an iterator from a value
+     */
+    intoIter(): Iter<T>;
+}
+export interface Iter<T> extends IntoIter<T> {
     /**
      * Transforms iterator into array
      * # Example

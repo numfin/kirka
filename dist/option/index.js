@@ -21,9 +21,16 @@ import { filter } from "./api/filter.js";
 import { isNoneAnd } from "./api/isNoneAnd.js";
 import { match } from "./api/match.js";
 import { unwrapOrElse } from "./api/unwrapOrElse.js";
+import { intoIter } from "./api/intoIter.js";
 export function createOption(v) {
     let inner = v;
     const api = {
+        *[Symbol.iterator]() {
+            if (isSome(inner)) {
+                yield inner.value;
+            }
+        },
+        intoIter: () => intoIter(inner),
         inner: () => inner,
         eq: (value, by) => eq(api, value, by),
         format: (formatter) => format(api, formatter),

@@ -46,6 +46,7 @@ export function createIter<T>(source: ClonnableGenerator<T>) {
         yield item;
       }
     },
+    intoIter: () => api.recreate(),
     next: () => next(inner),
     recreate: () => createIter(source),
     collect: () => collect(api),

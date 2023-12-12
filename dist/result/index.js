@@ -23,8 +23,15 @@ import { unwrapErrOr } from "./api/unwrapErrOr.js";
 import { unionOk } from "./api/unionOk.js";
 import { unionErr } from "./api/unionErr.js";
 import { match } from "./api/match.js";
+import { intoIter } from "./api/intoIter.js";
 export function createResult(result) {
     const api = {
+        *[Symbol.iterator]() {
+            if (isOk(result)) {
+                yield result.value;
+            }
+        },
+        intoIter: () => intoIter(result),
         inner: () => result,
         eq: (other) => eq(api, other),
         format: (formatter) => format(api, formatter),

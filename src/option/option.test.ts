@@ -209,3 +209,11 @@ test(`.unwrapOrElse()`, (t) => {
     "v2"
   );
 });
+test(`.intoIter()`, (t) => {
+  t.deepEqual(Some("v").intoIter().collect(), ["v"]);
+  t.deepEqual(None().intoIter().collect(), []);
+});
+test(`.[Symbol.iterator]()`, (t) => {
+  t.deepEqual(Array.from(Some("v")), ["v"]);
+  t.deepEqual(Array.from(None()), []);
+});

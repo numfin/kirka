@@ -1,3 +1,4 @@
+import { IntoIter } from "../index.js";
 import type { Option } from "../option/interfaces.js";
 export interface Ok<T> {
     type: "Ok";
@@ -8,7 +9,7 @@ export interface Err<T> {
     value: T;
 }
 export type ResultUnion<L, R> = Ok<L> | Err<R>;
-export interface Result<T, Err> {
+export interface Result<T, Err> extends IntoIter<T> {
     /**
      * Just a simple data formatter
      * # Example
