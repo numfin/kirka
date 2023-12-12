@@ -217,3 +217,17 @@ test(`.[Symbol.iterator]()`, (t) => {
   t.deepEqual(Array.from(Some("v")), ["v"]);
   t.deepEqual(Array.from(None()), []);
 });
+test(`.flatten()`, (t) => {
+  t.true(Some("v").flatten().eq(Some("v")));
+  t.true(None().flatten().eq(None()));
+
+  t.true(Some(Some("v")).flatten().eq(Some("v")));
+  t.true(
+    Some(Some(Some("v")))
+      .flatten()
+      .flatten()
+      .eq(Some("v"))
+  );
+  t.true(Some(None()).flatten().eq(None()));
+  t.true(Some(Some(None())).flatten().unwrap().eq(None()));
+});

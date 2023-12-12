@@ -132,9 +132,9 @@ export interface Option<T> extends IntoIter<T> {
      *
      * # Example
      * ```ts
-     * Some(3).isNoneAnd(v => true) // false
-     * None().isNoneAnd(v => true) // true
-     * None().isNoneAnd(v => false) // false
+     * Some(3).isNoneAnd(() => true) // false
+     * None().isNoneAnd(() => true) // true
+     * None().isNoneAnd(() => false) // false
      * ```
      */
     isNoneAnd(fn: () => boolean): boolean;
@@ -247,5 +247,30 @@ export interface Option<T> extends IntoIter<T> {
      * ```
      */
     match<U>(onSome: (item: T) => U, onNone: () => U): U;
+    /**
+     * Converts from `Option<Option<T>>` to `Option<T>`.
+     *
+     * # Example
+     *
+     * ```
+     * const x: Option<Option<number>> = Some(Some(6));
+     * assert(Some(6), x.flatten());
+     *
+     * const x: Option<Option<number>> = Some(None());
+     * assert(None(), x.flatten());
+     *
+     * const x: Option<Option<number>> = None();
+     * assert(None(), x.flatten());
+     * ```
+     *
+     * Flattening only removes one level of nesting at a time:
+     *
+     * ```
+     * const x: Option<Option<Option<number>>> = Some(Some(Some(6)));
+     * assert(Some(Some(6)), x.flatten());
+     * assert(Some(6), x.flatten().flatten());
+     * ```
+     */
+    flatten(): T extends Option<unknown> ? T : Option<T>;
 }
 //# sourceMappingURL=interfaces.d.ts.map

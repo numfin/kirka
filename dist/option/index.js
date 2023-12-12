@@ -22,6 +22,7 @@ import { isNoneAnd } from "./api/isNoneAnd.js";
 import { match } from "./api/match.js";
 import { unwrapOrElse } from "./api/unwrapOrElse.js";
 import { intoIter } from "./api/intoIter.js";
+import { flatten } from "./api/flatten.js";
 export function createOption(v) {
     let inner = v;
     const api = {
@@ -51,6 +52,7 @@ export function createOption(v) {
         result: (fn) => result(api, fn),
         filter: (fn) => filter(api, fn),
         match: (onSome, onNone) => match(api, onSome, onNone),
+        flatten: () => flatten(api),
     };
     return api;
 }
