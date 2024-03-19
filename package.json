@@ -8,12 +8,14 @@
   },
   "type": "module",
   "exports": {
-    ".": "./dist/index.js"
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   },
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
   "scripts": {
-    "build": "rimraf ./dist && tsc -p tsconfig.build.json",
+    "build": "rimraf ./dist && tsc -p tsconfig.build.json && npm run build:cjs",
+    "build:cjs": "rollup dist/index.js --file dist/index.cjs --format cjs",
     "test": "ava",
     "test:w": "NODE_OPTIONS='--loader=tsx --no-warnings' ava -w",
     "prepare": "husky install"
@@ -25,6 +27,7 @@
     "ava": "^5.3.1",
     "husky": "^8.0.3",
     "rimraf": "^4.4.1",
+    "rollup": "^4.13.0",
     "tsimp": "^2.0.11",
     "tsx": "^3.12.3",
     "typescript": "^5.3.3"
