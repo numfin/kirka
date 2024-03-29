@@ -17,7 +17,7 @@
     "build": "rimraf ./dist && tsc -p tsconfig.build.json && npm run build:cjs",
     "build:cjs": "rollup dist/index.js --file dist/index.cjs --format cjs",
     "test": "ava",
-    "test:w": "NODE_OPTIONS='--loader=tsx --no-warnings' ava -w",
+    "test:w": "ava -w",
     "prepare": "husky install"
   },
   "keywords": [],

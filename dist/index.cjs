@@ -812,19 +812,17 @@ class AnyHow {
         this.ctx = ctx;
     }
     static msg(msg) {
-        return new this(msg);
+        return new AnyHow(msg);
     }
     static expect(expected, got) {
-        return this.msg(`Expected ${expected}, got: ${got}`);
+        return AnyHow.msg(`Expected ${expected}, got: ${got}`);
     }
     wrapWith(msgFn) {
-        this.ctx.push(msgFn());
-        return this;
+        return new AnyHow(this.err, this.ctx.concat(msgFn()));
     }
     toString() {
-        const report = Array.from(this.ctx);
-        report.push(this.err.toString());
-        return report.reverse().join("\n");
+        const report = [this.err.toString()].concat(this.ctx);
+        return report.join("\n");
     }
     toErr() {
         return Err(this);

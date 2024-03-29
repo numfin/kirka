@@ -62,7 +62,7 @@ export interface Result<T, Err> extends IntoIter<T> {
      */
     isErr(): boolean;
     /**
-     * Returns the contained `Ok` value. It is preferred to use other methods rather than using `unwrap`
+     * Returns the contained `Ok` value. It is preferred to use other methods like `.map` rather than using `unwrap`
      *
      * But it's useful for quick prototyping or when you know type inside
      *
@@ -70,15 +70,13 @@ export interface Result<T, Err> extends IntoIter<T> {
      * When value is `Err`
      * # Example
      * ```ts
-     * const result = Ok(3);
-     * if (result.isOk()) {
-     *   result.unwrap() // number
-     * }
+     * Ok(3).unwrap() // number
+     * Err(4).unwrap() // Exception
      * ```
      */
     unwrap(): T;
     /**
-     * Returns the contained `Err` value. It is preferred to use other methods rather than using `unwrap`
+     * Returns the contained `Err` value. It is preferred to use other methods like `.mapErr` rather than using `unwrapErr`
      *
      * But it's useful for quick prototyping or when you know type inside
      *
@@ -86,10 +84,8 @@ export interface Result<T, Err> extends IntoIter<T> {
      * When value is `Ok`
      * # Example
      * ```ts
-     * const result = Ok(3);
-     * if (result.isOk()) {
-     *   result.unwrap() // number
-     * }
+     * Ok(3).unwrapErr() // Exception
+     * Err(4).unwrapErr() // number
      * ```
      */
     unwrapErr(): Err;
