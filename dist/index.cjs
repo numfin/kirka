@@ -26,12 +26,33 @@ const OptionFrom = {
     err: err$1,
 };
 
+function fallible(fn) {
+    try {
+        const result = fn();
+        return Ok(result);
+    }
+    catch (err) {
+        return Err(err);
+    }
+}
+async function fallibleAsync(fn) {
+    try {
+        const result = await fn();
+        return Ok(result);
+    }
+    catch (err) {
+        return Err(err);
+    }
+}
+
 function option(option, err) {
     return option.result(err);
 }
 
 const ResultFrom = {
     option,
+    fallible,
+    fallibleAsync
 };
 
 function and$1(result, otherResult) {
