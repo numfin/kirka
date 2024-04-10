@@ -378,3 +378,48 @@ test(`.reverse()`, (t) => {
   t.deepEqual(iter.collect(), valuesCopy.reverse());
   t.deepEqual(IterFrom.array([]).reverse().collect(), [].reverse());
 });
+
+test(`.chain()`, (t) => {
+  const values = [1, 2, 3];
+  const chain = [4, 5, 6];
+  t.deepEqual(
+    IterFrom.array(values).chain(chain).collect(),
+    [1, 2, 3, 4, 5, 6]
+  );
+  t.deepEqual(IterFrom.array<number>([]).chain(chain).collect(), [4, 5, 6]);
+  t.deepEqual(IterFrom.array(values).chain([]).collect(), [1, 2, 3]);
+});
+
+test(`.groupBy()`, (t) => {
+  const values = [1, 2, 3, 4, 5];
+  t.deepEqual(
+    IterFrom.array(values).groupBy((v) => v % 2),
+    new Map([
+      [1, [1, 3, 5]],
+      [0, [2, 4]],
+    ])
+  );
+});
+
+test(`.collectSet()`, (t) => {
+  const values = [1, 2, 3, 1];
+  t.deepEqual(IterFrom.array(values).collectSet(), new Set([1, 2, 3]));
+});
+
+test(`.sumBy()`, (t) => {
+  const values = [1, 2, 3, 1];
+  t.deepEqual(
+    IterFrom.array(values).sumBy((v) => v),
+    7
+  );
+  t.deepEqual(
+    IterFrom.array([]).sumBy((v) => v),
+    0
+  );
+  t.deepEqual(
+    IterFrom.array(values)
+      .map((v) => ({ v }))
+      .sumBy((v) => v.v),
+    7
+  );
+});

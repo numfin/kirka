@@ -3,7 +3,9 @@ export { IterFrom } from "./from/index.js";
 
 import { all } from "./api/all.js";
 import { any } from "./api/any.js";
+import { chain } from "./api/chain.js";
 import { collect } from "./api/collect.js";
+import { collectSet } from "./api/collectSet.js";
 import { cycle } from "./api/cycle.js";
 import { enumerate } from "./api/enumerate.js";
 import { eq } from "./api/eq.js";
@@ -17,6 +19,7 @@ import { flatten } from "./api/flatten.js";
 import { fold } from "./api/fold.js";
 import { forEach } from "./api/forEach.js";
 import { get } from "./api/get.js";
+import { groupBy } from "./api/groupBy.js";
 import { intersperse } from "./api/intersperse.js";
 import { isEmpty } from "./api/isEmpty.js";
 import { last } from "./api/last.js";
@@ -50,6 +53,7 @@ export function createIter<T>(source: ClonnableGenerator<T>) {
     next: () => next(inner),
     recreate: () => createIter(source),
     collect: () => collect(api),
+    collectSet: () => collectSet(api),
     map: (fn) => createIter(() => map(api, fn)),
     filter: (fn) => createIter(() => filter(api, fn)),
     filterMap: (fn) => filterMap(api, fn),
@@ -81,6 +85,9 @@ export function createIter<T>(source: ClonnableGenerator<T>) {
     partition: (fn) => partition(api, fn),
     reverse: () => reverse(api),
     get: (pos) => get(api, pos),
+    chain: (values) => createIter(() => chain(api, values)),
+    groupBy: (fn) => groupBy(source(), fn),
+    sumBy: (fn) => fold(api, 0, (acc, item) => fn(item) + acc),
   };
   return api;
 }

@@ -490,8 +490,25 @@ function any(source, fn) {
     return false;
 }
 
+function* iterChain(source, chainedItems) {
+    for (const item of source) {
+        yield item;
+    }
+    for (const item of chainedItems) {
+        yield item;
+    }
+}
+
+function chain(source, target) {
+    return iterChain(source, target);
+}
+
 function collect(source) {
     return Array.from(source);
+}
+
+function collectSet(source) {
+    return new Set(source);
 }
 
 function* iterCycle(source) {
@@ -621,6 +638,21 @@ function get(source, index) {
         return None();
     }
     return source.skip(index).first();
+}
+
+function groupBy(source, fn) {
+    const groups = new Map();
+    for (const item of source) {
+        const key = fn(item);
+        const group = groups.get(key);
+        if (Array.isArray(group)) {
+            group.push(item);
+        }
+        else {
+            groups.set(key, [item]);
+        }
+    }
+    return groups;
 }
 
 function* iterIntersperse(source, fn) {
@@ -790,6 +822,7 @@ function createIter(source) {
         next: () => next(inner),
         recreate: () => createIter(source),
         collect: () => collect(api),
+        collectSet: () => collectSet(api),
         map: (fn) => createIter(() => map(api, fn)),
         filter: (fn) => createIter(() => filter(api, fn)),
         filterMap: (fn) => filterMap(api, fn),
@@ -821,6 +854,9 @@ function createIter(source) {
         partition: (fn) => partition(api, fn),
         reverse: () => reverse(api),
         get: (pos) => get(api, pos),
+        chain: (values) => createIter(() => chain(api, values)),
+        groupBy: (fn) => groupBy(source(), fn),
+        sumBy: (fn) => fold(api, 0, (acc, item) => fn(item) + acc),
     };
     return api;
 }

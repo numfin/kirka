@@ -16,7 +16,7 @@ export interface IntoIter<T> extends Iterable<T> {
 }
 export interface Iter<T> extends IntoIter<T> {
     /**
-     * Transforms iterator into array
+     * Transforms iterator into T[]
      * # Example
      * ```ts
      * const values = [0, 1, 2, 3]
@@ -25,6 +25,16 @@ export interface Iter<T> extends IntoIter<T> {
      * ```
      */
     collect(): T[];
+    /**
+     * Transforms iterator into `Set<T>`
+     * # Example
+     * ```ts
+     * const values = [0, 1, 2, 1]
+     * const items = IterFrom.array(values);
+     * assert(items.collectSet(), new Set([0,1,2]))
+     * ```
+     */
+    collectSet(): Set<T>;
     /**
      * Takes a closure and creates an iterator which calls that closure on each element.
      * # Example
@@ -497,6 +507,42 @@ export interface Iter<T> extends IntoIter<T> {
      * ```
      */
     reverse(): Iter<T>;
+    /**
+     * Adds items of another iterator into current one
+     *
+     * # Example
+     * ```ts
+     * const iter = IterFrom.array([1, 2, 3, 4])
+     * assert(iter.chain([5,6]).collect(), [1,2,3,4,5,6])
+     * ```
+     */
+    chain(values: Iterable<T>): Iter<T>;
+    /**
+     * Groups items by criteria
+     *
+     * # Warning
+     * Order preserved
+     *
+     * # Example
+     * ```ts
+     * const iter = IterFrom.array([1, 2, 3, 4])
+     * assert(
+     *   iter.groupBy((v) => v % 2).collect(),
+     *   new Map(...) // {1: [1,3], 0: [2,4]}
+     * )
+     * ```
+     */
+    groupBy<U>(fn: (item: T) => U): Map<U, T[]>;
+    /**
+     * Sums items. Value taken from provided fn
+     *
+     * # Example
+     * ```ts
+     * const iter = IterFrom.array([1, 2, 3, 4])
+     * assert(iter.sumBy((v) => v), 10)
+     * ```
+     */
+    sumBy(fn: (item: T) => number): number;
 }
 export type ClonnableGenerator<T> = () => Generator<T>;
 //# sourceMappingURL=interfaces.d.ts.map
