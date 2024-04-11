@@ -18,7 +18,7 @@
     "build:cjs": "rollup dist/index.js --file dist/index.cjs --format cjs",
     "test": "ava",
     "test:w": "ava -w",
-    "prepare": "husky install"
+    "postinstall": "husky install"
   },
   "keywords": [],
   "author": "nextgen-samurai",
@@ -38,9 +38,10 @@
     },
     "nodeArguments": [
       "--import=tsimp"
-    ]
+    ],
+    "timeout": "30s"
   },
   "engines": {
-    "node": "^20.5"
+    "node": ">=20.5"
   }
 }
