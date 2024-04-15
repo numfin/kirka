@@ -18,7 +18,7 @@
     "build:cjs": "rollup dist/index.js --file dist/index.cjs --format cjs",
     "test": "ava",
     "test:w": "ava -w",
-    "postinstall": "husky install"
+    "prepare:husky": "husky install"
   },
   "keywords": [],
   "author": "nextgen-samurai",
