@@ -85,7 +85,7 @@ function orElse$1(result, fn) {
     return unionOk(result.unwrap());
 }
 
-function eq$2(self, other) {
+function eq$1(self, other) {
     const a = self.inner();
     const b = other.inner();
     return a.type === b.type && a.value === b.value;
@@ -180,13 +180,6 @@ function match$1(source, onOk, onErr) {
     }
 }
 
-function intoIter$1(result) {
-    if (isOk(result)) {
-        return IterFrom.array([result.value]);
-    }
-    return IterFrom.array([]);
-}
-
 function createResult(result) {
     const api = {
         *[Symbol.iterator]() {
@@ -194,9 +187,8 @@ function createResult(result) {
                 yield result.value;
             }
         },
-        intoIter: () => intoIter$1(result),
         inner: () => result,
-        eq: (other) => eq$2(api, other),
+        eq: (other) => eq$1(api, other),
         format: (formatter) => format$1(api, formatter),
         isOk: () => isOk(result),
         isErr: () => isErr(result),
@@ -327,14 +319,14 @@ function clone(option) {
     return option.type === "Some" ? unionSome(option.value) : unionNone();
 }
 
-function eq$1(option, value, by = (x) => x) {
+function eq(option, value, by = (x) => x) {
     if (value.isNone() || option.isNone()) {
         return value.isNone() && option.isNone();
     }
     return by(value.unwrap()) === by(option.unwrap());
 }
 
-function filter$1(source, fn) {
+function filter(source, fn) {
     if (source.isSomeAnd(fn)) {
         return source;
     }
@@ -353,14 +345,7 @@ function unwrapOrElse(option, default_fn) {
     return option.type === "None" ? default_fn() : option.value;
 }
 
-function intoIter(option) {
-    if (isSome(option)) {
-        return IterFrom.array([option.value]);
-    }
-    return IterFrom.array([]);
-}
-
-function flatten$1(source) {
+function flatten(source) {
     if (source.isNone()) {
         return source;
     }
@@ -384,9 +369,8 @@ function createOption(v) {
                 yield inner.value;
             }
         },
-        intoIter: () => intoIter(inner),
         inner: () => inner,
-        eq: (value, by) => eq$1(api, value, by),
+        eq: (value, by) => eq(api, value, by),
         format: (formatter) => format(api, formatter),
         clone: () => createOption(clone(inner)),
         unwrap: () => unwrap(api),
@@ -403,9 +387,9 @@ function createOption(v) {
         and: (new_value) => createOption(and(api, new_value)),
         andThen: (fn) => createOption(andThen(api, fn)),
         result: (fn) => result(api, fn),
-        filter: (fn) => filter$1(api, fn),
+        filter: (fn) => filter(api, fn),
         match: (onSome, onNone) => match(api, onSome, onNone),
-        flatten: () => flatten$1(api),
+        flatten: () => flatten(api),
     };
     return api;
 }
@@ -416,299 +400,26 @@ function None() {
     return createOption(unionNone());
 }
 
-exports.Order = void 0;
-(function (Order) {
-    Order[Order["Greater"] = 1] = "Greater";
-    Order[Order["Equal"] = 0] = "Equal";
-    Order[Order["Less"] = -1] = "Less";
-})(exports.Order || (exports.Order = {}));
-
-function defaultMap(item) {
-    return item;
+function createRemapper(fn) {
+    return (iter, source, inner) => new Iter(() => fn(iter, source, inner));
 }
 
-function defaultFilter(_item) {
-    return true;
-}
-
-function* iterFactory(source, map = (defaultMap), filter = (defaultFilter)) {
-    const check = (item) => filter(item);
-    for (const item of source) {
-        const mappedItem = map(item);
-        if (check(mappedItem)) {
-            yield mappedItem;
+function enumerate() {
+    return createRemapper(function* (_, source) {
+        let index = 0;
+        for (const item of source()) {
+            yield { item, index };
+            index += 1;
         }
-    }
+    });
 }
 
-function iterable(source) {
-    return createIter(() => iterFactory(source));
-}
-
-function array(source) {
-    return iterable(source);
-}
-
-function* iterInfinite() {
-    while (true) {
-        yield;
-    }
-}
-
-function range(from, to, inclusive = false) {
-    if (from > to) {
-        throw new Error(`Invalid range: From(${from}) > To(${to})`);
-    }
-    const extra = inclusive ? 1 : 0;
-    return createIter(() => iterInfinite())
-        .take(to - from + extra)
-        .enumerate()
-        .map(({ index }) => index + from);
-}
-
-const IterFrom = {
-    array,
-    iterable,
-    range,
-};
-
-function all(source, fn) {
-    for (let item of source) {
-        if (!fn(item)) {
-            return false;
+function map(fn) {
+    return createRemapper(function* (_, source) {
+        for (const item of source()) {
+            yield fn(item);
         }
-    }
-    return true;
-}
-
-function any(source, fn) {
-    for (let item of source) {
-        if (fn(item)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function* iterChain(source, chainedItems) {
-    for (const item of source) {
-        yield item;
-    }
-    for (const item of chainedItems) {
-        yield item;
-    }
-}
-
-function chain(source, target) {
-    return iterChain(source, target);
-}
-
-function collect(source) {
-    return Array.from(source);
-}
-
-function collectSet(source) {
-    return new Set(source);
-}
-
-function* iterCycle(source) {
-    let iter = source();
-    let firstValue = iter.next();
-    if (firstValue.done)
-        return;
-    yield firstValue.value;
-    while (true) {
-        let nextValue = iter.next();
-        if (nextValue.done) {
-            iter = source();
-        }
-        else {
-            yield nextValue.value;
-        }
-    }
-}
-
-function cycle(source) {
-    return iterCycle(source);
-}
-
-function* iterEnumerate(source) {
-    let index = 0;
-    for (const item of source) {
-        yield { item, index };
-        index += 1;
-    }
-}
-
-function enumerate(source) {
-    return iterEnumerate(source);
-}
-
-function eq(source, another, by) {
-    const sourceIter = source.recreate();
-    const anotherIter = IterFrom.iterable(another);
-    while (true) {
-        const sourceNext = sourceIter.next();
-        const anotherNext = anotherIter.next();
-        if (sourceNext.isSome() || anotherNext.isSome()) {
-            if (!sourceNext.eq(anotherNext, by)) {
-                return false;
-            }
-        }
-        else {
-            return true;
-        }
-    }
-}
-
-function filter(source, fn) {
-    return iterFactory(source, (x) => x, fn);
-}
-
-function filterMap(source, fn) {
-    return source
-        .map(fn)
-        .filter((v) => v.isSome())
-        .map((v) => v.unwrap());
-}
-
-function find(source, fn) {
-    const result = source
-        .skipWhile((item) => !fn(item))
-        .take(1)
-        .collect();
-    return result.length > 0 ? Some(result[0]) : None();
-}
-
-function findMap(source, fn) {
-    const result = source
-        .map(fn)
-        .skipWhile((v) => v.isNone())
-        .take(1)
-        .collect();
-    return result.length > 0 ? result[0] : None();
-}
-
-function first(source) {
-    for (const item of source) {
-        return Some(item);
-    }
-    return None();
-}
-
-function* iterFlat(source) {
-    for (const item of source) {
-        for (const subItem of item) {
-            yield subItem;
-        }
-    }
-}
-
-function flatMap(source, fn) {
-    return iterFlat(source.map(fn));
-}
-
-function toIterable(source) {
-    if (source && typeof source === "object" && Symbol.iterator in source) {
-        return source;
-    }
-    return [source];
-}
-
-function flatten(source) {
-    return source.map(toIterable).flatMap((v) => v);
-}
-
-function fold(source, startFrom, fn) {
-    let lastAcc = startFrom;
-    for (const item of source) {
-        lastAcc = fn(lastAcc, item);
-    }
-    return lastAcc;
-}
-
-function forEach(source, fn) {
-    for (const item of source) {
-        fn(item);
-    }
-}
-
-function get(source, index) {
-    if (index < 0) {
-        return None();
-    }
-    return source.skip(index).first();
-}
-
-function groupBy(source, fn) {
-    const groups = new Map();
-    for (const item of source) {
-        const key = fn(item);
-        const group = groups.get(key);
-        if (Array.isArray(group)) {
-            group.push(item);
-        }
-        else {
-            groups.set(key, [item]);
-        }
-    }
-    return groups;
-}
-
-function* iterIntersperse(source, fn) {
-    let alreadyRan = false;
-    for (const item of source) {
-        if (alreadyRan) {
-            yield fn();
-        }
-        yield item;
-        alreadyRan = true;
-    }
-}
-
-function intersperse(source, value) {
-    return iterIntersperse(source, () => value);
-}
-
-function isEmpty(source) {
-    for (const _ of source) {
-        return false;
-    }
-    return true;
-}
-
-function last(source) {
-    return source.fold(None(), (_, item) => Some(item));
-}
-
-function len(source) {
-    return Array.from(source).length;
-}
-
-function map(source, fn) {
-    return iterFactory(source, fn);
-}
-
-function maxBy(source, fn) {
-    let max = source.first();
-    for (const item of source.skip(1)) {
-        max = max
-            .filter((minItem) => fn(item) > fn(minItem))
-            .map(() => item)
-            .or(max);
-    }
-    return max;
-}
-
-function minBy(source, fn) {
-    let min = source.first();
-    for (const item of source.skip(1)) {
-        min = min
-            .filter((minItem) => fn(item) < fn(minItem))
-            .map(() => item)
-            .or(min);
-    }
-    return min;
+    });
 }
 
 function next(source) {
@@ -721,144 +432,65 @@ function next(source) {
     }
 }
 
-function nth(source, amount) {
-    if (amount <= 0) {
-        throw new Error(`Cannot iterate ${amount} - 1 times`);
-    }
-    for (let i = 0; i < amount - 1; i++) {
-        source.next();
-    }
-    return source.next();
-}
-
-function partition(source, fn) {
-    const iterA = [];
-    const iterB = [];
-    for (const item of source) {
-        if (fn(item)) {
-            iterA.push(item);
-        }
-        else {
-            iterB.push(item);
-        }
-    }
-    return [IterFrom.array(iterA), IterFrom.array(iterB)];
-}
-
-function position(source, fn) {
-    return source
-        .enumerate()
-        .find(({ item }) => fn(item))
-        .map(({ index }) => index);
-}
-
-function reverse(source) {
-    return IterFrom.array(Array.from(source).reverse());
-}
-
-function skip(source, skipAmount) {
-    return source
-        .enumerate()
-        .skipWhile(({ index }) => index < skipAmount)
-        .map(({ item }) => item);
-}
-
-function* iterSkipWhile(source, filter) {
-    let flag = false;
-    for (let item of source) {
-        if (flag || !filter(item)) {
-            flag = true;
-            yield item;
-        }
-    }
-}
-
-function skipWhile(source, fn) {
-    return iterSkipWhile(source, fn);
-}
-
-function stepBy(source, amount) {
-    if (amount <= 0) {
-        throw new Error(`.stepBy() amount should be > 0`);
-    }
-    return source
-        .enumerate()
-        .filter(({ index }) => index === 0 || index % amount === 0)
-        .map(({ item }) => item);
-}
-
-function take(source, takeAmount) {
-    return source
-        .enumerate()
-        .takeWhile(({ index }) => index < takeAmount)
-        .map(({ item }) => item);
-}
-
-function* iterTakeWhile(source, filter) {
-    for (let item of source) {
-        if (filter(item)) {
-            yield item;
-        }
-        else {
-            return;
-        }
-    }
-}
-
-function takeWhile(source, fn) {
-    return iterTakeWhile(source, fn);
-}
-
-function createIter(source) {
-    /** `Generator<T>` with local state, used for `.next()` iteration */
-    const inner = source();
-    const api = {
-        *[Symbol.iterator]() {
-            for (const item of source()) {
+function take(takeAmount) {
+    return createRemapper(function* (_, source) {
+        let i = 0;
+        for (const item of source()) {
+            if (i++ < takeAmount) {
                 yield item;
             }
-        },
-        intoIter: () => api.recreate(),
-        next: () => next(inner),
-        recreate: () => createIter(source),
-        collect: () => collect(api),
-        collectSet: () => collectSet(api),
-        map: (fn) => createIter(() => map(api, fn)),
-        filter: (fn) => createIter(() => filter(api, fn)),
-        filterMap: (fn) => filterMap(api, fn),
-        enumerate: () => createIter(() => enumerate(api)),
-        skipWhile: (fn) => createIter(() => skipWhile(api, fn)),
-        skip: (i) => skip(api, i),
-        takeWhile: (fn) => createIter(() => takeWhile(api, fn)),
-        take: (i) => take(api, i),
-        nth: (amount) => nth(api, amount),
-        all: (fn) => all(api, fn),
-        any: (fn) => any(api, fn),
-        cycle: () => createIter(() => cycle(source)),
-        eq: (another, by) => eq(api, another, by),
-        find: (fn) => find(api, fn),
-        findMap: (fn) => findMap(api, fn),
-        position: (fn) => position(api, fn),
-        flatMap: (fn) => createIter(() => flatMap(api, fn)),
-        flatten: () => flatten(api),
-        fold: (startFrom, fn) => fold(api, startFrom, fn),
-        stepBy: (amount) => stepBy(api, amount),
-        forEach: (fn) => forEach(api, fn),
-        intersperse: (value) => createIter(() => intersperse(api, value)),
-        isEmpty: () => isEmpty(api),
-        len: () => len(api),
-        first: () => first(api),
-        last: () => last(api),
-        minBy: (fn) => minBy(api, fn),
-        maxBy: (fn) => maxBy(api, fn),
-        partition: (fn) => partition(api, fn),
-        reverse: () => reverse(api),
-        get: (pos) => get(api, pos),
-        chain: (values) => createIter(() => chain(api, values)),
-        groupBy: (fn) => groupBy(source(), fn),
-        sumBy: (fn) => fold(api, 0, (acc, item) => fn(item) + acc),
-    };
-    return api;
+            else {
+                return;
+            }
+        }
+    });
+}
+
+class Iter {
+    source;
+    inner;
+    [Symbol.iterator]() {
+        return this.inner;
+    }
+    constructor(source) {
+        this.source = source;
+        this.inner = source();
+    }
+    static infinite() {
+        return new Iter(function* () {
+            while (true)
+                yield;
+        });
+    }
+    static from(source) {
+        return new Iter(function* () {
+            for (const item of source) {
+                yield item;
+            }
+        });
+    }
+    static fromRange(from, to, inclusive = false) {
+        if (from > to) {
+            throw new Error(`Invalid range: From(${from}) > To(${to})`);
+        }
+        const extra = inclusive ? 1 : 0;
+        return Iter.infinite()
+            .do(take(to - from + extra))
+            .do(enumerate())
+            .do(map(({ index }) => index + from));
+    }
+    clone() {
+        return new Iter(this.source);
+    }
+    next() {
+        return next(this.inner);
+    }
+    do(fn) {
+        return fn(this, this.source, this.inner);
+    }
+    pipe(fn) {
+        return (...args) => fn(...args)(this, this.source, this.inner);
+    }
 }
 
 class AnyHow {
@@ -886,6 +518,27 @@ class AnyHow {
     }
 }
 
+function createAggregator(fn) {
+    return (iter, source, inner) => fn(iter, source, inner);
+}
+
+function filterMap(fn) {
+    return createRemapper(function* (_, source) {
+        for (const item of source()) {
+            const data = fn(item).inner();
+            if (data.type === "Some") {
+                yield data.value;
+            }
+        }
+    });
+}
+
+function findMap(fn) {
+    return createAggregator((iter) => {
+        return iter.do(filterMap(fn)).next();
+    });
+}
+
 function Pipe(identity, members = []) {
     const pipe = {
         call(...v) {
@@ -903,9 +556,9 @@ function Pipe(identity, members = []) {
 }
 
 function SchemaCustom(createFn, flags = { isOptional: false }, rules = [], transforms = Pipe((v) => v)) {
-    const validate = (v) => IterFrom.array(rules)
-        .enumerate()
-        .findMap(({ index, item }) => (item(v) ? None() : Some(index)))
+    const validate = (v) => Iter.from(rules)
+        .do(enumerate())
+        .do(findMap(({ index, item }) => (item(v) ? None() : Some(index))))
         .match((index) => AnyHow.msg(`Rule ${index} failed`).toErr(), () => Ok(v));
     const api = {
         transform(checkFn) {
@@ -980,7 +633,7 @@ function defaultVahter$4(schema) {
             return AnyHow.expect("array", String(items)).toErr();
         }
         const parsedArr = [];
-        for (const { index, item } of IterFrom.array(items).enumerate()) {
+        for (const { index, item } of Iter.from(items).do(enumerate())) {
             const result = schema.parse(item);
             if (result.isOk()) {
                 parsedArr.push(result.unwrap());
@@ -1394,7 +1047,7 @@ const Schema = {
 
 exports.AnyHow = AnyHow;
 exports.Err = Err;
-exports.IterFrom = IterFrom;
+exports.Iter = Iter;
 exports.None = None;
 exports.Ok = Ok;
 exports.OptionFrom = OptionFrom;
@@ -1402,7 +1055,6 @@ exports.Pipe = Pipe;
 exports.ResultFrom = ResultFrom;
 exports.Schema = Schema;
 exports.Some = Some;
-exports.createIter = createIter;
 exports.createOption = createOption;
 exports.createResult = createResult;
 exports.tryFn = tryFn;

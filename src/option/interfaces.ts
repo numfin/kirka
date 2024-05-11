@@ -1,4 +1,3 @@
-import { IntoIter } from "../index.js";
 import type { Result } from "../result/interfaces.js";
 
 export interface Some<T> {
@@ -11,7 +10,7 @@ export interface None {
 
 export type OptionUnion<T> = None | Some<T>;
 
-export interface Option<T> extends IntoIter<T> {
+export interface Option<T> extends Iterable<T> {
   /**
    * Extract internals as union. Useful when you want to handle option yourself
    * # Example

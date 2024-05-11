@@ -1,17 +1,18 @@
-import { IterFrom } from "../from/index.js";
-export function eq(source, another, by) {
-    const sourceIter = source.recreate();
-    const anotherIter = IterFrom.iterable(another);
-    while (true) {
-        const sourceNext = sourceIter.next();
-        const anotherNext = anotherIter.next();
-        if (sourceNext.isSome() || anotherNext.isSome()) {
+import { createAggregator } from "../middleware/aggregate.js";
+import { Iter } from "../index.js";
+export function eq(another, by) {
+    return createAggregator((iter) => {
+        const sourceIter = iter.clone();
+        const anotherIter = Iter.from(another);
+        let sourceNext = sourceIter.next();
+        let anotherNext = anotherIter.next();
+        while (sourceNext.isSome() || anotherNext.isSome()) {
             if (!sourceNext.eq(anotherNext, by)) {
                 return false;
             }
+            sourceNext = sourceIter.next();
+            anotherNext = anotherIter.next();
         }
-        else {
-            return true;
-        }
-    }
+        return true;
+    });
 }

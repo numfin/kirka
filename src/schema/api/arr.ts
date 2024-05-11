@@ -1,5 +1,6 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { IterFrom, Ok, Option } from "../../index.js";
+import { Iter, Ok, Option } from "../../index.js";
+import { enumerate } from "../../iter/api/enumerate.js";
 import { Checker, Transformer, Schema, FromSchema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
@@ -50,7 +51,7 @@ function defaultVahter<T>(schema: Schema<T>) {
     }
     const parsedArr: Return = [];
 
-    for (const { index, item } of IterFrom.array(items).enumerate()) {
+    for (const { index, item } of Iter.from(items).do(enumerate())) {
       const result = schema.parse(item);
 
       if (result.isOk()) {

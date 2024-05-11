@@ -183,10 +183,6 @@ test(`.match()`, (t) => {
     "e"
   );
 });
-test(`.intoIter()`, (t) => {
-  t.deepEqual(Ok("v").intoIter().collect(), ["v"]);
-  t.deepEqual(Err("err").intoIter().collect(), []);
-});
 test(`.[Symbol.iterator]()`, (t) => {
   t.deepEqual(Array.from(Ok("v")), ["v"]);
   t.deepEqual(Array.from(Err("err")), []);

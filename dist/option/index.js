@@ -21,7 +21,6 @@ import { filter } from "./api/filter.js";
 import { isNoneAnd } from "./api/isNoneAnd.js";
 import { match } from "./api/match.js";
 import { unwrapOrElse } from "./api/unwrapOrElse.js";
-import { intoIter } from "./api/intoIter.js";
 import { flatten } from "./api/flatten.js";
 export function createOption(v) {
     let inner = v;
@@ -31,7 +30,6 @@ export function createOption(v) {
                 yield inner.value;
             }
         },
-        intoIter: () => intoIter(inner),
         inner: () => inner,
         eq: (value, by) => eq(api, value, by),
         format: (formatter) => format(api, formatter),

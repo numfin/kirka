@@ -1,8 +1,8 @@
-import { IterFrom } from "../../index.js";
+import { Iter } from "../../index.js";
 import { isSome } from "./isSome.js";
 export function intoIter(option) {
     if (isSome(option)) {
-        return IterFrom.array([option.value]);
+        return Iter.from([option.value]);
     }
-    return IterFrom.array([]);
+    return Iter.from([]);
 }

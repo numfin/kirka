@@ -1,2 +1,2 @@
-export declare function intersperse<T>(source: Iterable<T>, value: T): Generator<T, void, unknown>;
+export declare function intersperse<T>(value: T): import("../middleware/remap.js").MiddlewareRemap<T, T>;
 //# sourceMappingURL=intersperse.d.ts.map

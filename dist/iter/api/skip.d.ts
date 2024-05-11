@@ -1,3 +1,2 @@
-import { Iter } from "../interfaces.js";
-export declare function skip<T>(source: Iter<T>, skipAmount: number): Iter<T>;
+export declare function skip<T>(skipAmount: number): import("../middleware/remap.js").MiddlewareRemap<T, T>;
 //# sourceMappingURL=skip.d.ts.map

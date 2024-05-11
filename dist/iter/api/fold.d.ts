@@ -1,2 +1,2 @@
-export declare function fold<T, U>(source: Iterable<T>, startFrom: U, fn: (acc: U, item: T) => U): U;
+export declare function fold<T, U>(startFrom: U, fn: (endWith: U, item: T) => U): import("../middleware/aggregate.js").MiddlewareAggregator<T, U>;
 //# sourceMappingURL=fold.d.ts.map

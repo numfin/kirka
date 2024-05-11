@@ -1,1 +1,1 @@
-{"version":3,"file":"first.d.ts","sourceRoot":"","sources":["../../../src/iter/api/first.ts"],"names":[],"mappings":"AAEA,wBAAgB,KAAK,CAAC,CAAC,EAAE,MAAM,EAAE,QAAQ,CAAC,CAAC,CAAC,kDAK3C"}
+{"version":3,"file":"first.d.ts","sourceRoot":"","sources":["../../../src/iter/api/first.ts"],"names":[],"mappings":"AAAA,OAAO,EAAQ,MAAM,EAAQ,MAAM,uBAAuB,CAAC;AAG3D,wBAAgB,KAAK,CAAC,CAAC,6EAOtB"}

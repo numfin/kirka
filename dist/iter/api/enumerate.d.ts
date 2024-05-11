@@ -1,5 +1,6 @@
-export declare function enumerate<T>(source: Iterable<T>): Generator<{
+export type WithIndex<T> = {
     item: T;
     index: number;
-}, void, unknown>;
+};
+export declare function enumerate<T>(): import("../middleware/remap.js").MiddlewareRemap<T, WithIndex<T>>;
 //# sourceMappingURL=enumerate.d.ts.map

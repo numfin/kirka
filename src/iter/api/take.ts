@@ -1,8 +1,14 @@
-import { Iter } from "../interfaces.js";
+import { createRemapper } from "../middleware/remap.js";
 
-export function take<T>(source: Iter<T>, takeAmount: number) {
-  return source
-    .enumerate()
-    .takeWhile(({ index }) => index < takeAmount)
-    .map(({ item }) => item);
+export function take<T>(takeAmount: number) {
+  return createRemapper<T, T>(function* (_, source) {
+    let i = 0;
+    for (const item of source()) {
+      if (i++ < takeAmount) {
+        yield item;
+      } else {
+        return;
+      }
+    }
+  });
 }
