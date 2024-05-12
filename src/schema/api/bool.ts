@@ -1,6 +1,6 @@
 import { AnyHow } from "../../anyhow/index.js";
 import { Ok, Option } from "../../index.js";
-import { Checker, Transformer, Schema, SchemaError } from "../interface.js";
+import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
 export interface SchemaBool<T extends boolean, ParsedType = T>

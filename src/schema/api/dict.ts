@@ -1,6 +1,6 @@
 import { AnyHow } from "../../anyhow/index.js";
 import { Ok, Option } from "../../index.js";
-import { Checker, Transformer, Schema, FromSchema } from "../interface.js";
+import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
 export interface SchemaDict<

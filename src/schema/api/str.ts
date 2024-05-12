@@ -1,6 +1,6 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { Ok, Option, OptionFrom, Result } from "../../index.js";
-import { Checker, Transformer, Schema, SchemaError } from "../interface.js";
+import { Ok, Option, OptionFrom } from "../../index.js";
+import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
 export interface SchemaStr<T extends string, ParsedType = T>

@@ -1,7 +1,7 @@
 import { AnyHow } from "../../anyhow/index.js";
 import { Iter, Ok, Option } from "../../index.js";
 import { enumerate } from "../../iter/api/enumerate.js";
-import { Checker, Transformer, Schema, FromSchema } from "../interface.js";
+import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
 export interface SchemaArr<T, ParsedType = T[]> extends Schema<ParsedType> {

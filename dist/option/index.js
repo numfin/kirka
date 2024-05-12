@@ -23,7 +23,7 @@ import { match } from "./api/match.js";
 import { unwrapOrElse } from "./api/unwrapOrElse.js";
 import { flatten } from "./api/flatten.js";
 export function createOption(v) {
-    let inner = v;
+    const inner = v;
     const api = {
         *[Symbol.iterator]() {
             if (isSome(inner)) {

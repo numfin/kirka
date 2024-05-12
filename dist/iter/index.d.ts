@@ -3,7 +3,7 @@ import type { ClonnableGenerator } from "./interfaces.js";
 export declare class Iter<T> {
     source: ClonnableGenerator<T>;
     private inner;
-    [Symbol.iterator](): Generator<T, any, unknown>;
+    [Symbol.iterator](): Generator<T, unknown, unknown>;
     constructor(source: ClonnableGenerator<T>);
     static infinite(): Iter<undefined>;
     static from<T>(source: Iterable<T>): Iter<T>;

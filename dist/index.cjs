@@ -362,7 +362,7 @@ function flatten(source) {
 }
 
 function createOption(v) {
-    let inner = v;
+    const inner = v;
     const api = {
         *[Symbol.iterator]() {
             if (isSome(inner)) {
@@ -539,7 +539,9 @@ function findMap(fn) {
     });
 }
 
-function Pipe(identity, members = []) {
+function Pipe(identity, 
+// eslint-disable-next-line @typescript-eslint/ban-types
+members = []) {
     const pipe = {
         call(...v) {
             return members.reduce((lastV, member) => member(lastV), identity(...v));
@@ -825,7 +827,7 @@ function UnionInstance(currentTag, value) {
             return tag === currentTag && condition(value);
         },
         matchSome(matcher) {
-            if (matcher.hasOwnProperty(currentTag)) {
+            if (Object.prototype.hasOwnProperty.call(matcher, currentTag)) {
                 const fn = matcher[currentTag];
                 if (typeof fn === "function") {
                     return Some(fn(value));
@@ -865,7 +867,7 @@ function SchemaUnionInternal(schema, vahter) {
     };
     return new Proxy({}, {
         get(_, tag) {
-            if (schema.hasOwnProperty(tag)) {
+            if (Object.prototype.hasOwnProperty.call(schema, tag)) {
                 return (v) => UnionInstance(tag, v);
             }
             return api[tag];

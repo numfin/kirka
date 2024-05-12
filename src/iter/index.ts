@@ -6,7 +6,7 @@ import { take } from "./api/take.js";
 import type { ClonnableGenerator } from "./interfaces.js";
 
 export class Iter<T> {
-  private inner: Generator<T, any, unknown>;
+  private inner: Generator<T, unknown, unknown>;
   [Symbol.iterator]() {
     return this.inner;
   }

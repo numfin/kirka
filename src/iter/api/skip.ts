@@ -3,7 +3,7 @@ import { createRemapper } from "../middleware/remap.js";
 export function skip<T>(skipAmount: number) {
   return createRemapper<T, T>(function* (_, source) {
     let skipped = 0;
-    let iter = source();
+    const iter = source();
     while (skipped < skipAmount) {
       if (iter.next()) {
         skipped += 1;

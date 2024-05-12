@@ -26,7 +26,7 @@ import { unwrapOrElse } from "./api/unwrapOrElse.js";
 import { flatten } from "./api/flatten.js";
 
 export function createOption<T>(v: OptionUnion<T>): Option<T> {
-  let inner = v;
+  const inner = v;
 
   const api: Option<T> = {
     *[Symbol.iterator]() {

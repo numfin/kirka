@@ -5,7 +5,7 @@ import { ClonnableGenerator } from "../interfaces.js";
 export type MiddlewareAggregator<In, Out> = (
   iter: Iter<In>,
   source: ClonnableGenerator<In>,
-  inner: Generator<In, any, unknown>
+  inner: Generator<In, unknown, unknown>
 ) => Out;
 
 export function createAggregator<In, Out>(
@@ -14,6 +14,6 @@ export function createAggregator<In, Out>(
   return (
     iter: Iter<In>,
     source: ClonnableGenerator<In>,
-    inner: Generator<In, any, unknown>
+    inner: Generator<In, unknown, unknown>
   ) => fn(iter, source, inner);
 }
