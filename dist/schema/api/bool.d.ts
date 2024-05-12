@@ -37,5 +37,5 @@ export interface SchemaBool<T extends boolean, ParsedType = T> extends Schema<Pa
      */
     transform: Transformer<T, SchemaBool<T, ParsedType>>;
 }
-export declare const SchemaBool: <T extends boolean>(equalTo?: T | undefined) => SchemaBool<T, T>;
+export declare const SchemaBool: <T extends boolean>(equalTo?: T) => SchemaBool<T, T>;
 //# sourceMappingURL=bool.d.ts.map

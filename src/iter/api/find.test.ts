@@ -1,7 +1,7 @@
 import test from "ava";
 import { useSpy } from "../../testutils/spy.js";
-import { Iter, WithIndex } from "../index.js";
-import { enumerate } from "./enumerate.js";
+import { Iter } from "../index.js";
+import { WithIndex, enumerate } from "./enumerate.js";
 import { find } from "./find.js";
 
 test("find() should return first element found by condition", (t) => {
@@ -20,6 +20,5 @@ test("find() should return none if element not found", (t) => {
 
 test("find() should return none on empty iter", (t) => {
   const iter = Iter.from([]);
-
   t.truthy(iter.do(find((_) => true)).isNone());
 });

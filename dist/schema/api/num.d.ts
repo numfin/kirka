@@ -37,5 +37,5 @@ export interface SchemaNum<T extends number, ParsedType = T> extends Schema<Pars
      */
     transform: Transformer<T, SchemaNum<T, ParsedType>>;
 }
-export declare const SchemaNum: <T extends number>(equalTo?: T | undefined) => SchemaNum<T, T>;
+export declare const SchemaNum: <T extends number>(equalTo?: T) => SchemaNum<T, T>;
 //# sourceMappingURL=num.d.ts.map
