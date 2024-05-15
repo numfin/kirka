@@ -11,6 +11,6 @@
     "declarationMap": true,
     "lib": ["ESNext"]
   },
-  "include": ["src/**/*.ts", "src/iter/api/isEmpty.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }

@@ -17,7 +17,7 @@ export function UnionInstance(currentTag, value) {
             return tag === currentTag && condition(value);
         },
         matchSome(matcher) {
-            if (matcher.hasOwnProperty(currentTag)) {
+            if (Object.prototype.hasOwnProperty.call(matcher, currentTag)) {
                 const fn = matcher[currentTag];
                 if (typeof fn === "function") {
                     return Some(fn(value));
@@ -57,7 +57,7 @@ function SchemaUnionInternal(schema, vahter) {
     };
     return new Proxy({}, {
         get(_, tag) {
-            if (schema.hasOwnProperty(tag)) {
+            if (Object.prototype.hasOwnProperty.call(schema, tag)) {
                 return (v) => UnionInstance(tag, v);
             }
             return api[tag];

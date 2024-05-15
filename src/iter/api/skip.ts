@@ -1,8 +1,18 @@
-import { Iter } from "../interfaces.js";
+import { createRemapper } from "../middleware/remap.js";
 
-export function skip<T>(source: Iter<T>, skipAmount: number) {
-  return source
-    .enumerate()
-    .skipWhile(({ index }) => index < skipAmount)
-    .map(({ item }) => item);
+export function skip<T>(skipAmount: number) {
+  return createRemapper<T, T>(function* (_, source) {
+    let skipped = 0;
+    const iter = source();
+    while (skipped < skipAmount) {
+      if (iter.next()) {
+        skipped += 1;
+      } else {
+        return;
+      }
+    }
+    for (const item of iter) {
+      yield item;
+    }
+  });
 }

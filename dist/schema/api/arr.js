@@ -1,5 +1,6 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { IterFrom, Ok } from "../../index.js";
+import { Iter, Ok } from "../../index.js";
+import { enumerate } from "../../iter/api/enumerate.js";
 import { SchemaCustom } from "./custom.js";
 function defaultVahter(schema) {
     return SchemaCustom((items) => {
@@ -7,7 +8,7 @@ function defaultVahter(schema) {
             return AnyHow.expect("array", String(items)).toErr();
         }
         const parsedArr = [];
-        for (const { index, item } of IterFrom.array(items).enumerate()) {
+        for (const { index, item } of Iter.from(items).do(enumerate())) {
             const result = schema.parse(item);
             if (result.isOk()) {
                 parsedArr.push(result.unwrap());

@@ -102,5 +102,5 @@ export interface SchemaStr<T extends string, ParsedType = T> extends Schema<Pars
     re(re: () => RegExp, 
     /** Name of the regex rule */ kind?: string): SchemaStr<T, ParsedType>;
 }
-export declare const SchemaStr: <T extends string>(equalTo?: T | undefined) => SchemaStr<T, T>;
+export declare const SchemaStr: <T extends string>(equalTo?: T) => SchemaStr<T, T>;
 //# sourceMappingURL=str.d.ts.map

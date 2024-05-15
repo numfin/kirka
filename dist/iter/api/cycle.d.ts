@@ -1,3 +1,2 @@
-import { ClonnableGenerator } from "../interfaces.js";
-export declare function cycle<T>(source: ClonnableGenerator<T>): Generator<T, void, unknown>;
+export declare function cycle<T>(): import("../middleware/remap.js").MiddlewareRemap<T, T>;
 //# sourceMappingURL=cycle.d.ts.map

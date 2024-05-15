@@ -1,6 +1,5 @@
-import { Iter } from "../interfaces.js";
-import { toIterable } from "./toIterable.js";
+import { flatMap } from "./flat_map.js";
 
-export function flatten<T>(source: Iter<T>) {
-  return source.map(toIterable).flatMap((v) => v);
+export function flatten<T>() {
+  return flatMap<Iterable<T>, T>((v) => v);
 }

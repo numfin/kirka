@@ -1,3 +1,3 @@
-import { Iter } from "../interfaces.js";
-export declare function get<T>(source: Iter<T>, index: number): import("../../option/interfaces.js").Option<T>;
+import { Option } from "../../option/index.js";
+export declare function get<T>(index: number): import("../middleware/aggregate.js").MiddlewareAggregator<T, Option<T>>;
 //# sourceMappingURL=get.d.ts.map

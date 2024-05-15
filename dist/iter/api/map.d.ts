@@ -1,2 +1,2 @@
-export declare function map<T, U>(source: Iterable<T>, fn: (item: T) => U): Generator<U, void, unknown>;
+export declare function map<T, U>(fn: (item: T) => U): import("../middleware/remap.js").MiddlewareRemap<T, U>;
 //# sourceMappingURL=map.d.ts.map

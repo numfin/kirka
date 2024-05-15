@@ -1,4 +1,8 @@
-import { iterFactory } from "../generators/iterFactory.js";
-export function map(source, fn) {
-    return iterFactory(source, fn);
+import { createRemapper } from "../middleware/remap.js";
+export function map(fn) {
+    return createRemapper(function* (_, source) {
+        for (const item of source()) {
+            yield fn(item);
+        }
+    });
 }

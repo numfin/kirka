@@ -115,7 +115,7 @@ export function UnionInstance<T extends Record<PropertyKey, unknown>>(
       return tag === currentTag && condition(value);
     },
     matchSome(matcher) {
-      if (matcher.hasOwnProperty(currentTag)) {
+      if (Object.prototype.hasOwnProperty.call(matcher, currentTag)) {
         const fn = matcher[currentTag];
         if (typeof fn === "function") {
           return Some(fn(value));
@@ -174,7 +174,7 @@ function SchemaUnionInternal<
     {},
     {
       get(_, tag) {
-        if (schema.hasOwnProperty(tag)) {
+        if (Object.prototype.hasOwnProperty.call(schema, tag)) {
           return (v: T[keyof T]) => UnionInstance(tag, v);
         }
         return api[tag as keyof typeof api];

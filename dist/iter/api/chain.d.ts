@@ -1,2 +1,2 @@
-export declare function chain<T>(source: Iterable<T>, target: Iterable<T>): Generator<T, void, unknown>;
+export declare function chain<T>(chain: Iterable<T>): import("../middleware/remap.js").MiddlewareRemap<T, T>;
 //# sourceMappingURL=chain.d.ts.map

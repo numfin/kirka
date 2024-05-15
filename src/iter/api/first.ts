@@ -1,8 +1,11 @@
-import { None, Some } from "../../option/index.js";
+import { None, Option, Some } from "../../option/index.js";
+import { createAggregator } from "../middleware/aggregate.js";
 
-export function first<T>(source: Iterable<T>) {
-  for (const item of source) {
-    return Some(item);
-  }
-  return None<T>();
+export function first<T>() {
+  return createAggregator<T, Option<T>>((_, source) => {
+    for (const item of source()) {
+      return Some(item);
+    }
+    return None<T>();
+  });
 }

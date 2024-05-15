@@ -25,7 +25,6 @@ import type { Result, ResultUnion, Ok, Err } from "./interfaces.js";
 import { unionOk } from "./api/unionOk.js";
 import { unionErr } from "./api/unionErr.js";
 import { match } from "./api/match.js";
-import { intoIter } from "./api/intoIter.js";
 
 export function createResult<T, E>(result: ResultUnion<T, E>): Result<T, E> {
   const api: Result<T, E> = {
@@ -34,7 +33,6 @@ export function createResult<T, E>(result: ResultUnion<T, E>): Result<T, E> {
         yield result.value;
       }
     },
-    intoIter: () => intoIter(result),
     inner: () => result,
     eq: (other: Result<T, E>) => eq(api, other),
     format: (formatter) => format(api, formatter),

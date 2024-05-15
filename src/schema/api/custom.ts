@@ -1,6 +1,6 @@
 import { AnyHow } from "../../anyhow/index.js";
 import {
-  IterFrom,
+  Iter,
   None,
   Ok,
   Option,
@@ -8,6 +8,8 @@ import {
   Result,
   Some,
 } from "../../index.js";
+import { enumerate } from "../../iter/api/enumerate.js";
+import { findMap } from "../../iter/api/find_map.js";
 import { Pipe } from "../../pipe/index.js";
 import { Checker, Transformer, Schema, SchemaError } from "../interface.js";
 
@@ -57,9 +59,9 @@ export function SchemaCustom<T, ParsedType = T>(
   transforms = Pipe((v: Result<T, SchemaError>) => v)
 ) {
   const validate = (v: T) =>
-    IterFrom.array(rules)
-      .enumerate()
-      .findMap(({ index, item }) => (item(v) ? None() : Some(index)))
+    Iter.from(rules)
+      .do(enumerate())
+      .do(findMap(({ index, item }) => (item(v) ? None() : Some(index))))
       .match(
         (index) => AnyHow.msg(`Rule ${index} failed`).toErr(),
         () => Ok<T, SchemaError>(v)

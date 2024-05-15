@@ -1,3 +1,2 @@
-import { Iter } from "../interfaces.js";
-export declare function take<T>(source: Iter<T>, takeAmount: number): Iter<T>;
+export declare function take<T>(takeAmount: number): import("../middleware/remap.js").MiddlewareRemap<T, T>;
 //# sourceMappingURL=take.d.ts.map

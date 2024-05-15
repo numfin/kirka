@@ -1,20 +1,6 @@
 import { Option } from "../option/index.js";
-export type WithIndex<T> = {
-    item: T;
-    index: number;
-};
-export declare enum Order {
-    Greater = 1,
-    Equal = 0,
-    Less = -1
-}
-export interface IntoIter<T> extends Iterable<T> {
-    /**
-     * Creates an iterator from a value
-     */
-    intoIter(): Iter<T>;
-}
-export interface Iter<T> extends IntoIter<T> {
+import { WithIndex } from "./api/enumerate.js";
+export interface Iter<T> extends Iterable<T> {
     /**
      * Transforms iterator into T[]
      * # Example

@@ -1,3 +1,2 @@
-import { Iter } from "../interfaces.js";
-export declare function flatten<T>(source: Iter<T>): Iter<T extends readonly (infer InnerArr)[] ? InnerArr extends readonly (infer InnerArr)[] ? InnerArr : InnerArr : T>;
+export declare function flatten<T>(): import("../middleware/remap.js").MiddlewareRemap<Iterable<T>, T>;
 //# sourceMappingURL=flatten.d.ts.map
