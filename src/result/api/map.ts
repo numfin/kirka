@@ -1,11 +1,13 @@
-import { ResultUnion } from "../interfaces.js";
-import { unionOk } from "./unionOk.js";
-import { unionErr } from "./unionErr.js";
+import { createRemapper } from "../middleware/remap.js";
+import { isOk } from "./isOk.js";
+import { ResultNew } from "../../index.js";
 
-export function map<T, E, U>(result: ResultUnion<T, E>, fn: (value: T) => U) {
-  if (result.type === "Ok") {
-    return unionOk(fn(result.value));
-  } else {
-    return unionErr(result.value);
-  }
+export function map<T, E, T2>(fn: (value: T) => T2) {
+  return createRemapper<T, E, T2, E>((_, inner) => {
+    if (isOk(inner)) {
+      return ResultNew.Ok(fn(inner.value));
+    } else {
+      return ResultNew.Err(inner.err);
+    }
+  });
 }

@@ -1,7 +1,11 @@
-import { None } from "../index.js";
-export function filter(source, fn) {
-    if (source.isSomeAnd(fn)) {
-        return source;
-    }
-    return None();
+import { NewOption } from "../../index.js";
+import { createRemapper } from "../middleware/remap.js";
+import { isSomeAnd } from "./is_some_and.js";
+export function filter(fn) {
+    return createRemapper((option) => {
+        if (option.do(isSomeAnd(fn))) {
+            return option;
+        }
+        return NewOption.None();
+    });
 }

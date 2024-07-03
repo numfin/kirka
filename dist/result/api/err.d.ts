@@ -1,4 +1,3 @@
-import { Option } from "../../option/interfaces.js";
-import { Result } from "../interfaces.js";
-export declare function err<T, E>(result: Result<T, E>): Option<E>;
+import { NewOption } from "../../option/index.js";
+export declare function err<E>(): import("../middleware/aggregate.js").MiddlewareAggregator<unknown, E, NewOption<E>>;
 //# sourceMappingURL=err.d.ts.map

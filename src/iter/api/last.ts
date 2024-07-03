@@ -1,6 +1,11 @@
-import { None, Some } from "../../option/index.js";
-import { Iter } from "../interfaces.js";
+import { NewOption } from "../../option/index.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { fold } from "./fold.js";
 
-export function last<T>(source: Iter<T>) {
-  return source.fold(None<T>(), (_, item) => Some(item));
+export function last<T>() {
+  return createAggregator<T, NewOption<T>>((iter) => {
+    return iter.do(
+      fold(NewOption.None<T>(), (_, item) => NewOption.Some(item))
+    );
+  });
 }

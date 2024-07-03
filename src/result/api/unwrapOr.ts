@@ -1,5 +1,8 @@
-import { Result } from "../interfaces.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { isOk } from "./isOk.js";
 
-export function uwnrapOr<T, E>(result: Result<T, E>, default_value: T): T {
-  return result.isOk() ? result.unwrap() : default_value;
+export function unwrapOr<T>(default_value: T) {
+  return createAggregator<T, unknown, T>((_, inner) => {
+    return isOk(inner) ? inner.value : default_value;
+  });
 }

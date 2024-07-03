@@ -1,3 +1,4 @@
+import { tagOK } from "../base.js";
 export function isOk(result) {
-    return result.type === "Ok";
+    return result.type === tagOK;
 }

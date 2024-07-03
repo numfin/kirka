@@ -1,4 +1,4 @@
-import { Option } from "../../index.js";
+import { NewOption } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
 export interface SchemaNum<T extends number, ParsedType = T> extends Schema<ParsedType> {
     /**
@@ -10,7 +10,7 @@ export interface SchemaNum<T extends number, ParsedType = T> extends Schema<Pars
      * const v: Option<number> = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaNum<T, Option<T>>;
+    optional(): SchemaNum<T, NewOption<T>>;
     /**
      * # Description
      * Add validation rule to schema
@@ -37,5 +37,5 @@ export interface SchemaNum<T extends number, ParsedType = T> extends Schema<Pars
      */
     transform: Transformer<T, SchemaNum<T, ParsedType>>;
 }
-export declare const SchemaNum: <T extends number>(equalTo?: T | undefined) => SchemaNum<T, T>;
+export declare const SchemaNum: <T extends number>(equalTo?: T) => SchemaNum<T, T>;
 //# sourceMappingURL=num.d.ts.map

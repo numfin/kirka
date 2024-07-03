@@ -1,1 +1,1 @@
-{"version":3,"file":"take.d.ts","sourceRoot":"","sources":["../../../src/option/api/take.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,kBAAkB,CAAC;AAI/C,wBAAgB,IAAI,CAAC,CAAC,EAAE,MAAM,EAAE,WAAW,CAAC,CAAC,CAAC,kBAQ7C"}
+{"version":3,"file":"take.d.ts","sourceRoot":"","sources":["../../../src/option/api/take.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,gBAAgB,CAAC;AAK3C,wBAAgB,IAAI,CAAC,CAAC,gFASrB"}

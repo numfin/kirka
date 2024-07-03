@@ -1,88 +1,77 @@
-export { ResultFrom } from "./from/index.js";
-export * from "./interfaces.js";
-
-import { and } from "./api/and.js";
-import { or } from "./api/or.js";
-import { andThen } from "./api/andThen.js";
-import { orElse } from "./api/orElse.js";
-import { eq } from "./api/eq.js";
-import { format } from "./api/format.js";
-import { inspect } from "./api/inspect.js";
-import { inspectErr } from "./api/inspectErr.js";
+import { ResultUnion } from "./base.js";
 import { isOk } from "./api/isOk.js";
-import { isOkAnd } from "./api/isOkAnd.js";
 import { isErr } from "./api/isErr.js";
-import { isErrAnd } from "./api/isErrAnd.js";
-import { map } from "./api/map.js";
-import { mapErr } from "./api/mapErr.js";
-import { ok } from "./api/ok.js";
-import { err } from "./api/err.js";
 import { unwrap } from "./api/unwrap.js";
-import { uwnrapOr } from "./api/unwrapOr.js";
+import { ResultPipe } from "./middleware/middleware.js";
 import { unwrapErr } from "./api/unwrapErr.js";
+import { eq } from "./api/eq.js";
+import { unwrapOr } from "./api/unwrapOr.js";
 import { unwrapErrOr } from "./api/unwrapErrOr.js";
-import type { Result, ResultUnion, Ok, Err } from "./interfaces.js";
-import { unionOk } from "./api/unionOk.js";
-import { unionErr } from "./api/unionErr.js";
 import { match } from "./api/match.js";
-import { intoIter } from "./api/intoIter.js";
 
-export function createResult<T, E>(result: ResultUnion<T, E>): Result<T, E> {
-  const api: Result<T, E> = {
-    *[Symbol.iterator]() {
-      if (isOk(result)) {
-        yield result.value;
-      }
-    },
-    intoIter: () => intoIter(result),
-    inner: () => result,
-    eq: (other: Result<T, E>) => eq(api, other),
-    format: (formatter) => format(api, formatter),
-    isOk: () => isOk(result),
-    isErr: () => isErr(result),
-    unwrap: () => unwrap(api),
-    unwrapErr: () => unwrapErr(api),
-    unwrapOr: (default_value) => uwnrapOr(api, default_value),
-    unwrapErrOr: (default_value) => unwrapErrOr(api, default_value),
-    isOkAnd: (fn) => isOkAnd(api, fn),
-    isErrAnd: (fn) => isErrAnd(api, fn),
-    map: (fn) => createResult(map(result, fn)),
-    mapErr: (fn) => createResult(mapErr(result, fn)),
-    inspect: (fn) => inspect(api, fn),
-    inspectErr: (fn) => inspectErr(api, fn),
-    andThen: (fn) => createResult(andThen(api, fn)),
-    orElse: (fn) => createResult(orElse(api, fn)),
-    and: (new_value) => and(api, new_value),
-    or: (new_value) => or(api, new_value),
-    ok: () => ok(api),
-    err: () => err(api),
-    match: (onOk, onErr) => match(result, onOk, onErr),
-  };
-  return api;
-}
+export class ResultNew<T, E> {
+  *[Symbol.iterator]() {
+    if (isOk(this.inner)) {
+      yield this.inner.value;
+    }
+  }
+  constructor(public inner: ResultUnion<T, E>) {}
+  static Ok<T, E>(value: T) {
+    return new ResultNew<T, E>({ type: "Ok", value });
+  }
+  static Err<T, E>(err: E) {
+    return new ResultNew<T, E>({ type: "Err", err });
+  }
+  static tryFn<T, E>(fn: () => T) {
+    try {
+      const result = fn();
+      return Ok(result);
+    } catch (err) {
+      return Err(err as E);
+    }
+  }
+  static async tryAsync<T, E>(fn: () => Promise<T>): Promise<ResultNew<T, E>> {
+    try {
+      const result = await fn();
+      return Ok(result);
+    } catch (err) {
+      return Err(err as E);
+    }
+  }
 
-export function Ok<T, E>(value: T) {
-  return createResult<T, E>(unionOk(value));
-}
-export function Err<T, E>(value: E) {
-  return createResult<T, E>(unionErr(value));
-}
-
-/**
- * Wrapps `fn` into `tryCatch` returning result as `Ok<T>` and error as `Err<E>`
- * # Example
- * ```ts
- * tryFn(() => {
- *  throw new Error(`Oh no!`)
- * })
- * .map(data => console.log(data))
- * .or(err => console.log(err))
- * ```
- */
-export function tryFn<T, E>(fn: () => T): Result<T, E> {
-  try {
-    return Ok(fn());
-  } catch (err: unknown) {
-    return Err(err as E);
+  eq(other: ResultNew<T, E>) {
+    return this.do(eq(other));
+  }
+  isOk() {
+    return isOk(this.inner);
+  }
+  isErr() {
+    return isErr(this.inner);
+  }
+  unwrap() {
+    return this.do(unwrap());
+  }
+  unwrapOr(defaultValue: T) {
+    return this.do(unwrapOr(defaultValue));
+  }
+  unwrapErr() {
+    return this.do(unwrapErr());
+  }
+  unwrapErrOr(defaultErr: E) {
+    return this.do(unwrapErrOr(defaultErr));
+  }
+  match<U>(onOk: (v: T) => U, onErr: (e: E) => U) {
+    return this.do(match(onOk, onErr));
+  }
+  do<Out>(fn: ResultPipe<T, E, Out>) {
+    return fn(this, this.inner);
+  }
+  pipe<Args extends unknown[], Out>(
+    fn: (...args: Args) => ResultPipe<T, E, Out>
+  ) {
+    return (...args: Args) => fn(...args)(this, this.inner);
   }
 }
+
+export const Ok = ResultNew.Ok;
+export const Err = ResultNew.Err;

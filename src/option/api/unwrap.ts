@@ -1,10 +1,9 @@
-import { Option } from "../interfaces.js";
-import { format } from "./format.js";
+import { OptionUnion } from "../base.js";
+import { isNone } from "./is_none.js";
 
-export function unwrap<T>(option: Option<T>) {
-  const inner = option.inner();
-  if (inner.type === "None") {
-    throw new Error(`unwrap called on ${format(option)}`);
+export function unwrap<T>(inner: OptionUnion<T>) {
+  if (isNone(inner)) {
+    throw new Error(`unwrap called on None`);
   }
   return inner.value;
 }

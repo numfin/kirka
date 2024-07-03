@@ -1,5 +1,5 @@
 import test from "ava";
-import { None, Ok, Schema, Some } from "../../index.js";
+import { NewOption, Ok, Schema } from "../../index.js";
 
 test("Can check if value is string", (t) => {
   let s = Schema.str();
@@ -19,10 +19,10 @@ test("Can extract value", (t) => {
 });
 test("Can extract optional value", (t) => {
   let s = Schema.str().optional();
-  t.true(s.parse("").unwrap().eq(Some("")));
-  t.true(s.parse("asd").unwrap().eq(Some("asd")));
-  t.true(s.parse(null).unwrap().eq(None()));
-  t.true(s.parse(undefined).unwrap().eq(None()));
+  t.is(s.parse("").unwrap().unwrap(), "");
+  t.true(s.parse("asd").unwrap().eq(NewOption.Some("asd")));
+  t.true(s.parse(null).unwrap().eq(NewOption.None()));
+  t.true(s.parse(undefined).unwrap().eq(NewOption.None()));
 });
 test("Can validate value", (t) => {
   let s = Schema.str().is((v) => v.length > 1);
@@ -30,14 +30,14 @@ test("Can validate value", (t) => {
   t.true(s.parse("asd").eq(Ok("asd")));
   let so = s.optional();
   t.true(so.parse("").isErr());
-  t.true(so.parse("asd").unwrap().eq(Some("asd")));
+  t.true(so.parse("asd").unwrap().eq(NewOption.Some("asd")));
 });
 test("Can transform value", (t) => {
   let s = Schema.str();
   let s1 = s.transform((v) => Ok(v + "qwe"));
   t.is(s1.parse("asd").unwrap(), "asdqwe");
   let s2 = s.optional().transform((v) => Ok(v + "dsa"));
-  t.true(s2.parse("xyz").unwrap().eq(Some("xyzdsa")));
+  t.true(s2.parse("xyz").unwrap().eq(NewOption.Some("xyzdsa")));
 });
 test("Set min length", (t) => {
   let s = Schema.str().min(4);
@@ -45,17 +45,17 @@ test("Set min length", (t) => {
   t.is(s.parse("asdf").unwrap(), "asdf");
   let so = s.optional();
   t.true(so.parse("asd").isErr());
-  t.true(so.parse("asdf").unwrap().eq(Some("asdf")));
-  t.true(so.parse(null).unwrap().eq(None()));
+  t.true(so.parse("asdf").unwrap().eq(NewOption.Some("asdf")));
+  t.true(so.parse(null).unwrap().eq(NewOption.None()));
 });
 test("Set max length", (t) => {
   let s = Schema.str().max(3);
   t.is(s.parse("asd").unwrap(), "asd");
   t.true(s.parse("asdf").isErr());
   let so = s.optional();
-  t.true(so.parse("asd").unwrap().eq(Some("asd")));
+  t.true(so.parse("asd").unwrap().eq(NewOption.Some("asd")));
   t.true(so.parse("asdf").isErr());
-  t.true(so.parse(null).unwrap().eq(None()));
+  t.true(so.parse(null).unwrap().eq(NewOption.None()));
 });
 test("Is numeric", (t) => {
   let s = Schema.str().numeric();

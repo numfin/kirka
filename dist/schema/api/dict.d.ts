@@ -1,4 +1,4 @@
-import { Option } from "../../index.js";
+import { NewOption } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
 export interface SchemaDict<S extends Record<PropertyKey, unknown>, ParsedType = S> extends Schema<ParsedType> {
     /**
@@ -12,7 +12,7 @@ export interface SchemaDict<S extends Record<PropertyKey, unknown>, ParsedType =
      * const v: Option<{ a: string }> = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaDict<S, Option<S>>;
+    optional(): SchemaDict<S, NewOption<S>>;
     /**
      * # Description
      * Add validation rule to schema

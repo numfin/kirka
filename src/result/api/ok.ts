@@ -1,6 +1,9 @@
-import { None, Option, Some } from "../../option/index.js";
-import { Result } from "../interfaces.js";
+import { NewOption } from "../../option/index.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { isOk } from "./isOk.js";
 
-export function ok<T, E>(result: Result<T, E>): Option<T> {
-  return result.isOk() ? Some(result.inner().value as T) : None();
+export function ok<T>() {
+  return createAggregator<T, unknown, NewOption<T>>((_, inner) => {
+    return isOk(inner) ? NewOption.Some(inner.value) : NewOption.None();
+  });
 }

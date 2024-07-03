@@ -9,8 +9,8 @@
     "preserveConstEnums": true,
     "outDir": "./dist",
     "declarationMap": true,
-    "lib": ["ESNext"]
+    "lib": ["ESNext", "DOM"]
   },
-  "include": ["src/**/*.ts", "src/iter/api/isEmpty.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }

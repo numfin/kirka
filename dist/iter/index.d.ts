@@ -1,5 +1,16 @@
-export * from "./interfaces.js";
-export { IterFrom } from "./from/index.js";
-import type { ClonnableGenerator, Iter } from "./interfaces.js";
-export declare function createIter<T>(source: ClonnableGenerator<T>): Iter<T>;
+import { IterPipe } from "./middleware/middleware.js";
+import type { ClonnableGenerator } from "./interfaces.js";
+export declare class Iter<T> {
+    source: ClonnableGenerator<T>;
+    private inner;
+    [Symbol.iterator](): Generator<T, unknown, unknown>;
+    constructor(source: ClonnableGenerator<T>);
+    static infinite(): Iter<undefined>;
+    static from<T>(source: Iterable<T>): Iter<T>;
+    static fromRange(from: number, to: number, inclusive?: boolean): Iter<number>;
+    clone(): Iter<T>;
+    next(): import("../index.js").NewOption<T>;
+    do<Out>(fn: IterPipe<T, Out>): Out;
+    pipe<Args extends unknown[], Out>(fn: (...args: Args) => IterPipe<T, Out>): (...args: Args) => Out;
+}
 //# sourceMappingURL=index.d.ts.map

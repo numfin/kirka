@@ -1,5 +1,5 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { Ok, Option } from "../../index.js";
+import { NewOption, Ok } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
@@ -14,7 +14,7 @@ export interface SchemaNum<T extends number, ParsedType = T>
    * const v: Option<number> = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaNum<T, Option<T>>;
+  optional(): SchemaNum<T, NewOption<T>>;
   /**
    * # Description
    * Add validation rule to schema

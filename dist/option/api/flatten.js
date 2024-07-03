@@ -1,15 +1,7 @@
-export function flatten(source) {
-    if (source.isNone()) {
-        return source;
-    }
-    const v = source.unwrap();
-    try {
-        if (v.isSome()) {
-            return v;
-        }
-        return v;
-    }
-    catch (_) {
-        return source;
-    }
+import { createRemapper } from "../middleware/remap.js";
+import { andThen } from "./and_then.js";
+export function flatten() {
+    return createRemapper((option) => {
+        return option.do(andThen((v) => v));
+    });
 }

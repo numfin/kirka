@@ -1,4 +1,4 @@
-import { Option } from "../../index.js";
+import { NewOption } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
 export interface SchemaArr<T, ParsedType = T[]> extends Schema<ParsedType> {
     /**
@@ -10,7 +10,7 @@ export interface SchemaArr<T, ParsedType = T[]> extends Schema<ParsedType> {
      * const v: Option<string>[] = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaArr<T, Option<T[]>>;
+    optional(): SchemaArr<T, NewOption<T[]>>;
     /**
      * # Description
      * Add validation rule to schema

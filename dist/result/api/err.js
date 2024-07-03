@@ -1,4 +1,8 @@
-import { None, Some } from "../../option/index.js";
-export function err(result) {
-    return result.isErr() ? Some(result.unwrapErr()) : None();
+import { NewOption } from "../../option/index.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { isErr } from "./isErr.js";
+export function err() {
+    return createAggregator((_, inner) => {
+        return isErr(inner) ? NewOption.Some(inner.err) : NewOption.None();
+    });
 }

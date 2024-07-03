@@ -1,6 +1,7 @@
-export function format(option, fn) {
-    const inner = option.inner();
-    return inner.type === "Some"
-        ? `Some(${fn?.(option) ?? inner.value})`
-        : `None`;
+import { createAggregator } from "../middleware/aggregate.js";
+import { isSome } from "./is_some.js";
+export function format() {
+    return createAggregator((_, inner) => {
+        return isSome(inner) ? `Some(${inner.value})` : `None`;
+    });
 }

@@ -1,5 +1,5 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { None, Ok, Option, Some } from "../../index.js";
+import { NewOption, Ok } from "../../index.js";
 import { Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 import { RecordAsSchema } from "./dict.js";
@@ -66,7 +66,7 @@ export interface UnionInstance<T extends Record<PropertyKey, unknown>> {
    * }); // Some(2)
    * ```
    */
-  matchSome<U>(matcher: Partial<Matcher<T, U>>): Option<U>;
+  matchSome<U>(matcher: Partial<Matcher<T, U>>): NewOption<U>;
   /**
    * # Description
    * Check union tag
@@ -115,13 +115,13 @@ export function UnionInstance<T extends Record<PropertyKey, unknown>>(
       return tag === currentTag && condition(value);
     },
     matchSome(matcher) {
-      if (matcher.hasOwnProperty(currentTag)) {
+      if (Object.prototype.hasOwnProperty.call(matcher, currentTag)) {
         const fn = matcher[currentTag];
         if (typeof fn === "function") {
-          return Some(fn(value));
+          return NewOption.Some(fn(value));
         }
       }
-      return None();
+      return NewOption.None();
     },
     match(matcher) {
       return api.matchSome(matcher).unwrap();
@@ -134,7 +134,7 @@ export interface SchemaUnion<
   T extends Record<PropertyKey, unknown>,
   ParsedType = UnionInstance<T>
 > extends Schema<ParsedType> {
-  optional(): SchemaUnion<T, Option<UnionInstance<T>>>;
+  optional(): SchemaUnion<T, NewOption<UnionInstance<T>>>;
 }
 
 function defaultVahter<T extends Record<PropertyKey, unknown>>(
@@ -142,7 +142,7 @@ function defaultVahter<T extends Record<PropertyKey, unknown>>(
 ) {
   return SchemaCustom<UnionInstance<T>>((v) => {
     for (const [tag, tagSchema] of Object.entries(unionSchemas)) {
-      const result = (tagSchema as Schema<T[typeof tag]>).parse(v).inner();
+      const result = (tagSchema as Schema<T[typeof tag]>).parse(v).inner;
       if (result.type === "Ok") {
         return Ok(UnionInstance(tag, result.value));
       }
@@ -174,7 +174,7 @@ function SchemaUnionInternal<
     {},
     {
       get(_, tag) {
-        if (schema.hasOwnProperty(tag)) {
+        if (Object.prototype.hasOwnProperty.call(schema, tag)) {
           return (v: T[keyof T]) => UnionInstance(tag, v);
         }
         return api[tag as keyof typeof api];

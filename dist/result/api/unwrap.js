@@ -1,7 +1,11 @@
-export function unwrap(result) {
-    const inner = result.inner();
-    if (result.isErr()) {
-        throw new Error(`unwrap() on ${result.format()}`);
-    }
-    return inner.value;
+import { createAggregator } from "../middleware/aggregate.js";
+import { debug } from "./debug.js";
+import { isErr } from "./isErr.js";
+export function unwrap() {
+    return createAggregator((_, inner) => {
+        if (isErr(inner)) {
+            throw new Error(`unwrap() on ${debug(inner)}`);
+        }
+        return inner.value;
+    });
 }

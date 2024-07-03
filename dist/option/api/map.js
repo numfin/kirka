@@ -1,10 +1,10 @@
-import { unionNone } from "./unionNone.js";
-import { unionSome } from "./unionSome.js";
-import { unwrap } from "./unwrap.js";
-export function map(option, fn) {
-    const inner = option.inner();
-    if (inner.type === "Some") {
-        return unionSome(fn(unwrap(option)));
-    }
-    return unionNone();
+import { NewOption } from "../../index.js";
+import { createRemapper } from "../middleware/remap.js";
+export function map(fn) {
+    return createRemapper((_, inner) => {
+        if (inner.type === "Some") {
+            return NewOption.Some(fn(inner.value));
+        }
+        return NewOption.None();
+    });
 }

@@ -1,6 +1,6 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { Ok, Option } from "../../index.js";
-import { Checker, Transformer, Schema, SchemaError } from "../interface.js";
+import { NewOption, Ok } from "../../index.js";
+import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
 export interface SchemaBool<T extends boolean, ParsedType = T>
@@ -14,7 +14,7 @@ export interface SchemaBool<T extends boolean, ParsedType = T>
    * const v: Option<boolean> = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaBool<T, Option<T>>;
+  optional(): SchemaBool<T, NewOption<T>>;
   /**
    * # Description
    * Add validation rule to schema

@@ -1,3 +1,2 @@
-import { Option } from "../interfaces.js";
-export declare function match<T, U>(source: Option<T>, onSome: (v: T) => U, onNone: () => U): U;
+export declare function match<T, U>(onSome: (v: T) => U, onNone: () => U): import("../middleware/aggregate.js").MiddlewareAggregator<T, U>;
 //# sourceMappingURL=match.d.ts.map

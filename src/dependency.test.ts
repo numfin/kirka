@@ -1,17 +1,22 @@
 import test from "ava";
 import { Err, Ok } from "./result/index.js";
-import { None, OptionFrom, Some } from "./option/index.js";
-import { ResultFrom } from "./result/from/index.js";
+import { NewOption, None, Some } from "./option/index.js";
+import {
+  OptionFrom,
+  OptionTo,
+  ResultFrom,
+  ResultTo,
+} from "./convert/result-option.js";
 
 test(`Circular dependencies resolving`, (t) => {
   // Apis
   t.true(
-    Some(3)
-      .result(() => 4)
+    NewOption.Some(3)
+      .do(OptionTo.ok(() => 4))
       .eq(Ok(3))
   );
-  t.true(Err(3).ok().eq(None()));
+  t.true(Err(3).do(ResultTo.option()).eq(None()));
   // Froms
-  t.true(OptionFrom.ok(Err(3)).eq(None()));
-  t.true(ResultFrom.option(Some(3), () => 4).eq(Ok(3)));
+  t.true(OptionFrom.result(Err(3)).eq(None()));
+  t.true(ResultFrom.ok(Some(3), () => 4).eq(Ok(3)));
 });

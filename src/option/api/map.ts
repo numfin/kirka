@@ -1,12 +1,11 @@
-import { Option } from "../interfaces.js";
-import { unionNone } from "./unionNone.js";
-import { unionSome } from "./unionSome.js";
-import { unwrap } from "./unwrap.js";
+import { NewOption } from "../../index.js";
+import { createRemapper } from "../middleware/remap.js";
 
-export function map<T, U>(option: Option<T>, fn: (value: T) => U) {
-  const inner = option.inner();
-  if (inner.type === "Some") {
-    return unionSome(fn(unwrap(option)));
-  }
-  return unionNone<U>();
+export function map<T, U>(fn: (value: T) => U) {
+  return createRemapper<T, U>((_, inner) => {
+    if (inner.type === "Some") {
+      return NewOption.Some(fn(inner.value));
+    }
+    return NewOption.None<U>();
+  });
 }

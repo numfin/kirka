@@ -1,11 +1,14 @@
-import { unionNone } from "./unionNone.js";
-import { unionSome } from "./unionSome.js";
-export function take(option) {
-    if (option.type === "Some") {
-        option.type = "None";
-        const value = option.value;
-        option.value = undefined;
-        return unionSome(value);
-    }
-    return unionNone();
+import { NewOption } from "../../index.js";
+import { None } from "../base.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { isSome } from "./is_some.js";
+export function take() {
+    return createAggregator((option, inner) => {
+        if (isSome(inner)) {
+            const value = inner.value;
+            option.inner = None;
+            return NewOption.Some(value);
+        }
+        return NewOption.None();
+    });
 }

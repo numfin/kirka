@@ -1,864 +1,326 @@
 'use strict';
 
-function bool(v) {
-    return v ? Some(v) : None();
+const None$1 = { type: "None" };
+
+function isSome(inner) {
+    return inner !== None$1;
 }
 
-function ok$1(result) {
-    return result.ok();
+function isNone(inner) {
+    return inner === None$1;
 }
 
-function err$1(result) {
-    return result.err();
-}
-
-function nullable(v) {
-    if (v !== undefined && v !== null) {
-        return Some(v);
+function unwrap$1(inner) {
+    if (isNone(inner)) {
+        throw new Error(`unwrap called on None`);
     }
-    return None();
+    return inner.value;
 }
 
-const OptionFrom = {
-    bool,
-    nullable,
-    ok: ok$1,
-    err: err$1,
-};
+function createAggregator$2(fn) {
+    return (option, inner) => fn(option, inner);
+}
 
-function fallible(fn) {
-    try {
-        const result = fn();
-        return Ok(result);
+function match$1(onSome, onNone) {
+    return createAggregator$2((_, inner) => {
+        if (isSome(inner)) {
+            return onSome(inner.value);
+        }
+        return onNone();
+    });
+}
+
+function eq$1(other, by = (x) => x) {
+    return createAggregator$2((_, inner) => {
+        if (isSome(inner) && isSome(other.inner)) {
+            return by(inner.value) === by(other.inner.value);
+        }
+        return isNone(inner) && isNone(other.inner);
+    });
+}
+
+class NewOption {
+    inner;
+    *[Symbol.iterator]() {
+        if (isSome(this.inner)) {
+            yield this.inner.value;
+        }
     }
-    catch (err) {
-        return Err(err);
+    constructor(inner) {
+        this.inner = inner;
+    }
+    static None = () => new NewOption(None$1);
+    static Some(value) {
+        return new NewOption({ type: "Some", value });
+    }
+    static fromBool(predicate) {
+        return predicate ? NewOption.Some(predicate) : NewOption.None();
+    }
+    static fromNullable(v) {
+        if (v !== undefined && v !== null) {
+            return NewOption.Some(v);
+        }
+        return NewOption.None();
+    }
+    isSome() {
+        return isSome(this.inner);
+    }
+    isNone() {
+        return isNone(this.inner);
+    }
+    unwrap() {
+        return unwrap$1(this.inner);
+    }
+    clone() {
+        return isSome(this.inner)
+            ? NewOption.Some(this.inner.value)
+            : NewOption.None();
+    }
+    do(fn) {
+        return fn(this, this.inner);
+    }
+    pipe(fn) {
+        return (...args) => fn(...args)(this, this.inner);
+    }
+    eq(other, by = (x) => x) {
+        return this.do(eq$1(other, by));
+    }
+    match(onSome, onNone) {
+        return this.do(match$1(onSome, onNone));
     }
 }
-async function fallibleAsync(fn) {
-    try {
-        const result = await fn();
-        return Ok(result);
-    }
-    catch (err) {
-        return Err(err);
-    }
-}
+const Some = NewOption.Some;
+const None = NewOption.None;
 
-function option(option, err) {
-    return option.result(err);
-}
-
-const ResultFrom = {
-    option,
-    fallible,
-    fallibleAsync
-};
-
-function and$1(result, otherResult) {
-    return result.andThen(() => otherResult);
-}
-
-function or$1(result, otherResult) {
-    return result.orElse(() => otherResult);
-}
-
-function unionErr(value) {
-    return { value, type: "Err" };
-}
-
-function andThen$1(result, fn) {
-    if (result.isOk()) {
-        return fn(result.unwrap()).inner();
-    }
-    return unionErr(result.unwrapErr());
-}
-
-function unionOk(value) {
-    return { value, type: "Ok" };
-}
-
-function orElse$1(result, fn) {
-    if (result.isErr()) {
-        return fn(result.unwrapErr()).inner();
-    }
-    return unionOk(result.unwrap());
-}
-
-function eq$2(self, other) {
-    const a = self.inner();
-    const b = other.inner();
-    return a.type === b.type && a.value === b.value;
-}
-
-function format$1(result, formatter) {
-    const inner = result.inner();
-    return `Result.${inner.type}(${formatter?.(result) ?? inner.value})`;
-}
-
-function inspect(result, fn) {
-    result.map(fn);
-    return result;
-}
-
-function inspectErr(result, fn) {
-    result.mapErr(fn);
-    return result;
-}
+const tagOK = "Ok";
+const tagErr = "Err";
 
 function isOk(result) {
-    return result.type === "Ok";
-}
-
-function isOkAnd(result, fn) {
-    return result.isOk() && fn(result.unwrap());
+    return result.type === tagOK;
 }
 
 function isErr(result) {
-    return result.type === "Err";
+    return result.type === tagErr;
 }
 
-function isErrAnd(result, fn) {
-    return result.isErr() && fn(result.unwrapErr());
+function createAggregator$1(fn) {
+    return (option, inner) => fn(option, inner);
 }
 
-function map$2(result, fn) {
-    if (result.type === "Ok") {
-        return unionOk(fn(result.value));
-    }
-    else {
-        return unionErr(result.value);
-    }
+function debug(inner, { ok = (v) => v, err = (e) => e } = {}) {
+    return `Result.${inner.type}(${isOk(inner) ? ok(inner.value) : err(inner.err)})`;
 }
 
-function mapErr(result, fn) {
-    if (result.type === "Err") {
-        return unionErr(fn(result.value));
-    }
-    else {
-        return unionOk(result.value);
-    }
-}
-
-function ok(result) {
-    return result.isOk() ? Some(result.inner().value) : None();
-}
-
-function err(result) {
-    return result.isErr() ? Some(result.unwrapErr()) : None();
-}
-
-function unwrap$1(result) {
-    const inner = result.inner();
-    if (result.isErr()) {
-        throw new Error(`unwrap() on ${result.format()}`);
-    }
-    return inner.value;
-}
-
-function uwnrapOr(result, default_value) {
-    return result.isOk() ? result.unwrap() : default_value;
-}
-
-function unwrapErr(result) {
-    if (result.isOk()) {
-        throw new Error(`unwrapErr called on ${result.format()}`);
-    }
-    return result.inner().value;
-}
-
-function unwrapErrOr(result, default_value) {
-    return result.isErr() ? result.unwrapErr() : default_value;
-}
-
-function match$1(source, onOk, onErr) {
-    if (source.type === "Ok") {
-        return onOk(source.value);
-    }
-    else {
-        return onErr(source.value);
-    }
-}
-
-function intoIter$1(result) {
-    if (isOk(result)) {
-        return IterFrom.array([result.value]);
-    }
-    return IterFrom.array([]);
-}
-
-function createResult(result) {
-    const api = {
-        *[Symbol.iterator]() {
-            if (isOk(result)) {
-                yield result.value;
-            }
-        },
-        intoIter: () => intoIter$1(result),
-        inner: () => result,
-        eq: (other) => eq$2(api, other),
-        format: (formatter) => format$1(api, formatter),
-        isOk: () => isOk(result),
-        isErr: () => isErr(result),
-        unwrap: () => unwrap$1(api),
-        unwrapErr: () => unwrapErr(api),
-        unwrapOr: (default_value) => uwnrapOr(api, default_value),
-        unwrapErrOr: (default_value) => unwrapErrOr(api, default_value),
-        isOkAnd: (fn) => isOkAnd(api, fn),
-        isErrAnd: (fn) => isErrAnd(api, fn),
-        map: (fn) => createResult(map$2(result, fn)),
-        mapErr: (fn) => createResult(mapErr(result, fn)),
-        inspect: (fn) => inspect(api, fn),
-        inspectErr: (fn) => inspectErr(api, fn),
-        andThen: (fn) => createResult(andThen$1(api, fn)),
-        orElse: (fn) => createResult(orElse$1(api, fn)),
-        and: (new_value) => and$1(api, new_value),
-        or: (new_value) => or$1(api, new_value),
-        ok: () => ok(api),
-        err: () => err(api),
-        match: (onOk, onErr) => match$1(result, onOk, onErr),
-    };
-    return api;
-}
-function Ok(value) {
-    return createResult(unionOk(value));
-}
-function Err(value) {
-    return createResult(unionErr(value));
-}
-/**
- * Wrapps `fn` into `tryCatch` returning result as `Ok<T>` and error as `Err<E>`
- * # Example
- * ```ts
- * tryFn(() => {
- *  throw new Error(`Oh no!`)
- * })
- * .map(data => console.log(data))
- * .or(err => console.log(err))
- * ```
- */
-function tryFn(fn) {
-    try {
-        return Ok(fn());
-    }
-    catch (err) {
-        return Err(err);
-    }
-}
-
-function result(option, noneErr) {
-    return option.isSome() ? Ok(option.unwrap()) : Err(noneErr());
-}
-
-function unionNone() {
-    return { type: "None" };
-}
-
-function andThen(option, fn) {
-    return option.isSome() ? fn(option.unwrap()).inner() : unionNone();
-}
-
-function and(current_value, new_value) {
-    return current_value.isSome() ? new_value.inner() : unionNone();
-}
-
-function orElse(option, fn) {
-    return option.isSome() ? option.inner() : fn().inner();
-}
-
-function or(current_value, new_value) {
-    return current_value.isSome() ? current_value.inner() : new_value.inner();
-}
-
-function unionSome(value) {
-    return { type: "Some", value };
-}
-
-function format(option, fn) {
-    const inner = option.inner();
-    return inner.type === "Some"
-        ? `Some(${fn?.(option) ?? inner.value})`
-        : `None`;
-}
-
-function unwrap(option) {
-    const inner = option.inner();
-    if (inner.type === "None") {
-        throw new Error(`unwrap called on ${format(option)}`);
-    }
-    return inner.value;
-}
-
-function map$1(option, fn) {
-    const inner = option.inner();
-    if (inner.type === "Some") {
-        return unionSome(fn(unwrap(option)));
-    }
-    return unionNone();
-}
-
-function unwrapOr(option, default_value) {
-    return option.type === "None" ? default_value : option.value;
-}
-
-function isSomeAnd(option, fn) {
-    return option.isSome() && fn(option.unwrap());
-}
-
-function take$1(option) {
-    if (option.type === "Some") {
-        option.type = "None";
-        const value = option.value;
-        option.value = undefined;
-        return unionSome(value);
-    }
-    return unionNone();
-}
-
-function isSome(option) {
-    return option.type === "Some";
-}
-
-function isNone(option) {
-    return option.type === "None";
-}
-
-function clone(option) {
-    return option.type === "Some" ? unionSome(option.value) : unionNone();
-}
-
-function eq$1(option, value, by = (x) => x) {
-    if (value.isNone() || option.isNone()) {
-        return value.isNone() && option.isNone();
-    }
-    return by(value.unwrap()) === by(option.unwrap());
-}
-
-function filter$1(source, fn) {
-    if (source.isSomeAnd(fn)) {
-        return source;
-    }
-    return None();
-}
-
-function isNoneAnd(option, fn) {
-    return option.isNone() && fn();
-}
-
-function match(source, onSome, onNone) {
-    return source.map(onSome).unwrapOrElse(onNone);
-}
-
-function unwrapOrElse(option, default_fn) {
-    return option.type === "None" ? default_fn() : option.value;
-}
-
-function intoIter(option) {
-    if (isSome(option)) {
-        return IterFrom.array([option.value]);
-    }
-    return IterFrom.array([]);
-}
-
-function flatten$1(source) {
-    if (source.isNone()) {
-        return source;
-    }
-    const v = source.unwrap();
-    try {
-        if (v.isSome()) {
-            return v;
+function unwrap() {
+    return createAggregator$1((_, inner) => {
+        if (isErr(inner)) {
+            throw new Error(`unwrap() on ${debug(inner)}`);
         }
-        return v;
-    }
-    catch (_) {
-        return source;
-    }
+        return inner.value;
+    });
 }
 
-function createOption(v) {
-    let inner = v;
-    const api = {
-        *[Symbol.iterator]() {
-            if (isSome(inner)) {
-                yield inner.value;
-            }
-        },
-        intoIter: () => intoIter(inner),
-        inner: () => inner,
-        eq: (value, by) => eq$1(api, value, by),
-        format: (formatter) => format(api, formatter),
-        clone: () => createOption(clone(inner)),
-        unwrap: () => unwrap(api),
-        unwrapOr: (default_value) => unwrapOr(inner, default_value),
-        unwrapOrElse: (fn) => unwrapOrElse(inner, fn),
-        isNone: () => isNone(inner),
-        isSome: () => isSome(inner),
-        take: () => createOption(take$1(inner)),
-        isSomeAnd: (fn) => isSomeAnd(api, fn),
-        isNoneAnd: (fn) => isNoneAnd(api, fn),
-        map: (fn) => createOption(map$1(api, fn)),
-        or: (new_value) => createOption(or(api, new_value)),
-        orElse: (fn) => createOption(orElse(api, fn)),
-        and: (new_value) => createOption(and(api, new_value)),
-        andThen: (fn) => createOption(andThen(api, fn)),
-        result: (fn) => result(api, fn),
-        filter: (fn) => filter$1(api, fn),
-        match: (onSome, onNone) => match(api, onSome, onNone),
-        flatten: () => flatten$1(api),
-    };
-    return api;
-}
-function Some(v) {
-    return createOption(unionSome(v));
-}
-function None() {
-    return createOption(unionNone());
-}
-
-exports.Order = void 0;
-(function (Order) {
-    Order[Order["Greater"] = 1] = "Greater";
-    Order[Order["Equal"] = 0] = "Equal";
-    Order[Order["Less"] = -1] = "Less";
-})(exports.Order || (exports.Order = {}));
-
-function defaultMap(item) {
-    return item;
-}
-
-function defaultFilter(_item) {
-    return true;
-}
-
-function* iterFactory(source, map = (defaultMap), filter = (defaultFilter)) {
-    const check = (item) => filter(item);
-    for (const item of source) {
-        const mappedItem = map(item);
-        if (check(mappedItem)) {
-            yield mappedItem;
+function unwrapErr() {
+    return createAggregator$1((_, inner) => {
+        if (isOk(inner)) {
+            throw new Error(`unwrapErr called on ${debug(inner)}`);
         }
-    }
+        return inner.err;
+    });
 }
 
-function iterable(source) {
-    return createIter(() => iterFactory(source));
-}
-
-function array(source) {
-    return iterable(source);
-}
-
-function* iterInfinite() {
-    while (true) {
-        yield;
-    }
-}
-
-function range(from, to, inclusive = false) {
-    if (from > to) {
-        throw new Error(`Invalid range: From(${from}) > To(${to})`);
-    }
-    const extra = inclusive ? 1 : 0;
-    return createIter(() => iterInfinite())
-        .take(to - from + extra)
-        .enumerate()
-        .map(({ index }) => index + from);
-}
-
-const IterFrom = {
-    array,
-    iterable,
-    range,
-};
-
-function all(source, fn) {
-    for (let item of source) {
-        if (!fn(item)) {
-            return false;
+function eq(other) {
+    return createAggregator$1((_, inner) => {
+        if (isOk(inner) && inner.type === other.inner.type) {
+            return inner.value === other.inner.value;
         }
-    }
-    return true;
-}
-
-function any(source, fn) {
-    for (let item of source) {
-        if (fn(item)) {
-            return true;
+        if (isErr(inner) && inner.type === other.inner.type) {
+            return inner.err === other.inner.err;
         }
-    }
-    return false;
-}
-
-function* iterChain(source, chainedItems) {
-    for (const item of source) {
-        yield item;
-    }
-    for (const item of chainedItems) {
-        yield item;
-    }
-}
-
-function chain(source, target) {
-    return iterChain(source, target);
-}
-
-function collect(source) {
-    return Array.from(source);
-}
-
-function collectSet(source) {
-    return new Set(source);
-}
-
-function* iterCycle(source) {
-    let iter = source();
-    let firstValue = iter.next();
-    if (firstValue.done)
-        return;
-    yield firstValue.value;
-    while (true) {
-        let nextValue = iter.next();
-        if (nextValue.done) {
-            iter = source();
-        }
-        else {
-            yield nextValue.value;
-        }
-    }
-}
-
-function cycle(source) {
-    return iterCycle(source);
-}
-
-function* iterEnumerate(source) {
-    let index = 0;
-    for (const item of source) {
-        yield { item, index };
-        index += 1;
-    }
-}
-
-function enumerate(source) {
-    return iterEnumerate(source);
-}
-
-function eq(source, another, by) {
-    const sourceIter = source.recreate();
-    const anotherIter = IterFrom.iterable(another);
-    while (true) {
-        const sourceNext = sourceIter.next();
-        const anotherNext = anotherIter.next();
-        if (sourceNext.isSome() || anotherNext.isSome()) {
-            if (!sourceNext.eq(anotherNext, by)) {
-                return false;
-            }
-        }
-        else {
-            return true;
-        }
-    }
-}
-
-function filter(source, fn) {
-    return iterFactory(source, (x) => x, fn);
-}
-
-function filterMap(source, fn) {
-    return source
-        .map(fn)
-        .filter((v) => v.isSome())
-        .map((v) => v.unwrap());
-}
-
-function find(source, fn) {
-    const result = source
-        .skipWhile((item) => !fn(item))
-        .take(1)
-        .collect();
-    return result.length > 0 ? Some(result[0]) : None();
-}
-
-function findMap(source, fn) {
-    const result = source
-        .map(fn)
-        .skipWhile((v) => v.isNone())
-        .take(1)
-        .collect();
-    return result.length > 0 ? result[0] : None();
-}
-
-function first(source) {
-    for (const item of source) {
-        return Some(item);
-    }
-    return None();
-}
-
-function* iterFlat(source) {
-    for (const item of source) {
-        for (const subItem of item) {
-            yield subItem;
-        }
-    }
-}
-
-function flatMap(source, fn) {
-    return iterFlat(source.map(fn));
-}
-
-function toIterable(source) {
-    if (source && typeof source === "object" && Symbol.iterator in source) {
-        return source;
-    }
-    return [source];
-}
-
-function flatten(source) {
-    return source.map(toIterable).flatMap((v) => v);
-}
-
-function fold(source, startFrom, fn) {
-    let lastAcc = startFrom;
-    for (const item of source) {
-        lastAcc = fn(lastAcc, item);
-    }
-    return lastAcc;
-}
-
-function forEach(source, fn) {
-    for (const item of source) {
-        fn(item);
-    }
-}
-
-function get(source, index) {
-    if (index < 0) {
-        return None();
-    }
-    return source.skip(index).first();
-}
-
-function groupBy(source, fn) {
-    const groups = new Map();
-    for (const item of source) {
-        const key = fn(item);
-        const group = groups.get(key);
-        if (Array.isArray(group)) {
-            group.push(item);
-        }
-        else {
-            groups.set(key, [item]);
-        }
-    }
-    return groups;
-}
-
-function* iterIntersperse(source, fn) {
-    let alreadyRan = false;
-    for (const item of source) {
-        if (alreadyRan) {
-            yield fn();
-        }
-        yield item;
-        alreadyRan = true;
-    }
-}
-
-function intersperse(source, value) {
-    return iterIntersperse(source, () => value);
-}
-
-function isEmpty(source) {
-    for (const _ of source) {
         return false;
+    });
+}
+
+function unwrapOr(default_value) {
+    return createAggregator$1((_, inner) => {
+        return isOk(inner) ? inner.value : default_value;
+    });
+}
+
+function unwrapErrOr(defaultErr) {
+    return createAggregator$1((_, inner) => {
+        return isErr(inner) ? inner.err : defaultErr;
+    });
+}
+
+function match(onOk, onErr) {
+    return createAggregator$1((_, inner) => {
+        if (isOk(inner)) {
+            return onOk(inner.value);
+        }
+        return onErr(inner.err);
+    });
+}
+
+class ResultNew {
+    inner;
+    *[Symbol.iterator]() {
+        if (isOk(this.inner)) {
+            yield this.inner.value;
+        }
     }
-    return true;
-}
-
-function last(source) {
-    return source.fold(None(), (_, item) => Some(item));
-}
-
-function len(source) {
-    return Array.from(source).length;
-}
-
-function map(source, fn) {
-    return iterFactory(source, fn);
-}
-
-function maxBy(source, fn) {
-    let max = source.first();
-    for (const item of source.skip(1)) {
-        max = max
-            .filter((minItem) => fn(item) > fn(minItem))
-            .map(() => item)
-            .or(max);
+    constructor(inner) {
+        this.inner = inner;
     }
-    return max;
+    static Ok(value) {
+        return new ResultNew({ type: "Ok", value });
+    }
+    static Err(err) {
+        return new ResultNew({ type: "Err", err });
+    }
+    static tryFn(fn) {
+        try {
+            const result = fn();
+            return Ok(result);
+        }
+        catch (err) {
+            return Err(err);
+        }
+    }
+    static async tryAsync(fn) {
+        try {
+            const result = await fn();
+            return Ok(result);
+        }
+        catch (err) {
+            return Err(err);
+        }
+    }
+    eq(other) {
+        return this.do(eq(other));
+    }
+    isOk() {
+        return isOk(this.inner);
+    }
+    isErr() {
+        return isErr(this.inner);
+    }
+    unwrap() {
+        return this.do(unwrap());
+    }
+    unwrapOr(defaultValue) {
+        return this.do(unwrapOr(defaultValue));
+    }
+    unwrapErr() {
+        return this.do(unwrapErr());
+    }
+    unwrapErrOr(defaultErr) {
+        return this.do(unwrapErrOr(defaultErr));
+    }
+    match(onOk, onErr) {
+        return this.do(match(onOk, onErr));
+    }
+    do(fn) {
+        return fn(this, this.inner);
+    }
+    pipe(fn) {
+        return (...args) => fn(...args)(this, this.inner);
+    }
+}
+const Ok = ResultNew.Ok;
+const Err = ResultNew.Err;
+
+function createRemapper$1(fn) {
+    return (iter, source, inner) => new Iter(() => fn(iter, source, inner));
 }
 
-function minBy(source, fn) {
-    let min = source.first();
-    for (const item of source.skip(1)) {
-        min = min
-            .filter((minItem) => fn(item) < fn(minItem))
-            .map(() => item)
-            .or(min);
-    }
-    return min;
+function enumerate() {
+    return createRemapper$1(function* (_, source) {
+        let index = 0;
+        for (const item of source()) {
+            yield { item, index };
+            index += 1;
+        }
+    });
+}
+
+function map$1(fn) {
+    return createRemapper$1(function* (_, source) {
+        for (const item of source()) {
+            yield fn(item);
+        }
+    });
 }
 
 function next(source) {
     const nextValue = source.next();
     if (nextValue.done) {
-        return None();
+        return NewOption.None();
     }
     else {
-        return Some(nextValue.value);
+        return NewOption.Some(nextValue.value);
     }
 }
 
-function nth(source, amount) {
-    if (amount <= 0) {
-        throw new Error(`Cannot iterate ${amount} - 1 times`);
-    }
-    for (let i = 0; i < amount - 1; i++) {
-        source.next();
-    }
-    return source.next();
-}
-
-function partition(source, fn) {
-    const iterA = [];
-    const iterB = [];
-    for (const item of source) {
-        if (fn(item)) {
-            iterA.push(item);
-        }
-        else {
-            iterB.push(item);
-        }
-    }
-    return [IterFrom.array(iterA), IterFrom.array(iterB)];
-}
-
-function position(source, fn) {
-    return source
-        .enumerate()
-        .find(({ item }) => fn(item))
-        .map(({ index }) => index);
-}
-
-function reverse(source) {
-    return IterFrom.array(Array.from(source).reverse());
-}
-
-function skip(source, skipAmount) {
-    return source
-        .enumerate()
-        .skipWhile(({ index }) => index < skipAmount)
-        .map(({ item }) => item);
-}
-
-function* iterSkipWhile(source, filter) {
-    let flag = false;
-    for (let item of source) {
-        if (flag || !filter(item)) {
-            flag = true;
-            yield item;
-        }
-    }
-}
-
-function skipWhile(source, fn) {
-    return iterSkipWhile(source, fn);
-}
-
-function stepBy(source, amount) {
-    if (amount <= 0) {
-        throw new Error(`.stepBy() amount should be > 0`);
-    }
-    return source
-        .enumerate()
-        .filter(({ index }) => index === 0 || index % amount === 0)
-        .map(({ item }) => item);
-}
-
-function take(source, takeAmount) {
-    return source
-        .enumerate()
-        .takeWhile(({ index }) => index < takeAmount)
-        .map(({ item }) => item);
-}
-
-function* iterTakeWhile(source, filter) {
-    for (let item of source) {
-        if (filter(item)) {
-            yield item;
-        }
-        else {
-            return;
-        }
-    }
-}
-
-function takeWhile(source, fn) {
-    return iterTakeWhile(source, fn);
-}
-
-function createIter(source) {
-    /** `Generator<T>` with local state, used for `.next()` iteration */
-    const inner = source();
-    const api = {
-        *[Symbol.iterator]() {
-            for (const item of source()) {
+function take(takeAmount) {
+    return createRemapper$1(function* (_, source) {
+        let i = 0;
+        for (const item of source()) {
+            if (i++ < takeAmount) {
                 yield item;
             }
-        },
-        intoIter: () => api.recreate(),
-        next: () => next(inner),
-        recreate: () => createIter(source),
-        collect: () => collect(api),
-        collectSet: () => collectSet(api),
-        map: (fn) => createIter(() => map(api, fn)),
-        filter: (fn) => createIter(() => filter(api, fn)),
-        filterMap: (fn) => filterMap(api, fn),
-        enumerate: () => createIter(() => enumerate(api)),
-        skipWhile: (fn) => createIter(() => skipWhile(api, fn)),
-        skip: (i) => skip(api, i),
-        takeWhile: (fn) => createIter(() => takeWhile(api, fn)),
-        take: (i) => take(api, i),
-        nth: (amount) => nth(api, amount),
-        all: (fn) => all(api, fn),
-        any: (fn) => any(api, fn),
-        cycle: () => createIter(() => cycle(source)),
-        eq: (another, by) => eq(api, another, by),
-        find: (fn) => find(api, fn),
-        findMap: (fn) => findMap(api, fn),
-        position: (fn) => position(api, fn),
-        flatMap: (fn) => createIter(() => flatMap(api, fn)),
-        flatten: () => flatten(api),
-        fold: (startFrom, fn) => fold(api, startFrom, fn),
-        stepBy: (amount) => stepBy(api, amount),
-        forEach: (fn) => forEach(api, fn),
-        intersperse: (value) => createIter(() => intersperse(api, value)),
-        isEmpty: () => isEmpty(api),
-        len: () => len(api),
-        first: () => first(api),
-        last: () => last(api),
-        minBy: (fn) => minBy(api, fn),
-        maxBy: (fn) => maxBy(api, fn),
-        partition: (fn) => partition(api, fn),
-        reverse: () => reverse(api),
-        get: (pos) => get(api, pos),
-        chain: (values) => createIter(() => chain(api, values)),
-        groupBy: (fn) => groupBy(source(), fn),
-        sumBy: (fn) => fold(api, 0, (acc, item) => fn(item) + acc),
-    };
-    return api;
+            else {
+                return;
+            }
+        }
+    });
+}
+
+class Iter {
+    source;
+    inner;
+    [Symbol.iterator]() {
+        return this.inner;
+    }
+    constructor(source) {
+        this.source = source;
+        this.inner = source();
+    }
+    static infinite() {
+        return new Iter(function* () {
+            while (true)
+                yield;
+        });
+    }
+    static from(source) {
+        return new Iter(function* () {
+            for (const item of source) {
+                yield item;
+            }
+        });
+    }
+    static fromRange(from, to, inclusive = false) {
+        if (from > to) {
+            throw new Error(`Invalid range: From(${from}) > To(${to})`);
+        }
+        const extra = inclusive ? 1 : 0;
+        return Iter.infinite()
+            .do(take(to - from + extra))
+            .do(enumerate())
+            .do(map$1(({ index }) => index + from));
+    }
+    clone() {
+        return new Iter(this.source);
+    }
+    next() {
+        return next(this.inner);
+    }
+    do(fn) {
+        return fn(this, this.source, this.inner);
+    }
+    pipe(fn) {
+        return (...args) => fn(...args)(this, this.source, this.inner);
+    }
 }
 
 class AnyHow {
@@ -886,7 +348,30 @@ class AnyHow {
     }
 }
 
-function Pipe(identity, members = []) {
+function createAggregator(fn) {
+    return (iter, source, inner) => fn(iter, source, inner);
+}
+
+function filterMap(fn) {
+    return createRemapper$1(function* (_, source) {
+        for (const item of source()) {
+            const data = fn(item).inner;
+            if (isSome(data)) {
+                yield data.value;
+            }
+        }
+    });
+}
+
+function findMap(fn) {
+    return createAggregator((iter) => {
+        return iter.do(filterMap(fn)).next();
+    });
+}
+
+function Pipe(identity, 
+// eslint-disable-next-line @typescript-eslint/ban-types
+members = []) {
     const pipe = {
         call(...v) {
             return members.reduce((lastV, member) => member(lastV), identity(...v));
@@ -902,14 +387,38 @@ function Pipe(identity, members = []) {
     return pipe;
 }
 
+function createRemapper(fn) {
+    return (option, inner) => fn(option, inner);
+}
+
+function andThen(otherResult) {
+    return createRemapper((_, inner) => {
+        if (isOk(inner)) {
+            return otherResult(inner.value);
+        }
+        return ResultNew.Err(inner.err);
+    });
+}
+
+function map(fn) {
+    return createRemapper((_, inner) => {
+        if (isOk(inner)) {
+            return ResultNew.Ok(fn(inner.value));
+        }
+        else {
+            return ResultNew.Err(inner.err);
+        }
+    });
+}
+
 function SchemaCustom(createFn, flags = { isOptional: false }, rules = [], transforms = Pipe((v) => v)) {
-    const validate = (v) => IterFrom.array(rules)
-        .enumerate()
-        .findMap(({ index, item }) => (item(v) ? None() : Some(index)))
+    const validate = (v) => Iter.from(rules)
+        .do(enumerate())
+        .do(findMap(({ index, item }) => item(v) ? NewOption.None() : NewOption.Some(index)))
         .match((index) => AnyHow.msg(`Rule ${index} failed`).toErr(), () => Ok(v));
     const api = {
         transform(checkFn) {
-            return SchemaCustom(createFn, flags, rules, transforms.clone().chain((v) => v.andThen(checkFn)));
+            return SchemaCustom(createFn, flags, rules, transforms.clone().chain((v) => v.do(andThen(checkFn))));
         },
         is(checkFn) {
             return SchemaCustom(createFn, flags, rules.concat(checkFn), transforms);
@@ -919,10 +428,10 @@ function SchemaCustom(createFn, flags = { isOptional: false }, rules = [], trans
         },
         parse(v) {
             const validateAndTransform = Pipe(createFn)
-                .chain((v) => v.andThen(validate))
+                .chain((v) => v.do(andThen(validate)))
                 .chain(transforms.call);
             if (flags.isOptional) {
-                return OptionFrom.nullable(v).match((v) => validateAndTransform.call(v).map(Some), () => Ok(None()));
+                return NewOption.fromNullable(v).match((v) => validateAndTransform.call(v).do(map(NewOption.Some)), () => Ok(NewOption.None()));
             }
             return validateAndTransform.call(v);
         },
@@ -980,7 +489,7 @@ function defaultVahter$4(schema) {
             return AnyHow.expect("array", String(items)).toErr();
         }
         const parsedArr = [];
-        for (const { index, item } of IterFrom.array(items).enumerate()) {
+        for (const { index, item } of Iter.from(items).do(enumerate())) {
             const result = schema.parse(item);
             if (result.isOk()) {
                 parsedArr.push(result.unwrap());
@@ -1157,10 +666,12 @@ function SchemaStrInternal(vahter) {
     };
     return api;
 }
-const regexp = (re, kind, value) => OptionFrom.bool(re.test(value))
-    .result(() => AnyHow.expect(kind, value))
-    .map(() => value)
-    .orElse((err) => err.toErr());
+function regexp(re, kind, value) {
+    if (re.test(value)) {
+        return Ok(value);
+    }
+    return AnyHow.expect(kind, value).toErr();
+}
 const SchemaStr = (equalTo) => SchemaStrInternal(defaultVahter$1(equalTo));
 
 function UnionInstance(currentTag, value) {
@@ -1172,13 +683,13 @@ function UnionInstance(currentTag, value) {
             return tag === currentTag && condition(value);
         },
         matchSome(matcher) {
-            if (matcher.hasOwnProperty(currentTag)) {
+            if (Object.prototype.hasOwnProperty.call(matcher, currentTag)) {
                 const fn = matcher[currentTag];
                 if (typeof fn === "function") {
-                    return Some(fn(value));
+                    return NewOption.Some(fn(value));
                 }
             }
-            return None();
+            return NewOption.None();
         },
         match(matcher) {
             return api.matchSome(matcher).unwrap();
@@ -1189,7 +700,7 @@ function UnionInstance(currentTag, value) {
 function defaultVahter(unionSchemas) {
     return SchemaCustom((v) => {
         for (const [tag, tagSchema] of Object.entries(unionSchemas)) {
-            const result = tagSchema.parse(v).inner();
+            const result = tagSchema.parse(v).inner;
             if (result.type === "Ok") {
                 return Ok(UnionInstance(tag, result.value));
             }
@@ -1212,7 +723,7 @@ function SchemaUnionInternal(schema, vahter) {
     };
     return new Proxy({}, {
         get(_, tag) {
-            if (schema.hasOwnProperty(tag)) {
+            if (Object.prototype.hasOwnProperty.call(schema, tag)) {
                 return (v) => UnionInstance(tag, v);
             }
             return api[tag];
@@ -1226,13 +737,13 @@ const SchemaRecord = (keySchema, valueSchema) => SchemaDict({}, {
 }).transform((v) => {
     const result = {};
     for (const [key, value] of Object.entries(v)) {
-        const parsedKey = keySchema.parse(key).inner();
-        if (parsedKey.type === "Err") {
-            return parsedKey.value.toErr();
+        const parsedKey = keySchema.parse(key).inner;
+        if (isErr(parsedKey)) {
+            return parsedKey.err.toErr();
         }
-        const parsedValue = valueSchema.parse(value).inner();
+        const parsedValue = valueSchema.parse(value).inner;
         if (parsedValue.type === "Err") {
-            return parsedValue.value
+            return parsedValue.err
                 .wrapWith(() => `Invalid value for key: ${key}`)
                 .toErr();
         }
@@ -1394,15 +905,11 @@ const Schema = {
 
 exports.AnyHow = AnyHow;
 exports.Err = Err;
-exports.IterFrom = IterFrom;
+exports.Iter = Iter;
+exports.NewOption = NewOption;
 exports.None = None;
 exports.Ok = Ok;
-exports.OptionFrom = OptionFrom;
 exports.Pipe = Pipe;
-exports.ResultFrom = ResultFrom;
+exports.ResultNew = ResultNew;
 exports.Schema = Schema;
 exports.Some = Some;
-exports.createIter = createIter;
-exports.createOption = createOption;
-exports.createResult = createResult;
-exports.tryFn = tryFn;

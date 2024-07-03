@@ -1,4 +1,3 @@
-import { Iter } from "../interfaces.js";
-import { Option } from "../../option/index.js";
-export declare function find<T>(source: Iter<T>, fn: (item: T) => boolean): Option<T>;
+import { NewOption } from "../../option/index.js";
+export declare function find<T>(fn: (item: T) => boolean): import("../middleware/aggregate.js").MiddlewareAggregator<T, NewOption<T>>;
 //# sourceMappingURL=find.d.ts.map

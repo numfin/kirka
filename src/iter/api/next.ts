@@ -1,10 +1,10 @@
-import { None, Option, Some } from "../../option/index.js";
+import { NewOption } from "../../option/index.js";
 
-export function next<T>(source: Generator<T>): Option<T> {
+export function next<T>(source: Generator<T>): NewOption<T> {
   const nextValue = source.next();
   if (nextValue.done) {
-    return None();
+    return NewOption.None();
   } else {
-    return Some(nextValue.value);
+    return NewOption.Some(nextValue.value);
   }
 }

@@ -1,18 +1,9 @@
-import { Option } from "../index.js";
+import { NewOption } from "../../index.js";
+import { createRemapper } from "../middleware/remap.js";
+import { andThen } from "./and_then.js";
 
-export type FlattenedOption<T> = T extends Option<unknown> ? T : Option<T>;
-
-export function flatten<T>(source: Option<T>): FlattenedOption<T> {
-  if (source.isNone()) {
-    return source as FlattenedOption<T>;
-  }
-  const v = source.unwrap();
-  try {
-    if ((v as FlattenedOption<T>).isSome()) {
-      return v as FlattenedOption<T>;
-    }
-    return v as FlattenedOption<T>;
-  } catch (_) {
-    return source as FlattenedOption<T>;
-  }
+export function flatten<T>() {
+  return createRemapper<NewOption<T>, T>((option) => {
+    return option.do(andThen((v) => v));
+  });
 }

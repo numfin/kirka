@@ -1,1 +1,1 @@
-{"version":3,"file":"record.d.ts","sourceRoot":"","sources":["../../../src/schema/api/record.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,MAAM,EAAE,MAAM,iBAAiB,CAAC;AACzC,OAAO,EAAE,UAAU,EAAE,MAAM,WAAW,CAAC;AAEvC,eAAO,MAAM,YAAY,4IAsBrB,CAAC"}
+{"version":3,"file":"record.d.ts","sourceRoot":"","sources":["../../../src/schema/api/record.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,MAAM,EAAE,MAAM,iBAAiB,CAAC;AACzC,OAAO,EAAE,UAAU,EAAE,MAAM,WAAW,CAAC;AAEvC,eAAO,MAAM,YAAY,8CACZ,OAAO,GAAG,CAAC,eACT,OAAO,KAAK,CAAC,uDAoBxB,CAAC"}

@@ -1,6 +1,6 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { Ok, Option, OptionFrom, Result } from "../../index.js";
-import { Checker, Transformer, Schema, SchemaError } from "../interface.js";
+import { NewOption, Ok, ResultNew } from "../../index.js";
+import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
 export interface SchemaStr<T extends string, ParsedType = T>
@@ -14,7 +14,7 @@ export interface SchemaStr<T extends string, ParsedType = T>
    * const v: Option<string> = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaStr<T, Option<T>>;
+  optional(): SchemaStr<T, NewOption<T>>;
   /**
    * # Description
    * Add validation rule to schema
@@ -171,11 +171,16 @@ function SchemaStrInternal<T extends string, ParsedType = T>(
   return api;
 }
 
-const regexp = <T extends string>(re: RegExp, kind: string, value: T) =>
-  OptionFrom.bool(re.test(value))
-    .result(() => AnyHow.expect(kind, value))
-    .map(() => value)
-    .orElse((err) => err.toErr());
+function regexp<T extends string>(
+  re: RegExp,
+  kind: string,
+  value: T
+): ResultNew<T, AnyHow> {
+  if (re.test(value)) {
+    return Ok(value);
+  }
+  return AnyHow.expect(kind, value).toErr<T>();
+}
 
 export const SchemaStr = <T extends string>(equalTo?: T) =>
   SchemaStrInternal(defaultVahter(equalTo));

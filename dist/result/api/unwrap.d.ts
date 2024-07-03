@@ -1,3 +1,2 @@
-import { Result } from "../interfaces.js";
-export declare function unwrap<T, E>(result: Result<T, E>): T;
+export declare function unwrap<T>(): import("../middleware/aggregate.js").MiddlewareAggregator<T, unknown, T>;
 //# sourceMappingURL=unwrap.d.ts.map

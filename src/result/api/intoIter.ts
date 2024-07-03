@@ -1,10 +1,12 @@
-import { Iter, IterFrom } from "../../index.js";
-import { ResultUnion } from "../interfaces.js";
+import { Iter } from "../../index.js";
+import { createAggregator } from "../middleware/aggregate.js";
 import { isOk } from "./isOk.js";
 
-export function intoIter<T, E>(result: ResultUnion<T, E>): Iter<T> {
-  if (isOk(result)) {
-    return IterFrom.array([result.value]);
-  }
-  return IterFrom.array([]);
+export function intoIter<T>() {
+  return createAggregator<T, unknown, Iter<T>>((_, inner) => {
+    if (isOk(inner)) {
+      return Iter.from([inner.value]);
+    }
+    return Iter.from([]);
+  });
 }

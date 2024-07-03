@@ -1,4 +1,3 @@
 import { Iter } from "../../index.js";
-import { ResultUnion } from "../interfaces.js";
-export declare function intoIter<T, E>(result: ResultUnion<T, E>): Iter<T>;
+export declare function intoIter<T>(): import("../middleware/aggregate.js").MiddlewareAggregator<T, unknown, Iter<T>>;
 //# sourceMappingURL=intoIter.d.ts.map

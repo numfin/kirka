@@ -1,3 +1,2 @@
-import { Option } from "../interfaces.js";
-export declare function filter<T>(source: Option<T>, fn: (item: T) => boolean): Option<T>;
+export declare function filter<T>(fn: (item: T) => boolean): import("../middleware/remap.js").MiddlewareRemap<T, T>;
 //# sourceMappingURL=filter.d.ts.map

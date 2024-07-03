@@ -1,7 +1,10 @@
-import { None, Some } from "../../option/index.js";
-export function first(source) {
-    for (const item of source) {
-        return Some(item);
-    }
-    return None();
+import { NewOption } from "../../option/index.js";
+import { createAggregator } from "../middleware/aggregate.js";
+export function first() {
+    return createAggregator((_, source) => {
+        for (const item of source()) {
+            return NewOption.Some(item);
+        }
+        return NewOption.None();
+    });
 }

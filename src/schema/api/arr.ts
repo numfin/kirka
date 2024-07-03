@@ -1,6 +1,7 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { IterFrom, Ok, Option } from "../../index.js";
-import { Checker, Transformer, Schema, FromSchema } from "../interface.js";
+import { Iter, NewOption, Ok } from "../../index.js";
+import { enumerate } from "../../iter/api/enumerate.js";
+import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
 export interface SchemaArr<T, ParsedType = T[]> extends Schema<ParsedType> {
@@ -13,7 +14,7 @@ export interface SchemaArr<T, ParsedType = T[]> extends Schema<ParsedType> {
    * const v: Option<string>[] = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaArr<T, Option<T[]>>;
+  optional(): SchemaArr<T, NewOption<T[]>>;
   /**
    * # Description
    * Add validation rule to schema
@@ -50,7 +51,7 @@ function defaultVahter<T>(schema: Schema<T>) {
     }
     const parsedArr: Return = [];
 
-    for (const { index, item } of IterFrom.array(items).enumerate()) {
+    for (const { index, item } of Iter.from(items).do(enumerate())) {
       const result = schema.parse(item);
 
       if (result.isOk()) {

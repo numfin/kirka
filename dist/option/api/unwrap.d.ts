@@ -1,3 +1,3 @@
-import { Option } from "../interfaces.js";
-export declare function unwrap<T>(option: Option<T>): T;
+import { OptionUnion } from "../base.js";
+export declare function unwrap<T>(inner: OptionUnion<T>): T;
 //# sourceMappingURL=unwrap.d.ts.map

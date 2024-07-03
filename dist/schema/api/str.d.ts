@@ -1,4 +1,4 @@
-import { Option } from "../../index.js";
+import { NewOption } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
 export interface SchemaStr<T extends string, ParsedType = T> extends Schema<ParsedType> {
     /**
@@ -10,7 +10,7 @@ export interface SchemaStr<T extends string, ParsedType = T> extends Schema<Pars
      * const v: Option<string> = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaStr<T, Option<T>>;
+    optional(): SchemaStr<T, NewOption<T>>;
     /**
      * # Description
      * Add validation rule to schema
@@ -102,5 +102,5 @@ export interface SchemaStr<T extends string, ParsedType = T> extends Schema<Pars
     re(re: () => RegExp, 
     /** Name of the regex rule */ kind?: string): SchemaStr<T, ParsedType>;
 }
-export declare const SchemaStr: <T extends string>(equalTo?: T | undefined) => SchemaStr<T, T>;
+export declare const SchemaStr: <T extends string>(equalTo?: T) => SchemaStr<T, T>;
 //# sourceMappingURL=str.d.ts.map

@@ -1,5 +1,5 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { Ok, OptionFrom } from "../../index.js";
+import { Ok } from "../../index.js";
 import { SchemaCustom } from "./custom.js";
 function defaultVahter(equalTo) {
     return SchemaCustom((v) => {
@@ -55,8 +55,10 @@ function SchemaStrInternal(vahter) {
     };
     return api;
 }
-const regexp = (re, kind, value) => OptionFrom.bool(re.test(value))
-    .result(() => AnyHow.expect(kind, value))
-    .map(() => value)
-    .orElse((err) => err.toErr());
+function regexp(re, kind, value) {
+    if (re.test(value)) {
+        return Ok(value);
+    }
+    return AnyHow.expect(kind, value).toErr();
+}
 export const SchemaStr = (equalTo) => SchemaStrInternal(defaultVahter(equalTo));

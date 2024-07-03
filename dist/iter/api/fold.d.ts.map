@@ -1,1 +1,1 @@
-{"version":3,"file":"fold.d.ts","sourceRoot":"","sources":["../../../src/iter/api/fold.ts"],"names":[],"mappings":"AAAA,wBAAgB,IAAI,CAAC,CAAC,EAAE,CAAC,EACvB,MAAM,EAAE,QAAQ,CAAC,CAAC,CAAC,EACnB,SAAS,EAAE,CAAC,EACZ,EAAE,EAAE,CAAC,GAAG,EAAE,CAAC,EAAE,IAAI,EAAE,CAAC,KAAK,CAAC,GACzB,CAAC,CAMH"}
+{"version":3,"file":"fold.d.ts","sourceRoot":"","sources":["../../../src/iter/api/fold.ts"],"names":[],"mappings":"AAEA,wBAAgB,IAAI,CAAC,CAAC,EAAE,CAAC,EAAE,SAAS,EAAE,CAAC,EAAE,EAAE,EAAE,CAAC,OAAO,EAAE,CAAC,EAAE,IAAI,EAAE,CAAC,KAAK,CAAC,mEAQtE"}

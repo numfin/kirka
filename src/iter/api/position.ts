@@ -1,12 +1,14 @@
-import { Iter } from "../interfaces.js";
-import { Option } from "../../option/index.js";
+import { map } from "../../option/api/map.js";
+import { NewOption } from "../../option/index.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { enumerate } from "./enumerate.js";
+import { find } from "./find.js";
 
-export function position<T>(
-  source: Iter<T>,
-  fn: (item: T) => boolean
-): Option<number> {
-  return source
-    .enumerate()
-    .find(({ item }) => fn(item))
-    .map(({ index }) => index);
+export function position<T>(condition: (item: T) => boolean) {
+  return createAggregator<T, NewOption<number>>((iter) => {
+    return iter
+      .do(enumerate())
+      .do(find(({ item }) => condition(item)))
+      .do(map(({ index }) => index));
+  });
 }

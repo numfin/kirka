@@ -1,4 +1,4 @@
-import { Option } from "../../index.js";
+import { NewOption } from "../../index.js";
 import { Schema } from "../interface.js";
 import { RecordAsSchema } from "./dict.js";
 export type Matcher<T extends Record<PropertyKey, unknown>, U> = {
@@ -59,7 +59,7 @@ export interface UnionInstance<T extends Record<PropertyKey, unknown>> {
      * }); // Some(2)
      * ```
      */
-    matchSome<U>(matcher: Partial<Matcher<T, U>>): Option<U>;
+    matchSome<U>(matcher: Partial<Matcher<T, U>>): NewOption<U>;
     /**
      * # Description
      * Check union tag
@@ -84,7 +84,7 @@ export type UnionVariants<T extends Record<PropertyKey, unknown>> = {
 export declare function Union<T extends Record<PropertyKey, unknown>>(_unionSchemas: T): UnionVariants<T>;
 export declare function UnionInstance<T extends Record<PropertyKey, unknown>>(currentTag: keyof T, value: T[typeof currentTag]): UnionInstance<T>;
 export interface SchemaUnion<T extends Record<PropertyKey, unknown>, ParsedType = UnionInstance<T>> extends Schema<ParsedType> {
-    optional(): SchemaUnion<T, Option<UnionInstance<T>>>;
+    optional(): SchemaUnion<T, NewOption<UnionInstance<T>>>;
 }
 export declare const SchemaUnion: <T extends Record<PropertyKey, unknown>>(schema: RecordAsSchema<T>) => UnionVariants<T> & SchemaUnion<T, UnionInstance<T>>;
 //# sourceMappingURL=union.d.ts.map

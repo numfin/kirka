@@ -1,3 +1,2 @@
-import { ResultUnion } from "../interfaces.js";
-export declare function mapErr<T, E, U>(result: ResultUnion<T, E>, fn: (value: E) => U): import("../interfaces.js").Ok<T> | import("../interfaces.js").Err<U>;
+export declare function mapErr<T, E, E2>(fn: (value: E) => E2): import("../middleware/remap.js").MiddlewareRemap<T, E, T, E2>;
 //# sourceMappingURL=mapErr.d.ts.map

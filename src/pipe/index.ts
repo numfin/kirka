@@ -6,6 +6,7 @@ export interface Pipe<In extends unknown[], Out> {
 
 export function Pipe<In extends unknown[], Out = In>(
   identity: (...v: In) => Out,
+  // eslint-disable-next-line @typescript-eslint/ban-types
   members = [] as Function[]
 ) {
   const pipe: Pipe<In, Out> = {
