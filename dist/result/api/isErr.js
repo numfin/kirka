@@ -1,3 +1,4 @@
+import { tagErr } from "../base.js";
 export function isErr(result) {
-    return result.type === "Err";
+    return result.type === tagErr;
 }

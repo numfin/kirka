@@ -1,3 +1,3 @@
-import { Option } from "../interfaces.js";
-export declare function or<T>(current_value: Option<T>, new_value: Option<T>): import("../interfaces.js").OptionUnion<T>;
+import { NewOption } from "../../index.js";
+export declare function or<T>(new_value: NewOption<T>): import("../middleware/remap.js").MiddlewareRemap<T, T>;
 //# sourceMappingURL=or.d.ts.map

@@ -1,3 +1,2 @@
-import { ResultUnion } from "../interfaces.js";
-export declare function match<T, E, U>(source: ResultUnion<T, E>, onOk: (v: T) => U, onErr: (e: E) => U): U;
+export declare function match<T, E, U>(onOk: (v: T) => U, onErr: (e: E) => U): import("../middleware/aggregate.js").MiddlewareAggregator<T, E, U>;
 //# sourceMappingURL=match.d.ts.map

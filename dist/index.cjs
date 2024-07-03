@@ -1,411 +1,241 @@
 'use strict';
 
-function bool(v) {
-    return v ? Some(v) : None();
+const None$1 = { type: "None" };
+
+function isSome(inner) {
+    return inner !== None$1;
 }
 
-function ok$1(result) {
-    return result.ok();
+function isNone(inner) {
+    return inner === None$1;
 }
 
-function err$1(result) {
-    return result.err();
-}
-
-function nullable(v) {
-    if (v !== undefined && v !== null) {
-        return Some(v);
+function unwrap$1(inner) {
+    if (isNone(inner)) {
+        throw new Error(`unwrap called on None`);
     }
-    return None();
+    return inner.value;
 }
 
-const OptionFrom = {
-    bool,
-    nullable,
-    ok: ok$1,
-    err: err$1,
-};
+function createAggregator$2(fn) {
+    return (option, inner) => fn(option, inner);
+}
 
-function fallible(fn) {
-    try {
-        const result = fn();
-        return Ok(result);
+function match$1(onSome, onNone) {
+    return createAggregator$2((_, inner) => {
+        if (isSome(inner)) {
+            return onSome(inner.value);
+        }
+        return onNone();
+    });
+}
+
+function eq$1(other, by = (x) => x) {
+    return createAggregator$2((_, inner) => {
+        if (isSome(inner) && isSome(other.inner)) {
+            return by(inner.value) === by(other.inner.value);
+        }
+        return isNone(inner) && isNone(other.inner);
+    });
+}
+
+class NewOption {
+    inner;
+    *[Symbol.iterator]() {
+        if (isSome(this.inner)) {
+            yield this.inner.value;
+        }
     }
-    catch (err) {
-        return Err(err);
+    constructor(inner) {
+        this.inner = inner;
+    }
+    static None = () => new NewOption(None$1);
+    static Some(value) {
+        return new NewOption({ type: "Some", value });
+    }
+    static fromBool(predicate) {
+        return predicate ? NewOption.Some(predicate) : NewOption.None();
+    }
+    static fromNullable(v) {
+        if (v !== undefined && v !== null) {
+            return NewOption.Some(v);
+        }
+        return NewOption.None();
+    }
+    isSome() {
+        return isSome(this.inner);
+    }
+    isNone() {
+        return isNone(this.inner);
+    }
+    unwrap() {
+        return unwrap$1(this.inner);
+    }
+    clone() {
+        return isSome(this.inner)
+            ? NewOption.Some(this.inner.value)
+            : NewOption.None();
+    }
+    do(fn) {
+        return fn(this, this.inner);
+    }
+    pipe(fn) {
+        return (...args) => fn(...args)(this, this.inner);
+    }
+    eq(other, by = (x) => x) {
+        return this.do(eq$1(other, by));
+    }
+    match(onSome, onNone) {
+        return this.do(match$1(onSome, onNone));
     }
 }
-async function fallibleAsync(fn) {
-    try {
-        const result = await fn();
-        return Ok(result);
-    }
-    catch (err) {
-        return Err(err);
-    }
-}
+const Some = NewOption.Some;
+const None = NewOption.None;
 
-function option(option, err) {
-    return option.result(err);
-}
-
-const ResultFrom = {
-    option,
-    fallible,
-    fallibleAsync
-};
-
-function and$1(result, otherResult) {
-    return result.andThen(() => otherResult);
-}
-
-function or$1(result, otherResult) {
-    return result.orElse(() => otherResult);
-}
-
-function unionErr(value) {
-    return { value, type: "Err" };
-}
-
-function andThen$1(result, fn) {
-    if (result.isOk()) {
-        return fn(result.unwrap()).inner();
-    }
-    return unionErr(result.unwrapErr());
-}
-
-function unionOk(value) {
-    return { value, type: "Ok" };
-}
-
-function orElse$1(result, fn) {
-    if (result.isErr()) {
-        return fn(result.unwrapErr()).inner();
-    }
-    return unionOk(result.unwrap());
-}
-
-function eq$1(self, other) {
-    const a = self.inner();
-    const b = other.inner();
-    return a.type === b.type && a.value === b.value;
-}
-
-function format$1(result, formatter) {
-    const inner = result.inner();
-    return `Result.${inner.type}(${formatter?.(result) ?? inner.value})`;
-}
-
-function inspect(result, fn) {
-    result.map(fn);
-    return result;
-}
-
-function inspectErr(result, fn) {
-    result.mapErr(fn);
-    return result;
-}
+const tagOK = "Ok";
+const tagErr = "Err";
 
 function isOk(result) {
-    return result.type === "Ok";
-}
-
-function isOkAnd(result, fn) {
-    return result.isOk() && fn(result.unwrap());
+    return result.type === tagOK;
 }
 
 function isErr(result) {
-    return result.type === "Err";
+    return result.type === tagErr;
 }
 
-function isErrAnd(result, fn) {
-    return result.isErr() && fn(result.unwrapErr());
+function createAggregator$1(fn) {
+    return (option, inner) => fn(option, inner);
 }
 
-function map$2(result, fn) {
-    if (result.type === "Ok") {
-        return unionOk(fn(result.value));
-    }
-    else {
-        return unionErr(result.value);
-    }
+function debug(inner, { ok = (v) => v, err = (e) => e } = {}) {
+    return `Result.${inner.type}(${isOk(inner) ? ok(inner.value) : err(inner.err)})`;
 }
 
-function mapErr(result, fn) {
-    if (result.type === "Err") {
-        return unionErr(fn(result.value));
-    }
-    else {
-        return unionOk(result.value);
-    }
-}
-
-function ok(result) {
-    return result.isOk() ? Some(result.inner().value) : None();
-}
-
-function err(result) {
-    return result.isErr() ? Some(result.unwrapErr()) : None();
-}
-
-function unwrap$1(result) {
-    const inner = result.inner();
-    if (result.isErr()) {
-        throw new Error(`unwrap() on ${result.format()}`);
-    }
-    return inner.value;
-}
-
-function uwnrapOr(result, default_value) {
-    return result.isOk() ? result.unwrap() : default_value;
-}
-
-function unwrapErr(result) {
-    if (result.isOk()) {
-        throw new Error(`unwrapErr called on ${result.format()}`);
-    }
-    return result.inner().value;
-}
-
-function unwrapErrOr(result, default_value) {
-    return result.isErr() ? result.unwrapErr() : default_value;
-}
-
-function match$1(source, onOk, onErr) {
-    if (source.type === "Ok") {
-        return onOk(source.value);
-    }
-    else {
-        return onErr(source.value);
-    }
-}
-
-function createResult(result) {
-    const api = {
-        *[Symbol.iterator]() {
-            if (isOk(result)) {
-                yield result.value;
-            }
-        },
-        inner: () => result,
-        eq: (other) => eq$1(api, other),
-        format: (formatter) => format$1(api, formatter),
-        isOk: () => isOk(result),
-        isErr: () => isErr(result),
-        unwrap: () => unwrap$1(api),
-        unwrapErr: () => unwrapErr(api),
-        unwrapOr: (default_value) => uwnrapOr(api, default_value),
-        unwrapErrOr: (default_value) => unwrapErrOr(api, default_value),
-        isOkAnd: (fn) => isOkAnd(api, fn),
-        isErrAnd: (fn) => isErrAnd(api, fn),
-        map: (fn) => createResult(map$2(result, fn)),
-        mapErr: (fn) => createResult(mapErr(result, fn)),
-        inspect: (fn) => inspect(api, fn),
-        inspectErr: (fn) => inspectErr(api, fn),
-        andThen: (fn) => createResult(andThen$1(api, fn)),
-        orElse: (fn) => createResult(orElse$1(api, fn)),
-        and: (new_value) => and$1(api, new_value),
-        or: (new_value) => or$1(api, new_value),
-        ok: () => ok(api),
-        err: () => err(api),
-        match: (onOk, onErr) => match$1(result, onOk, onErr),
-    };
-    return api;
-}
-function Ok(value) {
-    return createResult(unionOk(value));
-}
-function Err(value) {
-    return createResult(unionErr(value));
-}
-/**
- * Wrapps `fn` into `tryCatch` returning result as `Ok<T>` and error as `Err<E>`
- * # Example
- * ```ts
- * tryFn(() => {
- *  throw new Error(`Oh no!`)
- * })
- * .map(data => console.log(data))
- * .or(err => console.log(err))
- * ```
- */
-function tryFn(fn) {
-    try {
-        return Ok(fn());
-    }
-    catch (err) {
-        return Err(err);
-    }
-}
-
-function result(option, noneErr) {
-    return option.isSome() ? Ok(option.unwrap()) : Err(noneErr());
-}
-
-function unionNone() {
-    return { type: "None" };
-}
-
-function andThen(option, fn) {
-    return option.isSome() ? fn(option.unwrap()).inner() : unionNone();
-}
-
-function and(current_value, new_value) {
-    return current_value.isSome() ? new_value.inner() : unionNone();
-}
-
-function orElse(option, fn) {
-    return option.isSome() ? option.inner() : fn().inner();
-}
-
-function or(current_value, new_value) {
-    return current_value.isSome() ? current_value.inner() : new_value.inner();
-}
-
-function unionSome(value) {
-    return { type: "Some", value };
-}
-
-function format(option, fn) {
-    const inner = option.inner();
-    return inner.type === "Some"
-        ? `Some(${fn?.(option) ?? inner.value})`
-        : `None`;
-}
-
-function unwrap(option) {
-    const inner = option.inner();
-    if (inner.type === "None") {
-        throw new Error(`unwrap called on ${format(option)}`);
-    }
-    return inner.value;
-}
-
-function map$1(option, fn) {
-    const inner = option.inner();
-    if (inner.type === "Some") {
-        return unionSome(fn(unwrap(option)));
-    }
-    return unionNone();
-}
-
-function unwrapOr(option, default_value) {
-    return option.type === "None" ? default_value : option.value;
-}
-
-function isSomeAnd(option, fn) {
-    return option.isSome() && fn(option.unwrap());
-}
-
-function take$1(option) {
-    if (option.type === "Some") {
-        option.type = "None";
-        const value = option.value;
-        option.value = undefined;
-        return unionSome(value);
-    }
-    return unionNone();
-}
-
-function isSome(option) {
-    return option.type === "Some";
-}
-
-function isNone(option) {
-    return option.type === "None";
-}
-
-function clone(option) {
-    return option.type === "Some" ? unionSome(option.value) : unionNone();
-}
-
-function eq(option, value, by = (x) => x) {
-    if (value.isNone() || option.isNone()) {
-        return value.isNone() && option.isNone();
-    }
-    return by(value.unwrap()) === by(option.unwrap());
-}
-
-function filter(source, fn) {
-    if (source.isSomeAnd(fn)) {
-        return source;
-    }
-    return None();
-}
-
-function isNoneAnd(option, fn) {
-    return option.isNone() && fn();
-}
-
-function match(source, onSome, onNone) {
-    return source.map(onSome).unwrapOrElse(onNone);
-}
-
-function unwrapOrElse(option, default_fn) {
-    return option.type === "None" ? default_fn() : option.value;
-}
-
-function flatten(source) {
-    if (source.isNone()) {
-        return source;
-    }
-    const v = source.unwrap();
-    try {
-        if (v.isSome()) {
-            return v;
+function unwrap() {
+    return createAggregator$1((_, inner) => {
+        if (isErr(inner)) {
+            throw new Error(`unwrap() on ${debug(inner)}`);
         }
-        return v;
-    }
-    catch (_) {
-        return source;
-    }
+        return inner.value;
+    });
 }
 
-function createOption(v) {
-    const inner = v;
-    const api = {
-        *[Symbol.iterator]() {
-            if (isSome(inner)) {
-                yield inner.value;
-            }
-        },
-        inner: () => inner,
-        eq: (value, by) => eq(api, value, by),
-        format: (formatter) => format(api, formatter),
-        clone: () => createOption(clone(inner)),
-        unwrap: () => unwrap(api),
-        unwrapOr: (default_value) => unwrapOr(inner, default_value),
-        unwrapOrElse: (fn) => unwrapOrElse(inner, fn),
-        isNone: () => isNone(inner),
-        isSome: () => isSome(inner),
-        take: () => createOption(take$1(inner)),
-        isSomeAnd: (fn) => isSomeAnd(api, fn),
-        isNoneAnd: (fn) => isNoneAnd(api, fn),
-        map: (fn) => createOption(map$1(api, fn)),
-        or: (new_value) => createOption(or(api, new_value)),
-        orElse: (fn) => createOption(orElse(api, fn)),
-        and: (new_value) => createOption(and(api, new_value)),
-        andThen: (fn) => createOption(andThen(api, fn)),
-        result: (fn) => result(api, fn),
-        filter: (fn) => filter(api, fn),
-        match: (onSome, onNone) => match(api, onSome, onNone),
-        flatten: () => flatten(api),
-    };
-    return api;
-}
-function Some(v) {
-    return createOption(unionSome(v));
-}
-function None() {
-    return createOption(unionNone());
+function unwrapErr() {
+    return createAggregator$1((_, inner) => {
+        if (isOk(inner)) {
+            throw new Error(`unwrapErr called on ${debug(inner)}`);
+        }
+        return inner.err;
+    });
 }
 
-function createRemapper(fn) {
+function eq(other) {
+    return createAggregator$1((_, inner) => {
+        if (isOk(inner) && inner.type === other.inner.type) {
+            return inner.value === other.inner.value;
+        }
+        if (isErr(inner) && inner.type === other.inner.type) {
+            return inner.err === other.inner.err;
+        }
+        return false;
+    });
+}
+
+function unwrapOr(default_value) {
+    return createAggregator$1((_, inner) => {
+        return isOk(inner) ? inner.value : default_value;
+    });
+}
+
+function unwrapErrOr(defaultErr) {
+    return createAggregator$1((_, inner) => {
+        return isErr(inner) ? inner.err : defaultErr;
+    });
+}
+
+function match(onOk, onErr) {
+    return createAggregator$1((_, inner) => {
+        if (isOk(inner)) {
+            return onOk(inner.value);
+        }
+        return onErr(inner.err);
+    });
+}
+
+class ResultNew {
+    inner;
+    *[Symbol.iterator]() {
+        if (isOk(this.inner)) {
+            yield this.inner.value;
+        }
+    }
+    constructor(inner) {
+        this.inner = inner;
+    }
+    static Ok(value) {
+        return new ResultNew({ type: "Ok", value });
+    }
+    static Err(err) {
+        return new ResultNew({ type: "Err", err });
+    }
+    static tryFn(fn) {
+        try {
+            const result = fn();
+            return Ok(result);
+        }
+        catch (err) {
+            return Err(err);
+        }
+    }
+    static async tryAsync(fn) {
+        try {
+            const result = await fn();
+            return Ok(result);
+        }
+        catch (err) {
+            return Err(err);
+        }
+    }
+    eq(other) {
+        return this.do(eq(other));
+    }
+    isOk() {
+        return isOk(this.inner);
+    }
+    isErr() {
+        return isErr(this.inner);
+    }
+    unwrap() {
+        return this.do(unwrap());
+    }
+    unwrapOr(defaultValue) {
+        return this.do(unwrapOr(defaultValue));
+    }
+    unwrapErr() {
+        return this.do(unwrapErr());
+    }
+    unwrapErrOr(defaultErr) {
+        return this.do(unwrapErrOr(defaultErr));
+    }
+    match(onOk, onErr) {
+        return this.do(match(onOk, onErr));
+    }
+    do(fn) {
+        return fn(this, this.inner);
+    }
+    pipe(fn) {
+        return (...args) => fn(...args)(this, this.inner);
+    }
+}
+const Ok = ResultNew.Ok;
+const Err = ResultNew.Err;
+
+function createRemapper$1(fn) {
     return (iter, source, inner) => new Iter(() => fn(iter, source, inner));
 }
 
 function enumerate() {
-    return createRemapper(function* (_, source) {
+    return createRemapper$1(function* (_, source) {
         let index = 0;
         for (const item of source()) {
             yield { item, index };
@@ -414,8 +244,8 @@ function enumerate() {
     });
 }
 
-function map(fn) {
-    return createRemapper(function* (_, source) {
+function map$1(fn) {
+    return createRemapper$1(function* (_, source) {
         for (const item of source()) {
             yield fn(item);
         }
@@ -425,15 +255,15 @@ function map(fn) {
 function next(source) {
     const nextValue = source.next();
     if (nextValue.done) {
-        return None();
+        return NewOption.None();
     }
     else {
-        return Some(nextValue.value);
+        return NewOption.Some(nextValue.value);
     }
 }
 
 function take(takeAmount) {
-    return createRemapper(function* (_, source) {
+    return createRemapper$1(function* (_, source) {
         let i = 0;
         for (const item of source()) {
             if (i++ < takeAmount) {
@@ -477,7 +307,7 @@ class Iter {
         return Iter.infinite()
             .do(take(to - from + extra))
             .do(enumerate())
-            .do(map(({ index }) => index + from));
+            .do(map$1(({ index }) => index + from));
     }
     clone() {
         return new Iter(this.source);
@@ -523,10 +353,10 @@ function createAggregator(fn) {
 }
 
 function filterMap(fn) {
-    return createRemapper(function* (_, source) {
+    return createRemapper$1(function* (_, source) {
         for (const item of source()) {
-            const data = fn(item).inner();
-            if (data.type === "Some") {
+            const data = fn(item).inner;
+            if (isSome(data)) {
                 yield data.value;
             }
         }
@@ -557,14 +387,38 @@ members = []) {
     return pipe;
 }
 
+function createRemapper(fn) {
+    return (option, inner) => fn(option, inner);
+}
+
+function andThen(otherResult) {
+    return createRemapper((_, inner) => {
+        if (isOk(inner)) {
+            return otherResult(inner.value);
+        }
+        return ResultNew.Err(inner.err);
+    });
+}
+
+function map(fn) {
+    return createRemapper((_, inner) => {
+        if (isOk(inner)) {
+            return ResultNew.Ok(fn(inner.value));
+        }
+        else {
+            return ResultNew.Err(inner.err);
+        }
+    });
+}
+
 function SchemaCustom(createFn, flags = { isOptional: false }, rules = [], transforms = Pipe((v) => v)) {
     const validate = (v) => Iter.from(rules)
         .do(enumerate())
-        .do(findMap(({ index, item }) => (item(v) ? None() : Some(index))))
+        .do(findMap(({ index, item }) => item(v) ? NewOption.None() : NewOption.Some(index)))
         .match((index) => AnyHow.msg(`Rule ${index} failed`).toErr(), () => Ok(v));
     const api = {
         transform(checkFn) {
-            return SchemaCustom(createFn, flags, rules, transforms.clone().chain((v) => v.andThen(checkFn)));
+            return SchemaCustom(createFn, flags, rules, transforms.clone().chain((v) => v.do(andThen(checkFn))));
         },
         is(checkFn) {
             return SchemaCustom(createFn, flags, rules.concat(checkFn), transforms);
@@ -574,10 +428,10 @@ function SchemaCustom(createFn, flags = { isOptional: false }, rules = [], trans
         },
         parse(v) {
             const validateAndTransform = Pipe(createFn)
-                .chain((v) => v.andThen(validate))
+                .chain((v) => v.do(andThen(validate)))
                 .chain(transforms.call);
             if (flags.isOptional) {
-                return OptionFrom.nullable(v).match((v) => validateAndTransform.call(v).map(Some), () => Ok(None()));
+                return NewOption.fromNullable(v).match((v) => validateAndTransform.call(v).do(map(NewOption.Some)), () => Ok(NewOption.None()));
             }
             return validateAndTransform.call(v);
         },
@@ -812,10 +666,12 @@ function SchemaStrInternal(vahter) {
     };
     return api;
 }
-const regexp = (re, kind, value) => OptionFrom.bool(re.test(value))
-    .result(() => AnyHow.expect(kind, value))
-    .map(() => value)
-    .orElse((err) => err.toErr());
+function regexp(re, kind, value) {
+    if (re.test(value)) {
+        return Ok(value);
+    }
+    return AnyHow.expect(kind, value).toErr();
+}
 const SchemaStr = (equalTo) => SchemaStrInternal(defaultVahter$1(equalTo));
 
 function UnionInstance(currentTag, value) {
@@ -830,10 +686,10 @@ function UnionInstance(currentTag, value) {
             if (Object.prototype.hasOwnProperty.call(matcher, currentTag)) {
                 const fn = matcher[currentTag];
                 if (typeof fn === "function") {
-                    return Some(fn(value));
+                    return NewOption.Some(fn(value));
                 }
             }
-            return None();
+            return NewOption.None();
         },
         match(matcher) {
             return api.matchSome(matcher).unwrap();
@@ -844,7 +700,7 @@ function UnionInstance(currentTag, value) {
 function defaultVahter(unionSchemas) {
     return SchemaCustom((v) => {
         for (const [tag, tagSchema] of Object.entries(unionSchemas)) {
-            const result = tagSchema.parse(v).inner();
+            const result = tagSchema.parse(v).inner;
             if (result.type === "Ok") {
                 return Ok(UnionInstance(tag, result.value));
             }
@@ -881,13 +737,13 @@ const SchemaRecord = (keySchema, valueSchema) => SchemaDict({}, {
 }).transform((v) => {
     const result = {};
     for (const [key, value] of Object.entries(v)) {
-        const parsedKey = keySchema.parse(key).inner();
-        if (parsedKey.type === "Err") {
-            return parsedKey.value.toErr();
+        const parsedKey = keySchema.parse(key).inner;
+        if (isErr(parsedKey)) {
+            return parsedKey.err.toErr();
         }
-        const parsedValue = valueSchema.parse(value).inner();
+        const parsedValue = valueSchema.parse(value).inner;
         if (parsedValue.type === "Err") {
-            return parsedValue.value
+            return parsedValue.err
                 .wrapWith(() => `Invalid value for key: ${key}`)
                 .toErr();
         }
@@ -1050,13 +906,10 @@ const Schema = {
 exports.AnyHow = AnyHow;
 exports.Err = Err;
 exports.Iter = Iter;
+exports.NewOption = NewOption;
 exports.None = None;
 exports.Ok = Ok;
-exports.OptionFrom = OptionFrom;
 exports.Pipe = Pipe;
-exports.ResultFrom = ResultFrom;
+exports.ResultNew = ResultNew;
 exports.Schema = Schema;
 exports.Some = Some;
-exports.createOption = createOption;
-exports.createResult = createResult;
-exports.tryFn = tryFn;

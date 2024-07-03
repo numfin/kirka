@@ -1,1 +1,1 @@
-{"version":3,"file":"next.d.ts","sourceRoot":"","sources":["../../../src/iter/api/next.ts"],"names":[],"mappings":"AAAA,OAAO,EAAQ,MAAM,EAAQ,MAAM,uBAAuB,CAAC;AAE3D,wBAAgB,IAAI,CAAC,CAAC,EAAE,MAAM,EAAE,SAAS,CAAC,CAAC,CAAC,GAAG,MAAM,CAAC,CAAC,CAAC,CAOvD"}
+{"version":3,"file":"next.d.ts","sourceRoot":"","sources":["../../../src/iter/api/next.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,uBAAuB,CAAC;AAElD,wBAAgB,IAAI,CAAC,CAAC,EAAE,MAAM,EAAE,SAAS,CAAC,CAAC,CAAC,GAAG,SAAS,CAAC,CAAC,CAAC,CAO1D"}

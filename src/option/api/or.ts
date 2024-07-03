@@ -1,5 +1,8 @@
-import { Option } from "../interfaces.js";
+import { NewOption } from "../../index.js";
+import { createRemapper } from "../middleware/remap.js";
 
-export function or<T>(current_value: Option<T>, new_value: Option<T>) {
-  return current_value.isSome() ? current_value.inner() : new_value.inner();
+export function or<T>(new_value: NewOption<T>) {
+  return createRemapper<T, T>((opt) => {
+    return opt.isSome() ? opt : new_value;
+  });
 }

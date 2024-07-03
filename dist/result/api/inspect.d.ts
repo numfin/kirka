@@ -1,3 +1,2 @@
-import { Result } from "../interfaces.js";
-export declare function inspect<T, E>(result: Result<T, E>, fn: (value: T) => void): Result<T, E>;
+export declare function inspect<T, E>(fn: (value: T) => void): import("../middleware/remap.js").MiddlewareRemap<T, E, T, E>;
 //# sourceMappingURL=inspect.d.ts.map

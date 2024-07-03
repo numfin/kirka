@@ -1,8 +1,7 @@
-import { format } from "./format.js";
-export function unwrap(option) {
-    const inner = option.inner();
-    if (inner.type === "None") {
-        throw new Error(`unwrap called on ${format(option)}`);
+import { isNone } from "./is_none.js";
+export function unwrap(inner) {
+    if (isNone(inner)) {
+        throw new Error(`unwrap called on None`);
     }
     return inner.value;
 }

@@ -1,5 +1,5 @@
 import { AnyHow } from "../anyhow/index.js";
-import { Result } from "../index.js";
+import { ResultNew } from "../index.js";
 export interface SchemaError extends AnyHow {
 }
 export interface Schema<T> {
@@ -12,7 +12,7 @@ export interface Schema<T> {
      * const v: Result<number> = s.parse(...);
      * ```
      */
-    parse(v: unknown): Result<T, SchemaError>;
+    parse(v: unknown): ResultNew<T, SchemaError>;
     /**
      * # Description
      * Test any value for schema type.
@@ -56,7 +56,7 @@ export interface Schema<T> {
  * ```
  */
 export interface Transformer<T, Api> {
-    (transformFn: (v: T) => Result<T, SchemaError>): Api;
+    (transformFn: (v: T) => ResultNew<T, SchemaError>): Api;
 }
 /**
  * # Description

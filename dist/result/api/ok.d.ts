@@ -1,4 +1,3 @@
-import { Option } from "../../option/index.js";
-import { Result } from "../interfaces.js";
-export declare function ok<T, E>(result: Result<T, E>): Option<T>;
+import { NewOption } from "../../option/index.js";
+export declare function ok<T>(): import("../middleware/aggregate.js").MiddlewareAggregator<T, unknown, NewOption<T>>;
 //# sourceMappingURL=ok.d.ts.map

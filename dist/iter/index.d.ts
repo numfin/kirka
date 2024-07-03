@@ -9,7 +9,7 @@ export declare class Iter<T> {
     static from<T>(source: Iterable<T>): Iter<T>;
     static fromRange(from: number, to: number, inclusive?: boolean): Iter<number>;
     clone(): Iter<T>;
-    next(): import("../index.js").Option<T>;
+    next(): import("../index.js").NewOption<T>;
     do<Out>(fn: IterPipe<T, Out>): Out;
     pipe<Args extends unknown[], Out>(fn: (...args: Args) => IterPipe<T, Out>): (...args: Args) => Out;
 }

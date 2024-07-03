@@ -1,9 +1,11 @@
 import test from "ava";
-import { None, Ok, Some } from "../../index.js";
+import { NewOption, Ok } from "../../index.js";
 import { SchemaDict } from "./dict.js";
 import { SchemaStr } from "./str.js";
 import { SchemaNum } from "./num.js";
 import { SchemaBool } from "./bool.js";
+import { isNoneAnd } from "../../option/api/is_none_and.js";
+import { isOkAnd } from "../../result/api/isOkAnd.js";
 
 const genSchema = () =>
   SchemaDict({
@@ -38,14 +40,18 @@ test("Optional fields replaced with Option<T>", (t) => {
     o: SchemaNum().optional(),
   });
   t.true(
-    so.parse({ s: "" }).isOkAnd((v) => {
-      return v.o.isNoneAnd(() => v.s === "");
-    })
+    so.parse({ s: "" }).do(
+      isOkAnd((v) => {
+        return v.o.do(isNoneAnd(() => v.s === ""));
+      })
+    )
   );
   t.true(
-    so.parse({ s: "", o: 3 }).isOkAnd((v) => {
-      return v.o.eq(Some(3)) && v.s === "";
-    })
+    so.parse({ s: "", o: 3 }).do(
+      isOkAnd((v) => {
+        return v.o.eq(NewOption.Some(3)) && v.s === "";
+      })
+    )
   );
 });
 
@@ -56,8 +62,8 @@ test("Can extract optional value", (t) => {
     n: 0,
     s: "",
   });
-  t.true(s.parse(null).unwrap().eq(None()));
-  t.true(s.parse(undefined).unwrap().eq(None()));
+  t.true(s.parse(null).unwrap().eq(NewOption.None()));
+  t.true(s.parse(undefined).unwrap().eq(NewOption.None()));
 });
 test("Can validate value", (t) => {
   let s = genSchema().is((v) => v.n >= 5);

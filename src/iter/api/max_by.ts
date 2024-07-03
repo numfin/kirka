@@ -1,17 +1,20 @@
-import { None, Some } from "../../option/index.js";
-import { Option } from "../../option/interfaces.js";
+import { map } from "../../option/api/map.js";
+import { or } from "../../option/api/or.js";
+import { NewOption } from "../../option/index.js";
 import { createAggregator } from "../middleware/aggregate.js";
 
 export function maxBy<T>(cmpFn: (item: T) => number) {
-  return createAggregator<T, Option<T>>((_, source) => {
-    let max = None<T>();
+  return createAggregator<T, NewOption<T>>((_, source) => {
+    let max = NewOption.None<T>();
     for (const nextMax of source()) {
       max = max
-        .map((currentMax) => {
-          const nextBigger = cmpFn(nextMax) > cmpFn(currentMax);
-          return nextBigger ? nextMax : currentMax;
-        })
-        .or(Some(nextMax));
+        .do(
+          map((currentMax) => {
+            const nextBigger = cmpFn(nextMax) > cmpFn(currentMax);
+            return nextBigger ? nextMax : currentMax;
+          })
+        )
+        .do(or(NewOption.Some(nextMax)));
     }
     return max;
   });

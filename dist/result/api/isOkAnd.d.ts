@@ -1,3 +1,2 @@
-import { Result } from "../interfaces.js";
-export declare function isOkAnd<T, E>(result: Result<T, E>, fn: (v: T) => boolean): boolean;
+export declare function isOkAnd<T>(fn: (v: T) => boolean): import("../middleware/aggregate.js").MiddlewareAggregator<T, unknown, boolean>;
 //# sourceMappingURL=isOkAnd.d.ts.map

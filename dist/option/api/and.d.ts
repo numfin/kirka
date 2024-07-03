@@ -1,3 +1,3 @@
-import { Option } from "../interfaces.js";
-export declare function and<T, U>(current_value: Option<T>, new_value: Option<U>): import("../interfaces.js").OptionUnion<U>;
+import { NewOption } from "../../index.js";
+export declare function and<T, U>(new_option: NewOption<U>): import("../middleware/remap.js").MiddlewareRemap<T, U>;
 //# sourceMappingURL=and.d.ts.map

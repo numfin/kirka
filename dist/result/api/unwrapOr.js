@@ -1,3 +1,7 @@
-export function uwnrapOr(result, default_value) {
-    return result.isOk() ? result.unwrap() : default_value;
+import { createAggregator } from "../middleware/aggregate.js";
+import { isOk } from "./isOk.js";
+export function unwrapOr(default_value) {
+    return createAggregator((_, inner) => {
+        return isOk(inner) ? inner.value : default_value;
+    });
 }

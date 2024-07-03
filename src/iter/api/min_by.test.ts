@@ -1,15 +1,15 @@
 import test from "ava";
 import { Iter } from "../index.js";
 import { map } from "./map.js";
-import { Some } from "../../option/index.js";
 import { enumerate } from "./enumerate.js";
 import { minBy } from "./min_by.js";
+import { NewOption } from "../../option/index.js";
 
 test(`minBy() returns smallest element from iter`, (t) => {
   const id = ({ v }: { v: number }) => v;
 
   const iter = Iter.from([4, 2, 1, 3, 2]).do(map((v) => ({ v })));
-  t.true(iter.do(minBy(id)).eq(Some({ v: 1 }), id));
+  t.true(iter.do(minBy(id)).eq(NewOption.Some({ v: 1 }), id));
 });
 
 test(`minBy() returns first smallest element from iter`, (t) => {
@@ -30,6 +30,6 @@ test(`minBy() works with 1 element`, (t) => {
   t.true(
     Iter.from([1])
       .do(minBy((v) => v))
-      .eq(Some(1))
+      .eq(NewOption.Some(1))
   );
 });

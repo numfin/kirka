@@ -1,5 +1,5 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { Iter, Ok, Option } from "../../index.js";
+import { Iter, NewOption, Ok } from "../../index.js";
 import { enumerate } from "../../iter/api/enumerate.js";
 import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
@@ -14,7 +14,7 @@ export interface SchemaArr<T, ParsedType = T[]> extends Schema<ParsedType> {
    * const v: Option<string>[] = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaArr<T, Option<T[]>>;
+  optional(): SchemaArr<T, NewOption<T[]>>;
   /**
    * # Description
    * Add validation rule to schema

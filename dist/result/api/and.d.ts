@@ -1,3 +1,3 @@
-import { Result } from "../interfaces.js";
-export declare function and<T, E, U>(result: Result<T, E>, otherResult: Result<U, E>): Result<U, E>;
+import { ResultNew } from "../../index.js";
+export declare function and<T, E, T2>(otherResult: ResultNew<T2, E>): import("../middleware/remap.js").MiddlewareRemap<T, E, T2, E>;
 //# sourceMappingURL=and.d.ts.map

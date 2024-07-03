@@ -1,6 +1,4 @@
-export interface Display {
-    toString(): string;
-}
+import { Display } from "../traits/display.js";
 export declare class AnyHow implements Display {
     err: Display;
     ctx: string[];
@@ -9,6 +7,6 @@ export declare class AnyHow implements Display {
     static expect(expected: Display, got: Display): AnyHow;
     wrapWith(msgFn: () => string): AnyHow;
     toString(): string;
-    toErr<T>(): import("../index.js").Result<T, AnyHow>;
+    toErr<T>(): import("../index.js").ResultNew<T, AnyHow>;
 }
 //# sourceMappingURL=index.d.ts.map

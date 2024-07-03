@@ -2,14 +2,14 @@ import test from "ava";
 import { Iter } from "../index.js";
 import { map } from "./map.js";
 import { maxBy } from "./max_by.js";
-import { Some } from "../../option/index.js";
 import { enumerate } from "./enumerate.js";
+import { NewOption } from "../../option/index.js";
 
 test(`maxBy() returns biggest element from iter`, (t) => {
   const id = ({ v }: { v: number }) => v;
 
   const iter = Iter.from([1, 2, 3, 2, 1]).do(map((v) => ({ v })));
-  t.true(iter.do(maxBy(id)).eq(Some({ v: 3 }), id));
+  t.true(iter.do(maxBy(id)).eq(NewOption.Some({ v: 3 }), id));
 });
 
 test(`maxBy() returns first biggest element from iter`, (t) => {
@@ -30,6 +30,6 @@ test(`maxBy() works with 1 element`, (t) => {
   t.true(
     Iter.from([1])
       .do(maxBy((v) => v))
-      .eq(Some(1))
+      .eq(NewOption.Some(1))
   );
 });

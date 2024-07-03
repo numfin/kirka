@@ -1,11 +1,9 @@
-import { Option } from "../interfaces.js";
+import { Display } from "../../traits/display.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { isSome } from "./is_some.js";
 
-export function format<T>(
-  option: Option<T>,
-  fn?: (option: Option<T>) => string
-) {
-  const inner = option.inner();
-  return inner.type === "Some"
-    ? `Some(${fn?.(option) ?? inner.value})`
-    : `None`;
+export function format<T extends Display>() {
+  return createAggregator<T, string>((_, inner) => {
+    return isSome(inner) ? `Some(${inner.value})` : `None`;
+  });
 }

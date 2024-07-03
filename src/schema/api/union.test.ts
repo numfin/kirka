@@ -1,5 +1,6 @@
 import test from "ava";
-import { Option, Schema, Some } from "../../index.js";
+import { NewOption, Schema } from "../../index.js";
+import { eq } from "../../option/api/eq.js";
 
 test("Convert value to union", (t) => {
   const s = Schema.union({
@@ -52,14 +53,14 @@ test("match union", (t) => {
       t.is(v, 10);
       return "v2";
     },
-    v3(v: Option<number>) {
-      t.true(v.eq(Some(20)));
+    v3(v: NewOption<number>) {
+      t.true(v.do(eq(NewOption.Some(20))));
       return "v3";
     },
   };
   t.is(tUnion.v1("").match(matcher), "v1");
   t.is(tUnion.v2(10).match(matcher), "v2");
-  t.is(tUnion.v3(Some(20)).match(matcher), "v3");
+  t.is(tUnion.v3(NewOption.Some(20)).match(matcher), "v3");
 });
 test("matchSome union", (t) => {
   const tUnion = Schema.union({
@@ -76,8 +77,8 @@ test("matchSome union", (t) => {
       t.is(v, 10);
       return "v2";
     },
-    v3(v: Option<number>) {
-      t.true(v.eq(Some(20)));
+    v3(v: NewOption<number>) {
+      t.true(v.do(eq(NewOption.Some(20))));
       return "v3";
     },
   };
@@ -87,7 +88,7 @@ test("matchSome union", (t) => {
       .matchSome({
         v1: matcher.v1,
       })
-      .eq(Some("v1"))
+      .do(eq(NewOption.Some("v1")))
   );
   t.true(
     tUnion
@@ -95,15 +96,15 @@ test("matchSome union", (t) => {
       .matchSome({
         v2: matcher.v2,
       })
-      .eq(Some("v2"))
+      .do(eq(NewOption.Some("v2")))
   );
   t.true(
     tUnion
-      .v3(Some(20))
+      .v3(NewOption.Some(20))
       .matchSome({
         v3: matcher.v3,
       })
-      .eq(Some("v3"))
+      .do(eq(NewOption.Some("v3")))
   );
 });
 

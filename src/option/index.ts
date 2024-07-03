@@ -1,67 +1,63 @@
-export * from "./interfaces.js";
-export { OptionFrom } from "./from/index.js";
-
-import { result } from "./api/result.js";
-import { andThen } from "./api/andThen.js";
-import { and } from "./api/and.js";
-import { orElse } from "./api/orElse.js";
-import { or } from "./api/or.js";
-import { map } from "./api/map.js";
-import { unwrapOr } from "./api/unwrapOr.js";
+import { None as NewNone, OptionUnion } from "./base.js";
+import { OptionPipe } from "./middleware/middleware.js";
+import { isSome } from "./api/is_some.js";
+import { isNone } from "./api/is_none.js";
 import { unwrap } from "./api/unwrap.js";
-import { isSomeAnd } from "./api/isSomeAnd.js";
-import { take } from "./api/take.js";
-import { isSome } from "./api/isSome.js";
-import { isNone } from "./api/isNone.js";
-import { clone } from "./api/clone.js";
-import { eq } from "./api/eq.js";
-import { format } from "./api/format.js";
-import { unionNone } from "./api/unionNone.js";
-import { unionSome } from "./api/unionSome.js";
-import type { Option, Some, OptionUnion, None } from "./interfaces.js";
-import { filter } from "./api/filter.js";
-import { isNoneAnd } from "./api/isNoneAnd.js";
 import { match } from "./api/match.js";
-import { unwrapOrElse } from "./api/unwrapOrElse.js";
-import { flatten } from "./api/flatten.js";
+import { eq } from "./api/eq.js";
 
-export function createOption<T>(v: OptionUnion<T>): Option<T> {
-  const inner = v;
+export class NewOption<T> {
+  *[Symbol.iterator]() {
+    if (isSome(this.inner)) {
+      yield this.inner.value;
+    }
+  }
 
-  const api: Option<T> = {
-    *[Symbol.iterator]() {
-      if (isSome(inner)) {
-        yield inner.value;
-      }
-    },
-    inner: () => inner,
-    eq: (value, by) => eq(api, value, by),
-    format: (formatter) => format(api, formatter),
-    clone: () => createOption(clone(inner)),
-    unwrap: () => unwrap(api),
-    unwrapOr: (default_value) => unwrapOr(inner, default_value),
-    unwrapOrElse: (fn) => unwrapOrElse(inner, fn),
-    isNone: () => isNone(inner),
-    isSome: () => isSome(inner),
-    take: () => createOption(take(inner)),
-    isSomeAnd: (fn) => isSomeAnd(api, fn),
-    isNoneAnd: (fn) => isNoneAnd(api, fn),
-    map: (fn) => createOption(map(api, fn)),
-    or: (new_value) => createOption(or(api, new_value)),
-    orElse: (fn) => createOption(orElse(api, fn)),
-    and: (new_value) => createOption(and(api, new_value)),
-    andThen: (fn) => createOption(andThen(api, fn)),
-    result: (fn) => result(api, fn),
-    filter: (fn) => filter(api, fn),
-    match: (onSome, onNone) => match(api, onSome, onNone),
-    flatten: () => flatten(api),
-  };
-  return api;
+  constructor(public inner: OptionUnion<T>) {}
+
+  static None = <T>() => new NewOption<T>(NewNone as OptionUnion<T>);
+  static Some<T>(value: T) {
+    return new NewOption({ type: "Some", value });
+  }
+  static fromBool(predicate: boolean) {
+    return predicate ? NewOption.Some(predicate) : NewOption.None();
+  }
+  static fromNullable<T>(v?: T | null) {
+    if (v !== undefined && v !== null) {
+      return NewOption.Some(v);
+    }
+    return NewOption.None();
+  }
+
+  isSome() {
+    return isSome(this.inner);
+  }
+  isNone() {
+    return isNone(this.inner);
+  }
+  unwrap() {
+    return unwrap(this.inner);
+  }
+  clone() {
+    return isSome(this.inner)
+      ? NewOption.Some(this.inner.value)
+      : NewOption.None();
+  }
+
+  do<Out>(fn: OptionPipe<T, Out>) {
+    return fn(this, this.inner);
+  }
+  pipe<Args extends unknown[], Out>(fn: (...args: Args) => OptionPipe<T, Out>) {
+    return (...args: Args) => fn(...args)(this, this.inner);
+  }
+
+  eq<U>(other: NewOption<T>, by = (x: T) => x as unknown as U) {
+    return this.do(eq(other, by));
+  }
+  match<U>(onSome: (v: T) => U, onNone: () => U) {
+    return this.do(match(onSome, onNone));
+  }
 }
 
-export function Some<T>(v: T) {
-  return createOption(unionSome(v));
-}
-export function None<T>() {
-  return createOption(unionNone<T>());
-}
+export const Some = NewOption.Some;
+export const None = NewOption.None;

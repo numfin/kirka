@@ -1,16 +1,10 @@
 import { AnyHow } from "../../anyhow/index.js";
-import {
-  Iter,
-  None,
-  Ok,
-  Option,
-  OptionFrom,
-  Result,
-  Some,
-} from "../../index.js";
+import { Iter, NewOption, Ok, ResultNew } from "../../index.js";
 import { enumerate } from "../../iter/api/enumerate.js";
 import { findMap } from "../../iter/api/find_map.js";
 import { Pipe } from "../../pipe/index.js";
+import { andThen } from "../../result/api/andThen.js";
+import { map } from "../../result/api/map.js";
 import { Checker, Transformer, Schema, SchemaError } from "../interface.js";
 
 export interface SchemaCustom<T, ParsedType = T> extends Schema<ParsedType> {
@@ -23,7 +17,7 @@ export interface SchemaCustom<T, ParsedType = T> extends Schema<ParsedType> {
    * const v: Option<T> = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaCustom<T, Option<T>>;
+  optional(): SchemaCustom<T, NewOption<T>>;
   /**
    * # Description
    * Add validation rule to schema
@@ -53,15 +47,19 @@ export interface SchemaCustom<T, ParsedType = T> extends Schema<ParsedType> {
 }
 
 export function SchemaCustom<T, ParsedType = T>(
-  createFn: (v: unknown) => Result<T, SchemaError>,
+  createFn: (v: unknown) => ResultNew<T, SchemaError>,
   flags = { isOptional: false },
   rules = [] as ((v: T) => boolean)[],
-  transforms = Pipe((v: Result<T, SchemaError>) => v)
+  transforms = Pipe((v: ResultNew<T, SchemaError>) => v)
 ) {
   const validate = (v: T) =>
     Iter.from(rules)
       .do(enumerate())
-      .do(findMap(({ index, item }) => (item(v) ? None() : Some(index))))
+      .do(
+        findMap(({ index, item }) =>
+          item(v) ? NewOption.None() : NewOption.Some(index)
+        )
+      )
       .match(
         (index) => AnyHow.msg(`Rule ${index} failed`).toErr(),
         () => Ok<T, SchemaError>(v)
@@ -72,7 +70,7 @@ export function SchemaCustom<T, ParsedType = T>(
         createFn,
         flags,
         rules,
-        transforms.clone().chain((v) => v.andThen(checkFn))
+        transforms.clone().chain((v) => v.do(andThen(checkFn)))
       );
     },
     is(checkFn) {
@@ -83,16 +81,16 @@ export function SchemaCustom<T, ParsedType = T>(
     },
     parse(v) {
       const validateAndTransform = Pipe(createFn)
-        .chain((v) => v.andThen(validate))
+        .chain((v) => v.do(andThen(validate)))
         .chain(transforms.call);
 
       if (flags.isOptional) {
-        return OptionFrom.nullable(v).match(
-          (v) => validateAndTransform.call(v).map(Some),
-          () => Ok(None())
-        ) as Result<ParsedType, SchemaError>;
+        return NewOption.fromNullable(v).match(
+          (v) => validateAndTransform.call(v).do(map(NewOption.Some)),
+          () => Ok(NewOption.None())
+        ) as ResultNew<ParsedType, SchemaError>;
       }
-      return validateAndTransform.call(v) as unknown as Result<
+      return validateAndTransform.call(v) as unknown as ResultNew<
         ParsedType,
         SchemaError
       >;

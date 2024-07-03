@@ -1,3 +1,4 @@
+import { map } from "../../option/api/map.js";
 import { createAggregator } from "../middleware/aggregate.js";
 import { enumerate } from "./enumerate.js";
 import { find } from "./find.js";
@@ -6,6 +7,6 @@ export function position(condition) {
         return iter
             .do(enumerate())
             .do(find(({ item }) => condition(item)))
-            .map(({ index }) => index);
+            .do(map(({ index }) => index));
     });
 }

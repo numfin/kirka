@@ -1,5 +1,8 @@
-import { Result } from "../interfaces.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { isErr } from "./isErr.js";
 
-export function unwrapErrOr<T, E>(result: Result<T, E>, default_value: E): E {
-  return result.isErr() ? result.unwrapErr() : default_value;
+export function unwrapErrOr<E>(defaultErr: E) {
+  return createAggregator<unknown, E, E>((_, inner) => {
+    return isErr(inner) ? inner.err : defaultErr;
+  });
 }

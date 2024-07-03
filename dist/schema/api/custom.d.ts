@@ -1,4 +1,4 @@
-import { Option, Result } from "../../index.js";
+import { NewOption, ResultNew } from "../../index.js";
 import { Pipe } from "../../pipe/index.js";
 import { Checker, Transformer, Schema, SchemaError } from "../interface.js";
 export interface SchemaCustom<T, ParsedType = T> extends Schema<ParsedType> {
@@ -11,7 +11,7 @@ export interface SchemaCustom<T, ParsedType = T> extends Schema<ParsedType> {
      * const v: Option<T> = s.parse(null).unwrap();
      * ```
      */
-    optional(): SchemaCustom<T, Option<T>>;
+    optional(): SchemaCustom<T, NewOption<T>>;
     /**
      * # Description
      * Add validation rule to schema
@@ -39,7 +39,7 @@ export interface SchemaCustom<T, ParsedType = T> extends Schema<ParsedType> {
      */
     transform: Transformer<T, SchemaCustom<T, ParsedType>>;
 }
-export declare function SchemaCustom<T, ParsedType = T>(createFn: (v: unknown) => Result<T, SchemaError>, flags?: {
+export declare function SchemaCustom<T, ParsedType = T>(createFn: (v: unknown) => ResultNew<T, SchemaError>, flags?: {
     isOptional: boolean;
-}, rules?: ((v: T) => boolean)[], transforms?: Pipe<[v: Result<T, SchemaError>], Result<T, SchemaError>>): SchemaCustom<T, ParsedType>;
+}, rules?: ((v: T) => boolean)[], transforms?: Pipe<[v: ResultNew<T, SchemaError>], ResultNew<T, SchemaError>>): SchemaCustom<T, ParsedType>;
 //# sourceMappingURL=custom.d.ts.map

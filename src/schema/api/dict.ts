@@ -1,5 +1,5 @@
 import { AnyHow } from "../../anyhow/index.js";
-import { Ok, Option } from "../../index.js";
+import { NewOption, Ok } from "../../index.js";
 import { Checker, Transformer, Schema } from "../interface.js";
 import { SchemaCustom } from "./custom.js";
 
@@ -18,7 +18,7 @@ export interface SchemaDict<
    * const v: Option<{ a: string }> = s.parse(null).unwrap();
    * ```
    */
-  optional(): SchemaDict<S, Option<S>>;
+  optional(): SchemaDict<S, NewOption<S>>;
   /**
    * # Description
    * Add validation rule to schema
@@ -104,7 +104,7 @@ function SchemaDictInternal<
 >(vahter: SchemaCustom<T, ParsedType>) {
   const api: SchemaDict<T, ParsedType> = {
     optional() {
-      return SchemaDictInternal<T, Option<T>>(vahter.optional());
+      return SchemaDictInternal<T, NewOption<T>>(vahter.optional());
     },
     parse(v) {
       return vahter.parse(v);

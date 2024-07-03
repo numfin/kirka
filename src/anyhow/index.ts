@@ -1,8 +1,5 @@
 import { Err } from "../index.js";
-
-export interface Display {
-  toString(): string;
-}
+import { Display } from "../traits/display.js";
 
 export class AnyHow implements Display {
   private constructor(public err: Display, public ctx = [] as string[]) {}

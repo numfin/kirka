@@ -1,5 +1,8 @@
-import { Result } from "../interfaces.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { isOk } from "./isOk.js";
 
-export function isOkAnd<T, E>(result: Result<T, E>, fn: (v: T) => boolean) {
-  return result.isOk() && fn(result.unwrap());
+export function isOkAnd<T>(fn: (v: T) => boolean) {
+  return createAggregator<T, unknown, boolean>((_, inner) => {
+    return isOk(inner) && fn(inner.value);
+  });
 }

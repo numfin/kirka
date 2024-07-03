@@ -1,8 +1,12 @@
-import { Result } from "../interfaces.js";
+import { createAggregator } from "../middleware/aggregate.js";
+import { debug } from "./debug.js";
+import { isOk } from "./isOk.js";
 
-export function unwrapErr<T, E>(result: Result<T, E>) {
-  if (result.isOk()) {
-    throw new Error(`unwrapErr called on ${result.format()}`);
-  }
-  return result.inner().value as E;
+export function unwrapErr<E>() {
+  return createAggregator<unknown, E, E>((_, inner) => {
+    if (isOk(inner)) {
+      throw new Error(`unwrapErr called on ${debug(inner)}`);
+    }
+    return inner.err;
+  });
 }

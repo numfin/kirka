@@ -1,3 +1,2 @@
-import { Option } from "../interfaces.js";
-export declare function map<T, U>(option: Option<T>, fn: (value: T) => U): import("../interfaces.js").OptionUnion<U>;
+export declare function map<T, U>(fn: (value: T) => U): import("../middleware/remap.js").MiddlewareRemap<T, U>;
 //# sourceMappingURL=map.d.ts.map

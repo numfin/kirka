@@ -1,17 +1,20 @@
-import { None, Some } from "../../option/index.js";
-import { Option } from "../../option/interfaces.js";
+import { map } from "../../option/api/map.js";
+import { or } from "../../option/api/or.js";
+import { NewOption } from "../../option/index.js";
 import { createAggregator } from "../middleware/aggregate.js";
 
 export function minBy<T>(cmpFn: (item: T) => number) {
-  return createAggregator<T, Option<T>>((_, source) => {
-    let min = None<T>();
+  return createAggregator<T, NewOption<T>>((_, source) => {
+    let min = NewOption.None<T>();
     for (const nextMin of source()) {
       min = min
-        .map((currentMin) => {
-          const nextSmaller = cmpFn(nextMin) < cmpFn(currentMin);
-          return nextSmaller ? nextMin : currentMin;
-        })
-        .or(Some(nextMin));
+        .do(
+          map((currentMin) => {
+            const nextSmaller = cmpFn(nextMin) < cmpFn(currentMin);
+            return nextSmaller ? nextMin : currentMin;
+          })
+        )
+        .do(or(NewOption.Some(nextMin)));
     }
     return min;
   });
