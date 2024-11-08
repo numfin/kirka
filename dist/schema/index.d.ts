@@ -18,7 +18,7 @@ export declare const Schema: {
      *   .transform((v) => Ok(v * 2))
      * ```
      */
-    num: <T extends number>(equalTo?: T | undefined) => SchemaNum<T, T>;
+    num: <T extends number>(equalTo?: T) => SchemaNum<T, T>;
     /**
      * # Description
      * Number type
@@ -31,7 +31,7 @@ export declare const Schema: {
      *   .transform((v) => Ok(v + "asd"))
      * ```
      */
-    str: <T_1 extends string>(equalTo?: T_1 | undefined) => SchemaStr<T_1, T_1>;
+    str: <T extends string>(equalTo?: T) => SchemaStr<T, T>;
     /**
      * # Description
      * Boolean type
@@ -44,7 +44,7 @@ export declare const Schema: {
      *   .transform((v) => Ok(!v))
      * ```
      */
-    bool: <T_2 extends boolean>(equalTo?: T_2 | undefined) => SchemaBool<T_2, T_2>;
+    bool: <T extends boolean>(equalTo?: T) => SchemaBool<T, T>;
     /**
      * # Description
      * Boilerplate for your own type. Contains transformation and validation functionality.
@@ -83,7 +83,7 @@ export declare const Schema: {
      *   })
      * ```
      */
-    dict: <T_3 extends Record<PropertyKey, unknown>>(schema: import("./api/dict.js").RecordAsSchema<T_3>, options?: Partial<import("./api/dict.js").DictVahterOptions> | undefined) => SchemaDict<T_3, T_3>;
+    dict: <T extends Record<PropertyKey, unknown>>(schema: import("./api/dict.js").RecordAsSchema<T>, options?: Partial<import("./api/dict.js").DictVahterOptions>) => SchemaDict<T, T>;
     /**
      * # Description
      * Helper over `Schema.dict` to define `Record<K, T>` object
@@ -117,7 +117,7 @@ export declare const Schema: {
      *   })
      * ```
      */
-    arr: <T_4>(schema: import("./interface.js").Schema<T_4>) => SchemaArr<T_4, T_4[]>;
+    arr: <T>(schema: import("./interface.js").Schema<T>) => SchemaArr<T, T[]>;
     /**
      * # Description
      * Tagged union. Used to describe different variants of type
@@ -153,6 +153,6 @@ export declare const Schema: {
      * const isV3 = v3.is("v3") // true
      * ```
      */
-    union: <T_5 extends Record<PropertyKey, unknown>>(schema: import("./api/dict.js").RecordAsSchema<T_5>) => import("./api/union.js").UnionVariants<T_5> & SchemaUnion<T_5, import("./api/union.js").UnionInstance<T_5>>;
+    union: <T extends Record<PropertyKey, unknown>>(schema: import("./api/dict.js").RecordAsSchema<T>) => import("./api/union.js").UnionVariants<T> & SchemaUnion<T, import("./api/union.js").UnionInstance<T>>;
 };
 //# sourceMappingURL=index.d.ts.map

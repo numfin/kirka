@@ -14,8 +14,8 @@
 
         # [EXTERNAL DEPENDENCIES]
         buildInputs = with pkgs; [
-          nodePackages_latest.nodejs
-          nodePackages_latest.np
+          nodejs_23
+          corepack_23
         ];
         nativeBuildInputs = with pkgs; [ ];
       in

@@ -5,11 +5,11 @@ export declare const ResultTo: {
 };
 export declare const ResultFrom: {
     ok<T, E>(ok: NewOption<T>, err: () => E): ResultNew<T, E>;
-    err<T_1, E_1>(err: NewOption<E_1>, ok: () => T_1): ResultNew<E_1, T_1>;
+    err<T, E>(err: NewOption<E>, ok: () => T): ResultNew<E, T>;
 };
 export declare const OptionTo: {
     ok<T, E>(err: () => E): import("../option/middleware/aggregate.js").MiddlewareAggregator<T, ResultNew<T, E>>;
-    err<T_1, E_1>(ok: () => T_1): import("../option/middleware/aggregate.js").MiddlewareAggregator<E_1, ResultNew<T_1, E_1>>;
+    err<T, E>(ok: () => T): import("../option/middleware/aggregate.js").MiddlewareAggregator<E, ResultNew<T, E>>;
 };
 export declare const OptionFrom: {
     result<T, E>(result: ResultNew<T, E>): NewOption<T>;
